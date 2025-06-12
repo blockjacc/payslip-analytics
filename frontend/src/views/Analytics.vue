@@ -7,6 +7,9 @@
           <h3>Employee ID: {{ employeeId }}</h3>
           <h4>Period: {{ formatDate(periodFrom) }} - {{ formatDate(periodTo) }}</h4>
         </div>
+        <div class="download-btn-container">
+          <button class="btn btn-download" @click="downloadCSV">Download CSV</button>
+        </div>
         <div class="chart-container">
           <Bar :data="chartData" :options="chartOptions" />
         </div>
@@ -57,20 +60,50 @@ export default defineComponent({
         payslip_count: 0,
         is_verified: false
       },
+      selectedFields: [],
+      fieldDisplayNames: {},
       baseYAxisMax: 40000,
-      componentColors: {
-        basic: '#9b59b6',      // Purple
-        nsd: '#4a90e2',        // Blue
-        ot: '#24c2ab',         // Teal
-        holiday: '#e74c3c',    // Red
-        paid_leave: '#f1c40f', // Yellow
-        allowances: '#2ecc71', // Green
-        deminimis: '#e67e22',  // Orange
-        bonuses: '#1abc9c',    // Light Teal
-        other_comp: '#3498db', // Light Blue
-        hazard_pay: '#8e44ad', // Dark Purple
-        retro: '#c0392b',      // Dark Red
-        adj: '#f39c12'         // Dark Yellow
+      // Color mapping from payslip_field_colors.txt
+      fieldColors: {
+        // Amounts
+        basic_pay: '#4a90e2',
+        regular_pay: '#24c2ab',
+        night_diff: '#f1c40f',
+        overtime_pay: '#e74c3c',
+        sunday_holiday: '#9b59b6',
+        allowances: '#2ecc71',
+        nt_allowances: '#e67e22',
+        hazard_pay: '#8e44ad',
+        cola: '#b1bacd',
+        service_charge_taxable: '#c0392b',
+        service_charge_non_taxable: '#f39c12',
+        bonuses: '#1abc9c',
+        other_compensation: '#3498db',
+        gross_pay: '#e67e22',
+        net_amount: '#16a085',
+        de_minimis: '#e84393',
+        leave_conversion_taxable: '#fdcb6e',
+        leave_conversion_non_taxable: '#00b894',
+        paid_leave_amount: '#636e72',
+        retroactive_total_amount: '#fd79a8',
+        absences: '#00cec9',
+        employee_boost_amount: '#6c5ce7',
+        tardiness_pay: '#d35400',
+        undertime_pay: '#00b894',
+        advance_amount: '#fdcb6e',
+        // Hours
+        regular_days: '#00b894',
+        days_absent: '#fdcb6e',
+        ot_no_hours: '#e17055',
+        retroactive_total_hours: '#00b894',
+        employee_total_hours_service_charge_val: '#00cec9',
+        // Taxes & Deductions
+        pp_sss: '#636e72',
+        pp_philhealth: '#00b894',
+        pp_pagibig: '#fdcb6e',
+        pp_withholding_tax: '#e17055',
+        pp_other_deductions: '#e84393',
+        voluntary_contributions: '#6c5ce7'
       }
     }
   },
@@ -89,51 +122,36 @@ export default defineComponent({
     },
     chartData() {
       const aggregationType = this.$route.params.aggregationType || 'single';
-      
       if (aggregationType === 'separate' && this.analytics.periods) {
-        // For separate view, create period-based stacked bars
         const periods = this.analytics.periods;
-        
-        // Get all components that have non-zero values in any period
-        const components = Object.keys(this.componentColors).filter(component => 
-          periods.some(period => 
-            period.analytics[component] > 0
-          )
+        // Use only selected fields
+        const components = this.selectedFields.filter(field =>
+          periods.some(period => period.analytics[field] > 0)
         );
-        
-        // Create datasets (one for each component)
-        const datasets = components.map(component => ({
-          label: this.formatLabel(component),
-          data: periods.map(period => period.analytics[component] || 0),
-          backgroundColor: this.componentColors[component],
+        const datasets = components.map(field => ({
+          label: this.formatLabel(field),
+          data: periods.map(period => period.analytics[field] || 0),
+          backgroundColor: this.fieldColors[field] || '#24c2ab',
           borderColor: 'rgba(255, 255, 255, 0.1)',
           borderWidth: 1,
-          // Set order based on the first period's values (can be adjusted if needed)
-          order: periods[0].analytics[component] || 0
+          order: periods[0].analytics[field] || 0
         }));
-        
         return {
-          labels: periods.map(period => 
+          labels: periods.map(period =>
             `${this.formatDate(period.period.from)} - ${this.formatDate(period.period.to)}`
           ),
           datasets
         };
       } else {
         // For single period or aggregated view
-        const components = Object.entries(this.analytics)
-          .filter(([key, value]) => 
-            key !== 'total_salary' && 
-            value > 0 && 
-            typeof value === 'number' &&
-            key in this.componentColors
-          )
-          .sort((a, b) => a[1] - b[1]);
-
+        const components = this.selectedFields.filter(field =>
+          this.analytics[field] > 0
+        );
         return {
-          labels: components.map(([key]) => this.formatLabel(key)),
+          labels: components.map(field => this.formatLabel(field)),
           datasets: [{
-            data: components.map(([_, value]) => value),
-            backgroundColor: components.map(([key]) => this.componentColors[key]),
+            data: components.map(field => this.analytics[field] || 0),
+            backgroundColor: components.map(field => this.fieldColors[field] || '#24c2ab'),
             borderColor: 'rgba(255, 255, 255, 0.1)',
             borderWidth: 1
           }]
@@ -142,78 +160,55 @@ export default defineComponent({
     },
     salaryData() {
       const aggregationType = this.$route.params.aggregationType || 'single';
-      
       if (aggregationType === 'separate' && this.analytics.periods) {
-        // For separate view, sum up all periods
-        const sums = {
-          basic: 0,
-          nsd: 0,
-          ot: 0,
-          holiday: 0,
-          paid_leave: 0,
-          allowances: 0,
-          deminimis: 0,
-          bonuses: 0,
-          other_comp: 0,
-          hazard_pay: 0,
-          retro: 0,
-          adj: 0
-        };
-        
+        // Sum up only selected fields
+        const sums = {};
+        this.selectedFields.forEach(field => { sums[field] = 0; });
         this.analytics.periods.forEach(period => {
-          Object.entries(period.analytics).forEach(([key, value]) => {
-            if (key !== 'total_salary') {
-              sums[key] = (sums[key] || 0) + value;
-            }
+          this.selectedFields.forEach(field => {
+            sums[field] += period.analytics[field] || 0;
           });
         });
-        
         return sums;
       } else {
-        // For single/aggregate view, use analytics directly
-        return {
-          basic: this.analytics.basic,
-          nsd: this.analytics.nsd,
-          ot: this.analytics.ot,
-          holiday: this.analytics.holiday,
-          paid_leave: this.analytics.paid_leave,
-          allowances: this.analytics.allowances,
-          deminimis: this.analytics.deminimis,
-          bonuses: this.analytics.bonuses,
-          other_comp: this.analytics.other_comp,
-          hazard_pay: this.analytics.hazard_pay,
-          retro: this.analytics.retro,
-          adj: this.analytics.adj
-        };
+        // Use analytics directly, only for selected fields
+        const result = {};
+        this.selectedFields.forEach(field => {
+          result[field] = this.analytics[field] || 0;
+        });
+        return result;
       }
     },
     totalSalary() {
       const aggregationType = this.$route.params.aggregationType || 'single';
-      
       if (aggregationType === 'separate' && this.analytics.periods) {
-        return this.analytics.periods.reduce((sum, period) => 
-          sum + period.analytics.total_salary, 0
-        );
+        return this.selectedFields.reduce((sum, field) => {
+          return sum + this.analytics.periods.reduce((pSum, period) => pSum + (period.analytics[field] || 0), 0);
+        }, 0);
       } else {
-        return this.analytics.total_salary;
+        return this.selectedFields.reduce((sum, field) => sum + (this.analytics[field] || 0), 0);
       }
     },
     dynamicYAxisMax() {
-      const fromDate = new Date(this.periodFrom);
-      const toDate = new Date(this.periodTo);
       const aggregationType = this.$route.params.aggregationType || 'single';
-      
-      // For single period view, always use base scale
-      if (aggregationType === 'single') {
-        return this.baseYAxisMax;
+      let maxValue = 0;
+      if (aggregationType === 'separate' && this.analytics.periods) {
+        // Find the highest value among all selected fields and all periods
+        this.analytics.periods.forEach(period => {
+          this.selectedFields.forEach(field => {
+            const value = period.analytics[field] || 0;
+            if (value > maxValue) maxValue = value;
+          });
+        });
+      } else {
+        // Find the highest value among all selected fields in the current analytics
+        this.selectedFields.forEach(field => {
+          const value = this.analytics[field] || 0;
+          if (value > maxValue) maxValue = value;
+        });
       }
-      
-      // For aggregate/separate views, calculate number of periods
-      const daysDiff = Math.ceil((toDate - fromDate) / (1000 * 60 * 60 * 24));
-      const numPeriods = Math.ceil(daysDiff / 14); // Each period is roughly 2 weeks
-      
-      // Linear scaling: 40k per period
-      return this.baseYAxisMax * numPeriods;
+      // If maxValue is 0, set a default (e.g., 1000) to avoid log scale issues
+      return maxValue > 0 ? maxValue : 1000;
     },
     chartOptions() {
       const aggregationType = this.$route.params.aggregationType || 'single';
@@ -301,7 +296,28 @@ export default defineComponent({
     }
   },
   methods: {
+    async fetchFieldDisplayNames() {
+      try {
+        const response = await fetch('/api/payslip-fields');
+        const data = await response.json();
+        
+        // Combine all field display names
+        this.fieldDisplayNames = {
+          ...data.amount_fields,
+          ...data.hour_fields,
+          ...data.tax_fields
+        };
+      } catch (err) {
+        console.error('Failed to fetch field display names:', err);
+      }
+    },
     formatLabel(key) {
+      // If we have a display name from the backend, use it
+      if (this.fieldDisplayNames[key]) {
+        return this.fieldDisplayNames[key];
+      }
+      
+      // Otherwise fall back to the hardcoded labels
       const labels = {
         basic: 'Basic Pay',
         nsd: 'Night Differential',
@@ -332,7 +348,16 @@ export default defineComponent({
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`/api/analytics/${this.companyId}/${this.employeeId}/${this.periodFrom}/${this.periodTo}/${this.$route.params.aggregationType || 'single'}`);
+        // Get selected fields from sessionStorage or use defaults
+        const selectedFields = this.selectedFields.length > 0 
+          ? this.selectedFields 
+          : ['basic_pay', 'regular_pay', 'gross_pay', 'net_amount'];
+        
+        // Create URL with selected fields as query parameter
+        const fieldsParam = encodeURIComponent(JSON.stringify(selectedFields));
+        const url = `/api/analytics/${this.companyId}/${this.employeeId}/${this.periodFrom}/${this.periodTo}/${this.$route.params.aggregationType || 'single'}?fields=${fieldsParam}`;
+        
+        const response = await fetch(url);
         
         const data = await response.json();
         
@@ -385,10 +410,59 @@ export default defineComponent({
         borderColor: 'rgba(255, 255, 255, 0.1)',
         borderWidth: 1
       }));
+    },
+    downloadCSV() {
+      const aggregationType = this.$route.params.aggregationType || 'single';
+      let csv = '';
+      // Header row
+      if (aggregationType === 'separate' && this.analytics.periods) {
+        csv += 'Period From,Period To';
+        this.selectedFields.forEach(field => {
+          csv += ',' + this.formatLabel(field);
+        });
+        csv += '\n';
+        // Data rows
+        this.analytics.periods.forEach(period => {
+          csv += `${period.period.from},${period.period.to}`;
+          this.selectedFields.forEach(field => {
+            csv += ',' + (period.analytics[field] !== undefined ? period.analytics[field] : '');
+          });
+          csv += '\n';
+        });
+      } else {
+        // Single/Aggregate view
+        csv += 'Field,Value\n';
+        this.selectedFields.forEach(field => {
+          csv += `${this.formatLabel(field)},${this.analytics[field] !== undefined ? this.analytics[field] : ''}\n`;
+        });
+      }
+      // Download logic
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `analytics_${this.companyId}_${this.employeeId}_${this.periodFrom}_${this.periodTo}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     }
   },
   mounted() {
-    this.fetchAnalytics()
+    // Load selected fields from sessionStorage
+    const storedFields = sessionStorage.getItem('selectedPayslipFields');
+    if (storedFields) {
+      this.selectedFields = JSON.parse(storedFields);
+    } else {
+      // Default to some basic fields if nothing was selected
+      this.selectedFields = ['basic_pay', 'regular_pay', 'gross_pay', 'net_amount'];
+    }
+    
+    // Fetch field display names
+    this.fetchFieldDisplayNames();
+    
+    // Fetch analytics data
+    this.fetchAnalytics();
   },
   watch: {
     '$route.params': {
@@ -440,6 +514,28 @@ export default defineComponent({
 .period-info h4 {
   color: #b1bacd;
   font-size: 1.2rem;
+}
+
+.download-btn-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.btn-download {
+  background: #24c2ab;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-download:hover {
+  background: #1abc9c;
 }
 
 .chart-container {

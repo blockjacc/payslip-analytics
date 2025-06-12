@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
+import FieldSelection from '../views/FieldSelection.vue'
 import Employees from '../views/Employees.vue'
 import DateRange from '../views/DateRange.vue'
 import Analytics from '../views/Analytics.vue'
@@ -10,6 +11,11 @@ const routes = [
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/field-selection/:companyId',
+    name: 'FieldSelection',
+    component: FieldSelection
   },
   {
     path: '/employees/:companyId',

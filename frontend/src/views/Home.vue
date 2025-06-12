@@ -45,7 +45,7 @@ export default {
         this.loading = true;
         const response = await axios.get(`/api/validate-company/${this.companyId}`);
         if (response.data.valid) {
-          this.$router.push(`/employees/${this.companyId}`);
+          this.$router.push(`/field-selection/${this.companyId}`);
         } else {
           this.error = 'Company does not exist';
         }

@@ -1,8 +1,14 @@
 <template>
   <div class="employees-container">
     <h1 class="page-title">Select Employee</h1>
+    <div v-if="selectedCategory && selectedFields.length > 0" class="selected-summary">
+      <span class="summary-label">Selected:</span>
+      <span class="summary-category">{{ selectedCategoryDisplay }}:</span>
+      <span class="summary-fields">{{ selectedFieldLabels.join(', ') }}</span>
+    </div>
     <div class="content-card">
       <h3>Company ID: {{ companyId }}</h3>
+      
       <div class="form-group">
         <input 
           type="text" 
@@ -56,7 +62,11 @@ export default {
       selectedEmployee: null,
       filteredEmployees: [],
       error: null,
-      searchTimeout: null
+      searchTimeout: null,
+      selectedCategory: '',
+      selectedFields: [],
+      selectedFieldLabels: [],
+      selectedCategoryDisplay: ''
     }
   },
   created() {
@@ -68,8 +78,42 @@ export default {
       this.error = 'Invalid company ID';
       this.$router.push('/');
     }
+    
+    // Load selected fields and category from sessionStorage
+    this.loadSelectedSummary();
   },
   methods: {
+    loadSelectedSummary() {
+      // Get selected fields
+      const storedFields = sessionStorage.getItem('selectedPayslipFields');
+      this.selectedFields = storedFields ? JSON.parse(storedFields) : [];
+      // Get selected category
+      const storedCategory = sessionStorage.getItem('selectedPayslipCategory');
+      this.selectedCategory = storedCategory || '';
+      // Get field display names from backend
+      axios.get('/api/payslip-fields').then(response => {
+        const allFields = {
+          ...response.data.amount_fields,
+          ...response.data.hour_fields,
+          ...response.data.tax_fields
+        };
+        this.selectedFieldLabels = this.selectedFields.map(f => allFields[f] || f);
+        // Set display name for category
+        switch (this.selectedCategory) {
+          case 'AMOUNTS':
+            this.selectedCategoryDisplay = 'Amounts';
+            break;
+          case 'HOURS':
+            this.selectedCategoryDisplay = 'Hours';
+            break;
+          case 'TAXES':
+            this.selectedCategoryDisplay = 'Taxes & Deductions';
+            break;
+          default:
+            this.selectedCategoryDisplay = '';
+        }
+      });
+    },
     selectAllEmployees() {
       this.selectType = 'all';
       this.$router.push(`/dates/${this.companyId}/all`);
@@ -226,5 +270,30 @@ export default {
 .btn:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+.selected-summary {
+  margin-bottom: 1.5rem;
+  background: rgba(36, 194, 171, 0.08);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  color: #24c2ab;
+  font-size: 1.1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 700px;
+  text-align: left;
+}
+.summary-label {
+  font-weight: bold;
+}
+.summary-category {
+  font-weight: bold;
+  color: #fff;
+}
+.summary-fields {
+  color: #24c2ab;
 }
 </style> 
