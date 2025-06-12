@@ -33,7 +33,7 @@
         >
           <option value="">Select end date</option>
           <option 
-            v-for="date in toDates" 
+            v-for="date in availableToDates" 
             :key="date"
             :value="date"
           >
@@ -78,7 +78,7 @@ export default {
   created() {
     this.companyId = this.$route.params.companyId;
     this.employeeId = this.$route.params.employeeId;
-    this.fetchAvailableDates();
+    this.fetchDates();
   },
   computed: {
     isValidDateRange() {
@@ -91,9 +91,7 @@ export default {
     }
   },
   methods: {
-    async fetchAvailableDates() {
-      this.loading = true;
-      this.error = '';
+    async fetchDates() {
       try {
         const endpoint = this.employeeId === 'all' 
           ? `/api/dates/${this.companyId}`
@@ -102,11 +100,9 @@ export default {
         const response = await axios.get(endpoint);
         this.fromDates = response.data.period_from_dates;
         this.toDates = response.data.period_to_dates;
+        this.updateToDateOptions();
       } catch (err) {
-        this.error = 'Failed to fetch available dates. Please try again.';
-        console.error('Error fetching dates:', err);
-      } finally {
-        this.loading = false;
+        this.error = 'Failed to fetch dates';
       }
     },
     formatDate(dateString) {
@@ -124,19 +120,49 @@ export default {
       
       this.loading = true;
       try {
-        // Navigate to the analytics page with the selected parameters
-        await this.router.push({
-          name: 'Analytics',
-          params: {
-            companyId: this.companyId,
-            employeeId: this.employeeId,
-            periodFrom: this.selectedFromDate,
-            periodTo: this.selectedToDate
-          }
+        // Check if this is a multiple pay period using the appropriate endpoint
+        const endpoint = this.employeeId === 'all' 
+          ? `/api/dates/${this.companyId}`
+          : `/api/dates/${this.companyId}/${this.employeeId}`;
+        
+        const response = await axios.get(endpoint);
+        const periodFromDates = response.data.period_from_dates;
+        
+        // Find if there's any period_from date that falls between our selected range
+        const selectedFromDate = new Date(this.selectedFromDate);
+        const selectedToDate = new Date(this.selectedToDate);
+        
+        const hasMultiplePeriods = periodFromDates.some(date => {
+          const periodFrom = new Date(date);
+          return periodFrom > selectedFromDate && periodFrom <= selectedToDate;
         });
+
+        if (hasMultiplePeriods) {
+          // Navigate to aggregation choice page
+          await this.router.push({
+            name: 'AggregationChoice',
+            params: {
+              companyId: this.companyId,
+              employeeId: this.employeeId,
+              periodFrom: this.selectedFromDate,
+              periodTo: this.selectedToDate
+            }
+          });
+        } else {
+          // Navigate directly to analytics
+          await this.router.push({
+            name: 'Analytics',
+            params: {
+              companyId: this.companyId,
+              employeeId: this.employeeId,
+              periodFrom: this.selectedFromDate,
+              periodTo: this.selectedToDate,
+              aggregationType: 'single'
+            }
+          });
+        }
       } catch (err) {
-        this.error = 'Failed to navigate to analytics page. Please try again.';
-        console.error('Navigation error:', err);
+        this.error = 'Failed to navigate. Please try again.';
       } finally {
         this.loading = false;
       }

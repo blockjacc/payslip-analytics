@@ -51,7 +51,6 @@ export default {
         }
       } catch (err) {
         this.error = 'Company does not exist';
-        console.error('Error validating company:', err);
       } finally {
         this.loading = false;
       }

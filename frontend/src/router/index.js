@@ -3,6 +3,7 @@ import Home from '../views/Home.vue'
 import Employees from '../views/Employees.vue'
 import DateRange from '../views/DateRange.vue'
 import Analytics from '../views/Analytics.vue'
+import AggregationChoice from '../views/AggregationChoice.vue'
 
 const routes = [
   {
@@ -21,7 +22,12 @@ const routes = [
     component: DateRange
   },
   {
-    path: '/analytics/:companyId/:employeeId/:periodFrom/:periodTo',
+    path: '/aggregation/:companyId/:employeeId/:periodFrom/:periodTo',
+    name: 'AggregationChoice',
+    component: AggregationChoice
+  },
+  {
+    path: '/analytics/:companyId/:employeeId/:periodFrom/:periodTo/:aggregationType?',
     name: 'Analytics',
     component: Analytics
   }

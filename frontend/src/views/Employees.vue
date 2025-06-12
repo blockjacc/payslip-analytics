@@ -98,16 +98,9 @@ export default {
       
       try {
         const response = await axios.get(`/api/search-employees/${this.companyId}/${this.searchQuery}`);
-        if (response.data && response.data.employees) {
-          this.filteredEmployees = response.data.employees;
-          console.log('Found employees:', this.filteredEmployees); // Debug log
-        } else {
-          this.filteredEmployees = [];
-        }
+        this.filteredEmployees = response.data.employees;
       } catch (err) {
-        console.error('Error searching employees:', err);
-        this.filteredEmployees = [];
-        this.error = 'An error occurred while searching for employees. Please try again later.';
+        this.error = 'Failed to search employees';
       }
     },
     selectEmployee(empId) {
@@ -180,13 +173,15 @@ export default {
   top: 100%;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(36, 194, 171, 0.1);
+  border: 1px solid rgba(36, 194, 171, 0.2);
   border-radius: 8px;
   margin-top: 4px;
   max-height: 200px;
   overflow-y: auto;
   z-index: 1000;
   backdrop-filter: blur(10px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .employee-item {
@@ -194,7 +189,9 @@ export default {
   cursor: pointer;
   transition: all 0.2s;
   color: #fff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(36, 194, 171, 0.2);
+  text-align: left;
+  font-size: 1.1rem;
 }
 
 .employee-item:last-child {
