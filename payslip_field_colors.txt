@@ -1,0 +1,44 @@
+PAYSLIP FIELD COLOR MAPPING
+==========================
+
+# Amounts Category
+basic_pay: #4a90e2
+regular_pay: #24c2ab
+night_diff: #f1c40f
+overtime_pay: #e74c3c
+sunday_holiday: #9b59b6
+allowances: #2ecc71
+nt_allowances: #e67e22
+hazard_pay: #8e44ad
+cola: #b1bacd
+service_charge_taxable: #c0392b
+service_charge_non_taxable: #f39c12
+bonuses: #1abc9c
+other_compensation: #3498db
+gross_pay: #e67e22
+net_amount: #16a085
+de_minimis: #e84393
+leave_conversion_taxable: #fdcb6e
+leave_conversion_non_taxable: #00b894
+paid_leave_amount: #636e72
+retroactive_total_amount: #fd79a8
+absences: #00cec9
+employee_boost_amount: #6c5ce7
+tardiness_pay: #d35400
+undertime_pay: #00b894
+advance_amount: #fdcb6e
+
+# Hours Category
+regular_days: #00b894
+days_absent: #fdcb6e
+ot_no_hours: #e17055
+retroactive_total_hours: #00b894
+employee_total_hours_service_charge_val: #00cec9
+
+# Taxes & Deductions Category
+pp_sss: #636e72
+pp_philhealth: #00b894
+pp_pagibig: #fdcb6e
+pp_withholding_tax: #e17055
+pp_other_deductions: #e84393
+voluntary_contributions: #6c5ce7 

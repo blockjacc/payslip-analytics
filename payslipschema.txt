@@ -1,0 +1,97 @@
+Column Name	Type	Description
+payroll_payslip_id	int(11)	Primary key, unique identifier for each payslip.
+emp_id	int(11)	Foreign key to the employee. Identifies which employee the payslip is for.
+payroll_date	date	The date the payroll was processed.
+period_from	date	Start date of the payroll period.
+period_to	date	End date of the payroll period.
+payroll_group_id	int(11)	Identifies the payroll group (e.g., montly, semi-monthly, weekly).
+company_id	int(11)	ID of the company
+rate	varbinary(150)	Employee basic pay based on compensation details (likely encrypted).
+pay_date	date	The actual date when salary is released.
+pay_coverage_from	date	Coverage start date used for computations.
+pay_coverage_to	date	Coverage end date used for computations.
+basic_pay	varbinary(150)	Basic salary without deductions or additions. (e.g Monthly Basic Pay / 2 if semi montly pay schedule)
+days_absent	varbinary(150)	Number of days the employee was absent.
+absences	varbinary(150)	Total amount deducted due to absences.
+paid_leave_amount	varbinary(150)	Amount paid for leaves.
+regular_days	varbinary(150)	Number of days worked under regular schedule.
+regular_pay	varbinary(150)	Basic salary
+night_diff	varbinary(150)	Additional pay for night differential hours.
+overtime_pay	varbinary(150)	Pay earned from overtime hours.
+sunday_holiday	varbinary(150)	Additional pay for working on Sundays or holidays.
+adjustment_1	varbinary(150)	Retro Active Amount
+adjustment_2	varbinary(150)	Total Adjustment (e.g workday + tardiness + undertime + nsd)
+gross_pay	varbinary(150)	Total earnings before deductions.
+pp_sss	varbinary(150)	SSS contribution deducted from this payslip.
+pp_philhealth	varbinary(150)	PhilHealth contribution deducted.
+pp_pagibig	varbinary(150)	Pag-IBIG contribution deducted.
+pp_withholding_tax	varbinary(150)	Withholding tax deducted.
+allowances	varbinary(150)	Taxable allowances given.
+nt_allowances	varbinary(150)	Non-taxable allowances.
+advance_amount	varbinary(150)	Amount deducted for salary advances.
+de_minimis	varbinary(150)	Small-value non-taxable benefits (de minimis).
+non_taxable_income	varbinary(150)	Other non-taxable income components.
+pp_accrual	varbinary(150)	Accrued amounts (e.g., leave not yet paid).
+pp_other_deductions	varbinary(150)	Total Other Deductions deducted.
+tardiness_pay	varbinary(150)	Amount deducted due to lateness.
+undertime_pay	varbinary(150)	Amount deducted for leaving early.
+net_amount	varbinary(150)	Final take-home pay after all deductions.
+ot_no_hours	varbinary(150)	Number of overtime hours worked.
+bonuses	varbinary(150)	Bonus amount included in the payslip.
+other_compensation	varbinary(150)	Additional earnings not categorized above.
+hazard_pay	varbinary(150)	Compensation for hazardous work conditions.
+payslip_status	enum('pending','approve','reject')	Status of the payslip approval.
+cola	varbinary(150)	MINIMUM WAGE EARNER Cost of Living Allowance.
+service_charge_non_taxable	varbinary(150)	Non-taxable portion of service charges.
+service_charge_taxable	varbinary(150)	Taxable portion of service charges.
+hazard_pay_taxable	varbinary(150)	Taxable portion of hazard pay.
+hazard_pay_non_taxable	varbinary(150)	Non-taxable portion of hazard pay.
+flag_prev_emp_income	int(1)	If set, indicates consideration of income from previous employers.
+leave_conversion_taxable	varbinary(150)	Amount from taxable leave conversion.
+leave_conversion_non_taxable	varbinary(150)	Amount from non-taxable leave conversion.
+status	enum('Active','Inactive')	Status of the payslip (used for filtering, not financial logic).
+flag_leave_conversion	enum('0','1')	Indicates if leave conversion was applied.
+leave_conversion_type_ids	varchar(55)	Comma-separated IDs for types of leave conversions applied.
+fixed_sss	enum('no','yes')	Overrides standard SSS calculation.
+pagibig_contribution_type	enum('fixed','mixed_deduction','basic_pay')	Specifies method for Pag-IBIG deduction.
+voluntary_contributions	varbinary(150)	Voluntary deductions (e.g., additional Pag-IBIG Deduction).
+hdmf_modified	varbinary(150)	Manually overridden HDMF (Pag-IBIG) value.
+total_earnings	varbinary(150)	Sum of all earnings components.
+flag_custom_employee	enum('Yes','No')	Specifies if the employee is handled by custom rules.
+created_date	timestamp	Auto-updated timestamp when the record is created or modified.
+sss_or_number	varchar(250)	SSS Official Receipt Number.
+sss_or_date_remitted	datetime	Date SSS contribution was remitted.
+previous_paid_leave_amount_correction	varbinary(150)	Adjustments to paid leave from previous payroll.
+retroactive_total_hours	varbinary(150)	Hours computed retroactively.
+retroactive_total_amount	varbinary(150)	Earnings computed retroactively.
+employee_settings	text	Serialized employee-specific settings for payroll.
+hdmf_or_number	varchar(250)	Official receipt number for HDMF.
+hdmf_or_date_remitted	datetime	Date HDMF was remitted.
+phic_or_number	varchar(250)	Official receipt number for PhilHealth.
+phic_or_date_remitted	datetime	Date PhilHealth was remitted.
+auto_take_up_total_hours	varbinary(155)	System-computed hours for auto take-up adjustments.
+auto_take_up_total_amount	varbinary(155)	System-computed amounts for auto take-up.
+auto_take_up_array_val	mediumtext	JSON or serialized structure of auto take-up details.
+disbursement_total_amount	varbinary(150)	Total amount released during disbursement.
+disbursement_full_data	longtext	Complete disbursement breakdown (likely JSON).
+fringe_benefit_val	text	Breakdown on fringe benefits.
+employee_service_charge_time_in_val_array	text	Time-in data for calculating service charges.
+employee_total_hours_service_charge_val	decimal(11,2)	Total hours used for service charge computation.
+maternity_leave_data_array	text	Structured details about maternity leave.
+employee_boost_amount	varbinary(150)	Additional deductions.
+sum_nontax_pay	varbinary(150)	YTD or period total of non-taxable pay.
+ytd_nontax_pay	varbinary(150)	Year-To-Date non-taxable pay.
+sum_tax_pay	varbinary(150)	YTD or period total of taxable pay.
+ytd_tax_pay	varbinary(150)	Year-To-Date taxable pay.
+payslip_type	varchar(250)	Custom tag/classification of the payslip.
+custom_payslip_status	varchar(250)	Additional/custom status used for workflows.
+disbursement_application_id	int(11)	FK or reference to a disbursement request or app.
+employee_thirteenth_month_by_year_id	int(11)	Reference to 13th-month record for that year.
+tm_number_of_payslips	int(11)	Running count of how many payslips for 13th month calculation.
+tm_hours_worked_adjustments	varbinary(250)	Adjusted hours for 13th-month computation.
+tm_beginning_balance_thirteenth_month	varbinary(250)	Carry-over from previous 13th-month balance.
+tm_pay_ashima	varbinary(250)	Pay component related to Ashima calculation (custom logic).
+tm_current_basic_pay	varbinary(250)	Current basic pay used in 13th-month calculation.
+tm_daily_rate	varbinary(250)	Daily rate used for 13th-month pay.
+updated_url_source	text	Source URL or system where last update originated.
+non_attendance_array	text	Serialized data of non-attendance (absences, etc.).

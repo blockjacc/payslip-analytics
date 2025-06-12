@@ -1,0 +1,58 @@
+PAYSLIP FIELD MAPPING
+====================
+
+1. AMOUNTS CATEGORY
+------------------
+database_field_name          → Human Readable Alias
+----------------------------------------
+basic_pay                    → Base
+regular_pay                  → Regular
+night_diff                   → Night Shift
+overtime_pay                 → Overtime
+sunday_holiday              → Holiday
+allowances                   → Tax Allow
+nt_allowances               → N-Tax Allow
+hazard_pay                   → Hazard
+cola                         → COLA
+service_charge_taxable      → Tax Service
+service_charge_non_taxable  → N-Tax Service
+bonuses                      → Bonus
+other_compensation          → Other
+gross_pay                    → Total
+net_amount                   → Net
+de_minimis                   → De Minimis
+leave_conversion_taxable    → Tax Leave
+leave_conversion_non_taxable → N-Tax Leave
+paid_leave_amount           → Paid Leave
+retroactive_total_amount    → Retro
+absences                    → Absences
+employee_boost_amount       → Boost
+tardiness_pay              → Late
+undertime_pay              → Early
+advance_amount             → Advance
+
+2. HOURS CATEGORY
+----------------
+database_field_name          → Human Readable Alias
+----------------------------------------
+regular_days                → Regular
+days_absent                 → Absent
+ot_no_hours                 → Overtime
+retroactive_total_hours    → Retro
+employee_total_hours_service_charge_val → Service
+
+3. TAXES & DEDUCTIONS CATEGORY
+-----------------------------
+database_field_name          → Human Readable Alias
+----------------------------------------
+pp_sss                      → SSS
+pp_philhealth              → PHIC
+pp_pagibig                 → HDMF
+pp_withholding_tax         → Tax
+pp_other_deductions       → Other
+voluntary_contributions    → Voluntary
+
+Notes:
+- Most amount fields are stored as varbinary(150) in the database (encrypted)
+- Fields excluded: metadata fields (dates, IDs), system fields, configuration fields
+- All aliases are shortened for display purposes 
