@@ -6,6 +6,7 @@ import os
 from datetime import datetime
 import logging
 import sys
+from payslip_fields import get_field_display_names_by_category, FieldCategory
 
 # Load environment variables
 load_dotenv()
@@ -45,6 +46,26 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
             datetime.strptime(period_to, '%Y-%m-%d')
         except ValueError as e:
             return jsonify({'error': f'Invalid date format: {str(e)}'}), 400
+        
+        # Get selected fields from query parameters, default to a set of basic fields if not provided
+        selected_fields = request.args.get('fields', None)
+        if selected_fields:
+            try:
+                import json
+                selected_fields = json.loads(selected_fields)
+                if not isinstance(selected_fields, list):
+                    selected_fields = None
+            except:
+                selected_fields = None
+        
+        # Default fields if none provided
+        if not selected_fields:
+            selected_fields = [
+                'basic_pay', 'regular_pay', 'night_diff', 'overtime_pay', 'sunday_holiday',
+                'adjustment_1', 'adjustment_2', 'gross_pay', 'absences', 'tardiness_pay',
+                'undertime_pay', 'paid_leave_amount', 'allowances', 'de_minimis',
+                'bonuses', 'other_compensation', 'hazard_pay'
+            ]
             
         cursor = mysql.connection.cursor()
         
@@ -76,12 +97,10 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
             
             # Process each period
             for period_start, period_end in periods:
-                # Base query to get the encrypted data for this period
-                query = """
-                    SELECT regular_pay, night_diff, overtime_pay, sunday_holiday, 
-                           adjustment_1, adjustment_2, gross_pay, absences, tardiness_pay,
-                           undertime_pay, paid_leave_amount, allowances, de_minimis,
-                           bonuses, other_compensation, hazard_pay
+                # Dynamically build the query based on selected fields
+                query_fields = ", ".join(selected_fields)
+                query = f"""
+                    SELECT {query_fields}
                     FROM payroll_payslip 
                     WHERE company_id = %s
                     AND period_from = %s AND period_to = %s
@@ -98,30 +117,12 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
                 if not rows:
                     continue
                     
-                # Initialize sums for this period
-                period_sums = {
-                    'regular_pay': 0.0,
-                    'night_diff': 0.0,
-                    'overtime_pay': 0.0,
-                    'sunday_holiday': 0.0,
-                    'adjustment_1': 0.0,
-                    'adjustment_2': 0.0,
-                    'gross_pay': 0.0,
-                    'absences': 0.0,
-                    'tardiness_pay': 0.0,
-                    'undertime_pay': 0.0,
-                    'paid_leave_amount': 0.0,
-                    'allowances': 0.0,
-                    'de_minimis': 0.0,
-                    'bonuses': 0.0,
-                    'other_compensation': 0.0,
-                    'hazard_pay': 0.0
-                }
+                # Initialize sums for this period with selected fields
+                period_sums = {field: 0.0 for field in selected_fields}
                 
                 # Process each row for this period
                 for row in rows:
-                    field_names = list(period_sums.keys())
-                    for i, field in enumerate(field_names):
+                    for i, field in enumerate(selected_fields):
                         if row[i] and row[i] != 'NO_AUTO_VALUE_ON_ZERO':
                             decrypt_query = "SELECT CAST(AES_DECRYPT(%s, %s) AS DECIMAL(10,2)) as value"
                             cursor.execute(decrypt_query, (row[i], ENCRYPT_KEY))
@@ -129,47 +130,36 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
                             if decrypted_result and decrypted_result[0] is not None:
                                 period_sums[field] += float(decrypted_result[0])
                 
-                # Calculate basic pay for this period
-                basic_pay = period_sums['regular_pay'] - period_sums['absences'] - period_sums['tardiness_pay'] - period_sums['undertime_pay']
-                
                 # Add period data to result
+                period_analytics = {}
+                for field, value in period_sums.items():
+                    # Map DB field names to API field names if needed
+                    api_field = field
+                    period_analytics[api_field] = round(value, 2)
+                
+                # Add total_salary (gross_pay) if it exists
+                if 'gross_pay' in period_sums:
+                    period_analytics['total_salary'] = round(period_sums['gross_pay'], 2)
+                
                 result['periods'].append({
                     'period': {
                         'from': period_start.strftime('%Y-%m-%d'),
                         'to': period_end.strftime('%Y-%m-%d')
                     },
-                    'analytics': {
-                        'basic': round(basic_pay, 2),
-                        'nsd': round(period_sums['night_diff'], 2),
-                        'ot': round(period_sums['overtime_pay'], 2),
-                        'holiday': round(period_sums['sunday_holiday'], 2),
-                        'paid_leave': round(period_sums['paid_leave_amount'], 2),
-                        'allowances': round(period_sums['allowances'], 2),
-                        'deminimis': round(period_sums['de_minimis'], 2),
-                        'bonuses': round(period_sums['bonuses'], 2),
-                        'other_comp': round(period_sums['other_compensation'], 2),
-                        'hazard_pay': round(period_sums['hazard_pay'], 2),
-                        'retro': round(period_sums['adjustment_1'], 2),
-                        'adj': round(period_sums['adjustment_2'], 2),
-                        'total_salary': round(period_sums['gross_pay'], 2)
-                    }
+                    'analytics': period_analytics
                 })
             
             cursor.close()
             return jsonify(result)
             
-        # For single/aggregate view, use existing logic
-        base_query = """
-            SELECT regular_pay, night_diff, overtime_pay, sunday_holiday, 
-                   adjustment_1, adjustment_2, gross_pay, absences, tardiness_pay,
-                   undertime_pay, paid_leave_amount, allowances, de_minimis,
-                   bonuses, other_compensation, hazard_pay,
-                   period_from, period_to
+        # For single/aggregate view
+        # Dynamically build the query based on selected fields
+        query_fields = ", ".join(selected_fields)
+        query = f"""
+            SELECT {query_fields}, period_from, period_to
             FROM payroll_payslip 
             WHERE company_id = %s
         """
-        
-        query = base_query
         
         # Handle date filtering based on aggregation type
         if aggregation_type == 'single':
@@ -192,65 +182,36 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
         if not rows:
             return jsonify({'error': 'No data found for the specified period'}), 404
             
-        # Initialize sums
-        sums = {
-            'regular_pay': 0.0,
-            'night_diff': 0.0,
-            'overtime_pay': 0.0,
-            'sunday_holiday': 0.0,
-            'adjustment_1': 0.0,
-            'adjustment_2': 0.0,
-            'gross_pay': 0.0,
-            'absences': 0.0,
-            'tardiness_pay': 0.0,
-            'undertime_pay': 0.0,
-            'paid_leave_amount': 0.0,
-            'allowances': 0.0,
-            'de_minimis': 0.0,
-            'bonuses': 0.0,
-            'other_compensation': 0.0,
-            'hazard_pay': 0.0
-        }
-        
+        # Initialize sums with selected fields
+        sums = {field: 0.0 for field in selected_fields}
+            
         # Process each row
-        for row_idx, row in enumerate(rows):
-            field_names = list(sums.keys())
-            for i, field in enumerate(field_names):
-                try:
-                    if row[i] and row[i] != 'NO_AUTO_VALUE_ON_ZERO':
-                        decrypt_query = "SELECT CAST(AES_DECRYPT(%s, %s) AS DECIMAL(10,2)) as value"
-                        cursor.execute(decrypt_query, (row[i], ENCRYPT_KEY))
-                        decrypted_result = cursor.fetchone()
-                        if decrypted_result and decrypted_result[0] is not None:
-                            sums[field] += float(decrypted_result[0])
-                except Exception as e:
-                    pass
+        for row in rows:
+            for i, field in enumerate(selected_fields):
+                if row[i] and row[i] != 'NO_AUTO_VALUE_ON_ZERO':
+                    decrypt_query = "SELECT CAST(AES_DECRYPT(%s, %s) AS DECIMAL(10,2)) as value"
+                    cursor.execute(decrypt_query, (row[i], ENCRYPT_KEY))
+                    decrypted_result = cursor.fetchone()
+                    if decrypted_result and decrypted_result[0] is not None:
+                        sums[field] += float(decrypted_result[0])
         
-        # Calculate basic pay
-        basic_pay = sums['regular_pay'] - sums['absences'] - sums['tardiness_pay'] - sums['undertime_pay']
+        # Create result object with field sums
+        result = {}
+        for field, value in sums.items():
+            # Map DB field names to API field names if needed
+            api_field = field
+            result[api_field] = round(value, 2)
         
-        # Format response
-        analytics = {
-            'basic': round(basic_pay, 2),
-            'nsd': round(sums['night_diff'], 2),
-            'ot': round(sums['overtime_pay'], 2),
-            'holiday': round(sums['sunday_holiday'], 2),
-            'paid_leave': round(sums['paid_leave_amount'], 2),
-            'allowances': round(sums['allowances'], 2),
-            'deminimis': round(sums['de_minimis'], 2),
-            'bonuses': round(sums['bonuses'], 2),
-            'other_comp': round(sums['other_compensation'], 2),
-            'hazard_pay': round(sums['hazard_pay'], 2),
-            'retro': round(sums['adjustment_1'], 2),
-            'adj': round(sums['adjustment_2'], 2),
-            'total_salary': round(sums['gross_pay'], 2)
-        }
+        # Add total_salary (gross_pay) if it exists
+        if 'gross_pay' in sums:
+            result['total_salary'] = round(sums['gross_pay'], 2)
         
         cursor.close()
-        return jsonify(analytics)
+        return jsonify(result)
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        app.logger.error(f"Error in analytics: {str(e)}")
+        return jsonify({'error': f'Failed to retrieve analytics data: {str(e)}'}), 500
 
 @app.route('/api/validate-company/<int:company_id>', methods=['GET'])
 def validate_company(company_id):
@@ -396,6 +357,24 @@ def get_company_dates(company_id):
         'period_from_dates': period_from_dates,
         'period_to_dates': period_to_dates
     })
+
+@app.route('/api/payslip-fields', methods=['GET'])
+def get_payslip_fields():
+    try:
+        # Get field display names by category
+        amount_fields = get_field_display_names_by_category(FieldCategory.AMOUNTS)
+        hour_fields = get_field_display_names_by_category(FieldCategory.HOURS)
+        tax_fields = get_field_display_names_by_category(FieldCategory.TAXES)
+        
+        # Return the field mappings
+        return jsonify({
+            'amount_fields': amount_fields,
+            'hour_fields': hour_fields,
+            'tax_fields': tax_fields
+        })
+    except Exception as e:
+        app.logger.error(f"Error fetching payslip fields: {str(e)}")
+        return jsonify({'error': 'Failed to retrieve payslip fields'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 
