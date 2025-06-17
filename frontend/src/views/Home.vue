@@ -1,20 +1,20 @@
 <template>
-  <div class="home-container">
-    <h1 class="page-title">Welcome to Payslip Analytics</h1>
-    <div class="content-card">
-      <h3>Enter Company ID</h3>
-      <div class="form-group">
+  <div class="flex flex-col items-center justify-center min-h-[80vh] p-8">
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">Welcome to Payslip Analytics</h1>
+    <div class="bg-white/10 rounded-xl p-8 w-full max-w-md text-center">
+      <h3 class="text-primary mb-6 text-2xl">Enter Company ID</h3>
+      <div class="mb-6">
         <input 
           type="text" 
-          class="form-control"
+          class="text-center text-lg h-12 w-full rounded border border-white/20 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:border-primary transition" 
           v-model="companyId"
           placeholder="Enter company ID"
           @keyup.enter="validateCompany"
         >
-        <div v-if="error" class="error-message">{{ error }}</div>
+        <div v-if="error" class="text-red-400 text-sm mt-2">{{ error }}</div>
       </div>
       <button 
-        class="btn btn-grad-blue"
+        class="px-8 py-3 text-lg rounded bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold disabled:opacity-70 disabled:cursor-not-allowed transition"
         @click="validateCompany"
         :disabled="!companyId || loading"
       >
@@ -57,64 +57,4 @@ export default {
     }
   }
 }
-</script>
-
-<style scoped>
-.home-container {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-}
-
-.page-title {
-  font-family: 'Zilla Slab', serif;
-  color: #fff;
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
-  text-align: center;
-}
-
-.content-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-}
-
-.content-card h3 {
-  color: #24c2ab;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-}
-
-.form-control {
-  text-align: center;
-  font-size: 1.2rem;
-  height: 48px;
-}
-
-.error-message {
-  color: #ff6060;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.btn {
-  padding: 12px 32px;
-  font-size: 1rem;
-}
-
-.btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-</style> 
+</script> 

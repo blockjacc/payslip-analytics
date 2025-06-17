@@ -1,26 +1,28 @@
 <template>
-  <div class="analytics-container">
-    <h1 class="page-title">Payroll Analytics</h1>
-    <div class="analytics-content">
-      <div class="analytics-card">
-        <div class="period-info">
-          <h3>Employee ID: {{ employeeId }}</h3>
-          <h4>Period: {{ formatDate(periodFrom) }} - {{ formatDate(periodTo) }}</h4>
+  <div class="p-8">
+    <h1 class="font-serif text-white mb-8 text-4xl">Payroll Analytics</h1>
+    <div class="flex justify-center">
+      <div class="bg-white/10 rounded-xl p-8 w-full max-w-6xl">
+        <div class="text-center mb-8">
+          <h3 class="text-primary mb-2 text-2xl">Employee ID: {{ employeeId }}</h3>
+          <h4 class="text-secondary text-lg">Period: {{ formatDate(periodFrom) }} - {{ formatDate(periodTo) }}</h4>
         </div>
-        <div class="download-btn-container">
-          <button class="btn btn-download" @click="downloadCSV">Download CSV</button>
+        <div class="flex justify-end mb-4">
+          <button class="bg-primary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-500" @click="downloadCSV">Download CSV</button>
         </div>
-        <div class="chart-container">
+        <div class="h-[60vh] mb-12">
           <Bar :data="chartData" :options="chartOptions" />
         </div>
-        <div class="salary-details">
-          <div v-for="(value, key) in salaryData" :key="key" class="salary-item" v-if="value > 0">
-            <span class="label">{{ formatLabel(key) }}:</span>
-            <span class="amount">{{ formatCurrency(value) }}</span>
+        <div class="mt-8 pt-8 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div v-for="(value, key) in salaryData" :key="key" class="flex justify-between items-center p-2 px-4 bg-white/5 rounded-lg" v-if="value > 0">
+            <span class="text-sm text-secondary">{{ formatLabel(key) }}:</span>
+            <span class="font-sans font-semibold text-white">{{ formatCurrency(value) }}</span>
           </div>
-          <div class="salary-item total">
-            <span class="label">Total:</span>
-            <span class="amount">{{ formatCurrency(totalSalary) }}</span>
+          <div class="col-span-full mt-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+            <div class="flex justify-between items-center">
+              <span class="text-xl font-bold text-primary">Total:</span>
+              <span class="text-xl font-bold text-primary">{{ formatCurrency(totalSalary) }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -473,117 +475,4 @@ export default defineComponent({
     }
   }
 })
-</script>
-
-<style scoped>
-.analytics-container {
-  padding: 2rem;
-}
-
-.page-title {
-  font-family: 'Zilla Slab', serif;
-  color: #fff;
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
-}
-
-.analytics-content {
-  display: flex;
-  justify-content: center;
-}
-
-.analytics-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 1200px;
-}
-
-.period-info {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.period-info h3 {
-  color: #24c2ab;
-  margin-bottom: 0.5rem;
-  font-size: 1.5rem;
-}
-
-.period-info h4 {
-  color: #b1bacd;
-  font-size: 1.2rem;
-}
-
-.download-btn-container {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 1rem;
-}
-
-.btn-download {
-  background: #24c2ab;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1.5rem;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-download:hover {
-  background: #1abc9c;
-}
-
-.chart-container {
-  height: 60vh;
-  margin-bottom: 3rem;
-}
-
-.salary-details {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-.salary-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-}
-
-.salary-item .label {
-  font-size: 0.9rem;
-  color: #b1bacd;
-}
-
-.salary-item .amount {
-  font-family: 'Open Sans', sans-serif;
-  font-weight: 600;
-  color: #fff;
-}
-
-.salary-item.total {
-  grid-column: 1 / -1;
-  margin-top: 1rem;
-  padding: 1rem;
-  background: rgba(36, 194, 171, 0.1);
-  border: 1px solid rgba(36, 194, 171, 0.2);
-}
-
-.salary-item.total .label,
-.salary-item.total .amount {
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: #24c2ab;
-}
-</style> 
+</script> 

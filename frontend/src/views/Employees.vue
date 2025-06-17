@@ -1,49 +1,49 @@
 <template>
-  <div class="employees-container">
-    <h1 class="page-title">Select Employee</h1>
-    <div v-if="selectedCategory && selectedFields.length > 0" class="selected-summary">
-      <span class="summary-label">Selected:</span>
-      <span class="summary-category">{{ selectedCategoryDisplay }}:</span>
-      <span class="summary-fields">{{ selectedFieldLabels.join(', ') }}</span>
+  <div class="flex flex-col items-center justify-center min-h-[80vh] p-8">
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">Select Employee</h1>
+    <div v-if="selectedCategory && selectedFields.length > 0" class="mb-6 bg-primary/8 rounded-lg p-2 px-4 text-primary text-lg flex flex-wrap items-center gap-2 max-w-2xl text-left">
+      <span class="font-bold">Selected:</span>
+      <span class="font-bold text-white">{{ selectedCategoryDisplay }}:</span>
+      <span class="text-primary">{{ selectedFieldLabels.join(', ') }}</span>
     </div>
-    <div class="content-card">
-      <h3>Company ID: {{ companyId }}</h3>
+    <div class="bg-white/10 rounded-xl p-8 w-full max-w-lg text-center">
+      <h3 class="text-primary mb-6 text-2xl">Company ID: {{ companyId }}</h3>
       
-      <div class="form-group">
+      <div class="mb-6 relative">
         <input 
           type="text" 
-          class="form-control"
+          class="text-center text-lg h-12 w-full rounded border border-white/20 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:border-primary transition"
           v-model="searchQuery"
           placeholder="Enter employee ID or select 'All Employees'"
           @input="debouncedSearch"
         >
-        <div class="employee-list" v-if="filteredEmployees.length > 0">
+        <div class="absolute top-full left-0 right-0 bg-primary/10 border border-primary/20 rounded-lg mt-1 max-h-[200px] overflow-y-auto z-50 backdrop-blur-md shadow-lg" v-if="filteredEmployees.length > 0">
           <div 
             v-for="employee in filteredEmployees" 
             :key="employee"
-            class="employee-item"
+            class="p-3 cursor-pointer transition-all duration-200 text-white border-b border-primary/20 text-left text-lg hover:bg-primary/20 hover:translate-x-1 last:border-b-0"
             @click="selectEmployee(employee)"
           >
             {{ employee }}
           </div>
         </div>
       </div>
-      <div class="buttons">
+      <div class="flex gap-4 justify-center mb-4">
         <button 
-          class="btn btn-grad-blue"
+          class="px-6 py-3 text-base bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold flex-1 max-w-[200px] transition"
           @click="selectAllEmployees"
         >
           All Employees
         </button>
         <button 
-          class="btn btn-green"
+          class="px-6 py-3 text-base bg-emerald-500 text-white font-semibold flex-1 max-w-[200px] disabled:opacity-70 disabled:cursor-not-allowed transition"
           @click="selectEmployee(searchQuery)"
           :disabled="!searchQuery"
         >
           Select Employee
         </button>
       </div>
-      <div v-if="error" class="error-message">{{ error }}</div>
+      <div v-if="error" class="text-red-400 text-sm mt-2">{{ error }}</div>
     </div>
   </div>
 </template>
@@ -166,134 +166,4 @@ export default {
     }
   }
 }
-</script>
-
-<style scoped>
-.employees-container {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-}
-
-.page-title {
-  font-family: 'Zilla Slab', serif;
-  color: #fff;
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
-  text-align: center;
-}
-
-.content-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 500px;
-  text-align: center;
-}
-
-.content-card h3 {
-  color: #24c2ab;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-  position: relative;
-}
-
-.form-control {
-  text-align: center;
-  font-size: 1.2rem;
-  height: 48px;
-}
-
-.employee-list {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: rgba(36, 194, 171, 0.1);
-  border: 1px solid rgba(36, 194, 171, 0.2);
-  border-radius: 8px;
-  margin-top: 4px;
-  max-height: 200px;
-  overflow-y: auto;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.employee-item {
-  padding: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #fff;
-  border-bottom: 1px solid rgba(36, 194, 171, 0.2);
-  text-align: left;
-  font-size: 1.1rem;
-}
-
-.employee-item:last-child {
-  border-bottom: none;
-}
-
-.employee-item:hover {
-  background: rgba(36, 194, 171, 0.2);
-  transform: translateX(5px);
-}
-
-.buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.error-message {
-  color: #ff6060;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.btn {
-  padding: 12px 24px;
-  font-size: 1rem;
-  flex: 1;
-  max-width: 200px;
-}
-
-.btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.selected-summary {
-  margin-bottom: 1.5rem;
-  background: rgba(36, 194, 171, 0.08);
-  border-radius: 8px;
-  padding: 0.5rem 1rem;
-  color: #24c2ab;
-  font-size: 1.1rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  max-width: 700px;
-  text-align: left;
-}
-.summary-label {
-  font-weight: bold;
-}
-.summary-category {
-  font-weight: bold;
-  color: #fff;
-}
-.summary-fields {
-  color: #24c2ab;
-}
-</style> 
+</script> 

@@ -1,30 +1,30 @@
 <template>
-  <div class="aggregation-container">
-    <h1 class="page-title">Multiple Pay Periods Detected</h1>
-    <div class="content-card">
-      <div class="info-section">
-        <h3>Company ID: {{ companyId }}</h3>
-        <h3>Employee ID: {{ employeeId === 'all' ? 'All Employees' : employeeId }}</h3>
-        <h3>Period: {{ formatDate(periodFrom) }} - {{ formatDate(periodTo) }}</h3>
+  <div class="flex flex-col items-center justify-center min-h-[80vh] p-8">
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">Multiple Pay Periods Detected</h1>
+    <div class="bg-white/10 rounded-xl p-8 w-full max-w-2xl text-center">
+      <div class="mb-8 pb-6 border-b border-white/10">
+        <h3 class="text-primary mb-3 text-xl">Company ID: {{ companyId }}</h3>
+        <h3 class="text-primary mb-3 text-xl">Employee ID: {{ employeeId === 'all' ? 'All Employees' : employeeId }}</h3>
+        <h3 class="text-primary text-xl">Period: {{ formatDate(periodFrom) }} - {{ formatDate(periodTo) }}</h3>
       </div>
-      <p class="description">
+      <p class="text-white mb-8 text-lg">
         Your selected date range contains multiple pay periods. 
         How would you like to view the data?
       </p>
-      <div class="buttons">
+      <div class="flex flex-col gap-4">
         <button 
-          class="btn btn-grad-blue"
+          class="p-6 text-xl bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold flex flex-col items-center justify-center w-full transition-transform hover:-translate-y-1"
           @click="selectAggregation('aggregate')"
         >
           Aggregate Data
-          <small>View combined totals for all periods</small>
+          <small class="block text-sm mt-2 opacity-80">View combined totals for all periods</small>
         </button>
         <button 
-          class="btn btn-green"
+          class="p-6 text-xl bg-emerald-500 text-white font-semibold flex flex-col items-center justify-center w-full transition-transform hover:-translate-y-1"
           @click="selectAggregation('separate')"
         >
           Separate Data
-          <small>View each period individually</small>
+          <small class="block text-sm mt-2 opacity-80">View each period individually</small>
         </button>
       </div>
     </div>
@@ -70,82 +70,4 @@ export default {
     }
   }
 }
-</script>
-
-<style scoped>
-.aggregation-container {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-}
-
-.page-title {
-  font-family: 'Zilla Slab', serif;
-  color: #fff;
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
-  text-align: center;
-}
-
-.content-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 600px;
-  text-align: center;
-}
-
-.info-section {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.info-section h3 {
-  color: #24c2ab;
-  margin-bottom: 0.75rem;
-  font-size: 1.25rem;
-}
-
-.info-section h3:last-child {
-  margin-bottom: 0;
-}
-
-.description {
-  color: #fff;
-  margin-bottom: 2rem;
-  font-size: 1.1rem;
-}
-
-.buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.btn {
-  padding: 1.5rem;
-  font-size: 1.2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  transition: transform 0.2s;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
-}
-
-.btn small {
-  display: block;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-  opacity: 0.8;
-}
-</style> 
+</script> 

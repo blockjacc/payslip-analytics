@@ -1,16 +1,16 @@
 <template>
-  <div class="date-range-container">
-    <h1 class="page-title">Select Date Range</h1>
-    <div class="content-card">
-      <div class="info-section">
-        <h3>Company ID: {{ companyId }}</h3>
-        <h3>Employee ID: {{ employeeId === 'all' ? 'All Employees' : employeeId }}</h3>
+  <div class="flex flex-col items-center justify-center min-h-[80vh] p-8">
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">Select Date Range</h1>
+    <div class="bg-white/10 rounded-xl p-8 w-full max-w-lg text-center">
+      <div class="mb-8 pb-6 border-b border-white/10">
+        <h3 class="text-primary mb-3 text-xl">Company ID: {{ companyId }}</h3>
+        <h3 class="text-primary text-xl">Employee ID: {{ employeeId === 'all' ? 'All Employees' : employeeId }}</h3>
       </div>
-      <h3>Choose Period</h3>
-      <div class="form-group">
-        <label>From:</label>
+      <h3 class="text-primary mb-6 text-2xl">Choose Period</h3>
+      <div class="mb-6 text-left">
+        <label class="block mb-2 text-secondary text-sm">From:</label>
         <select 
-          class="form-control"
+          class="w-full h-12 text-base bg-white/10 border border-white/20 text-white rounded focus:outline-none focus:border-primary transition"
           v-model="selectedFromDate"
           @change="updateToDateOptions"
         >
@@ -24,10 +24,10 @@
           </option>
         </select>
       </div>
-      <div class="form-group">
-        <label>To:</label>
+      <div class="mb-6 text-left">
+        <label class="block mb-2 text-secondary text-sm">To:</label>
         <select 
-          class="form-control"
+          class="w-full h-12 text-base bg-white/10 border border-white/20 text-white rounded focus:outline-none focus:border-primary transition disabled:opacity-50"
           v-model="selectedToDate"
           :disabled="!selectedFromDate"
         >
@@ -42,13 +42,13 @@
         </select>
       </div>
       <button 
-        class="btn btn-grad-blue"
+        class="w-full max-w-[200px] px-8 py-3 text-base bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold disabled:opacity-70 disabled:cursor-not-allowed transition"
         @click="submitDateRange"
         :disabled="!selectedFromDate || !selectedToDate"
       >
         View Analytics
       </button>
-      <div v-if="error" class="error-message">{{ error }}</div>
+      <div v-if="error" class="text-red-400 text-sm mt-2">{{ error }}</div>
     </div>
   </div>
 </template>
@@ -181,89 +181,4 @@ export default {
     }
   }
 }
-</script>
-
-<style scoped>
-.date-range-container {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 80vh;
-}
-
-.page-title {
-  font-family: 'Zilla Slab', serif;
-  color: #fff;
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
-  text-align: center;
-}
-
-.content-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 500px;
-  text-align: center;
-}
-
-.content-card h3 {
-  color: #24c2ab;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.form-group {
-  margin-bottom: 1.5rem;
-  text-align: left;
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #b1bacd;
-  font-size: 0.9rem;
-}
-
-.form-control {
-  font-size: 1rem;
-  height: 48px;
-}
-
-.error-message {
-  color: #ff6060;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.btn {
-  padding: 12px 32px;
-  font-size: 1rem;
-  width: 100%;
-  max-width: 200px;
-}
-
-.btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.info-section {
-  margin-bottom: 2rem;
-  padding-bottom: 1.5rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.info-section h3 {
-  color: #24c2ab;
-  margin-bottom: 0.75rem;
-  font-size: 1.25rem;
-}
-
-.info-section h3:last-child {
-  margin-bottom: 0;
-}
-</style> 
+</script> 

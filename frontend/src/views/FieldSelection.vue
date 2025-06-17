@@ -1,45 +1,45 @@
 <template>
-  <div class="field-selection-container">
-    <h1 class="page-title">Select Fields to Analyze</h1>
-    <div class="content-card">
-      <h3>Company ID: {{ companyId }}</h3>
+  <div class="p-8">
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">Select Fields to Analyze</h1>
+    <div class="bg-white/10 rounded-xl p-8 w-full max-w-4xl text-center mx-auto">
+      <h3 class="text-primary mb-6 text-2xl">Company ID: {{ companyId }}</h3>
       
       <!-- Step 1: Category Selection -->
       <div v-if="currentStep === 1" class="category-selection">
-        <h4>Select a category to analyze:</h4>
-        <div class="category-buttons">
+        <h4 class="text-white mb-6 text-lg">Select a category to analyze:</h4>
+        <div class="flex justify-center gap-6 mb-8 flex-col md:flex-row items-center">
           <button 
-            class="btn category-btn"
-            :class="{ 'selected': selectedCategory === 'AMOUNTS' }"
+            class="px-6 py-6 text-lg min-w-[180px] bg-white/5 text-white border border-white/20 transition-all duration-300 hover:bg-primary/10 hover:-translate-y-1"
+            :class="{ 'bg-primary/20 border-primary/50 font-bold': selectedCategory === 'AMOUNTS' }"
             @click="selectCategory('AMOUNTS')"
           >
             Amounts
           </button>
           <button 
-            class="btn category-btn"
-            :class="{ 'selected': selectedCategory === 'HOURS' }"
+            class="px-6 py-6 text-lg min-w-[180px] bg-white/5 text-white border border-white/20 transition-all duration-300 hover:bg-primary/10 hover:-translate-y-1"
+            :class="{ 'bg-primary/20 border-primary/50 font-bold': selectedCategory === 'HOURS' }"
             @click="selectCategory('HOURS')"
           >
             Hours
           </button>
           <button 
-            class="btn category-btn"
-            :class="{ 'selected': selectedCategory === 'TAXES' }"
+            class="px-6 py-6 text-lg min-w-[180px] bg-white/5 text-white border border-white/20 transition-all duration-300 hover:bg-primary/10 hover:-translate-y-1"
+            :class="{ 'bg-primary/20 border-primary/50 font-bold': selectedCategory === 'TAXES' }"
             @click="selectCategory('TAXES')"
           >
             Taxes & Deductions
           </button>
         </div>
         
-        <div class="buttons">
+        <div class="flex gap-4 justify-center mt-6">
           <button 
-            class="btn btn-back"
+            class="px-6 py-3 text-base bg-white/10 text-white border border-white/20 hover:bg-white/20 transition flex-1 max-w-[200px]"
             @click="goBack"
           >
             Back
           </button>
           <button 
-            class="btn btn-grad-blue"
+            class="px-6 py-3 text-base bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold disabled:opacity-70 disabled:cursor-not-allowed transition flex-1 max-w-[200px]"
             @click="goToFieldSelection"
             :disabled="!selectedCategory"
           >
@@ -50,44 +50,44 @@
       
       <!-- Step 2: Field Selection -->
       <div v-if="currentStep === 2" class="field-selection">
-        <h4>Select fields to analyze from {{ getCategoryDisplayName(selectedCategory) }}:</h4>
+        <h4 class="text-white mb-6 text-lg">Select fields to analyze from {{ getCategoryDisplayName(selectedCategory) }}:</h4>
         
-        <div class="field-list">
+        <div class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-2 mb-6">
           <div 
             v-for="(displayName, fieldName) in getCurrentCategoryFields()" 
             :key="fieldName"
-            class="field-item"
-            :class="{ 'selected': isFieldSelected(fieldName) }"
+            class="p-3 cursor-pointer transition-all duration-200 text-white bg-white/5 rounded-md text-left text-sm border border-transparent hover:bg-primary/10 hover:translate-x-1"
+            :class="{ 'bg-primary/20 border-primary/50 font-bold': isFieldSelected(fieldName) }"
             @click="toggleField(fieldName)"
           >
             {{ displayName }}
           </div>
         </div>
         
-        <div class="selection-summary">
+        <div class="text-primary text-lg mb-4">
           <p>Selected: {{ selectedFields.length }} fields</p>
         </div>
         
         <!-- Selected fields display with delete options -->
-        <div v-if="selectedFields.length > 0" class="selected-fields-display">
-          <h5>Selected Fields:</h5>
-          <div class="selected-fields-list">
-            <div v-for="fieldName in selectedFields" :key="fieldName" class="selected-field-tag">
+        <div v-if="selectedFields.length > 0" class="mb-6 text-left">
+          <h5 class="text-primary mb-2 text-base">Selected Fields:</h5>
+          <div class="flex flex-wrap gap-2">
+            <div v-for="fieldName in selectedFields" :key="fieldName" class="flex items-center bg-primary/20 border border-primary/50 rounded-full px-3 py-1 text-sm text-white">
               <span>{{ getFieldDisplayName(fieldName) }}</span>
-              <button class="delete-btn" @click.stop="removeField(fieldName)">×</button>
+              <button class="bg-none border-none text-white text-lg ml-2 cursor-pointer flex items-center justify-center w-5 h-5 rounded-full p-0 leading-none hover:bg-white/20" @click.stop="removeField(fieldName)">×</button>
             </div>
           </div>
         </div>
         
-        <div class="buttons">
+        <div class="flex gap-4 justify-center mt-6">
           <button 
-            class="btn btn-back"
+            class="px-6 py-3 text-base bg-white/10 text-white border border-white/20 hover:bg-white/20 transition flex-1 max-w-[200px]"
             @click="currentStep = 1"
           >
             Back
           </button>
           <button 
-            class="btn btn-grad-blue"
+            class="px-6 py-3 text-base bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold disabled:opacity-70 disabled:cursor-not-allowed transition flex-1 max-w-[200px]"
             @click="continueToEmployees"
             :disabled="selectedFields.length === 0"
           >
@@ -96,7 +96,7 @@
         </div>
       </div>
       
-      <div v-if="error" class="error-message">{{ error }}</div>
+      <div v-if="error" class="text-red-400 text-sm mt-2">{{ error }}</div>
     </div>
   </div>
 </template>
@@ -240,227 +240,4 @@ export default {
     }
   }
 }
-</script>
-
-<style scoped>
-.field-selection-container {
-  padding: 2rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  min-height: 80vh;
-}
-
-.page-title {
-  font-family: 'Zilla Slab', serif;
-  color: #fff;
-  margin-bottom: 2rem;
-  font-size: 2.5rem;
-  text-align: center;
-}
-
-.content-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 2rem;
-  width: 100%;
-  max-width: 800px;
-  text-align: center;
-}
-
-.content-card h3 {
-  color: #24c2ab;
-  margin-bottom: 1.5rem;
-  font-size: 1.5rem;
-}
-
-.content-card h4 {
-  color: #fff;
-  margin-bottom: 1.5rem;
-  font-size: 1.2rem;
-}
-
-.category-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-bottom: 2rem;
-}
-
-.category-btn {
-  padding: 1.5rem 1rem;
-  font-size: 1.2rem;
-  min-width: 180px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
-}
-
-.category-btn:hover {
-  background: rgba(36, 194, 171, 0.1);
-  transform: translateY(-5px);
-}
-
-.category-btn.selected {
-  background: rgba(36, 194, 171, 0.2);
-  border: 1px solid rgba(36, 194, 171, 0.5);
-  font-weight: bold;
-}
-
-.field-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-height: 300px;
-  overflow-y: auto;
-  padding-right: 0.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.field-item {
-  padding: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  text-align: left;
-  font-size: 0.9rem;
-  border: 1px solid transparent;
-}
-
-.field-item:hover {
-  background: rgba(36, 194, 171, 0.1);
-  transform: translateX(5px);
-}
-
-.field-item.selected {
-  background: rgba(36, 194, 171, 0.2);
-  border: 1px solid rgba(36, 194, 171, 0.5);
-  font-weight: bold;
-}
-
-.selection-summary {
-  margin: 1rem 0;
-  color: #24c2ab;
-  font-size: 1.1rem;
-}
-
-.buttons {
-  display: flex;
-  gap: 1rem;
-  justify-content: center;
-  margin-top: 1.5rem;
-}
-
-.error-message {
-  color: #ff6060;
-  font-size: 0.9rem;
-  margin-top: 0.5rem;
-}
-
-.btn {
-  padding: 12px 24px;
-  font-size: 1rem;
-  flex: 1;
-  max-width: 200px;
-}
-
-.btn-back {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-back:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.btn:disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* Scrollbar styling */
-.field-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.field-list::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
-}
-
-.field-list::-webkit-scrollbar-thumb {
-  background: rgba(36, 194, 171, 0.3);
-  border-radius: 10px;
-}
-
-.field-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(36, 194, 171, 0.5);
-}
-
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .category-buttons {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .category-btn {
-    width: 100%;
-    max-width: 300px;
-  }
-}
-
-.selected-fields-display {
-  margin: 1.5rem 0;
-  text-align: left;
-}
-
-.selected-fields-display h5 {
-  color: #24c2ab;
-  margin-bottom: 0.5rem;
-  font-size: 1rem;
-}
-
-.selected-fields-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.selected-field-tag {
-  display: flex;
-  align-items: center;
-  background: rgba(36, 194, 171, 0.2);
-  border: 1px solid rgba(36, 194, 171, 0.5);
-  border-radius: 50px;
-  padding: 0.25rem 0.75rem;
-  font-size: 0.9rem;
-  color: #fff;
-}
-
-.delete-btn {
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 1.2rem;
-  margin-left: 0.5rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  padding: 0;
-  line-height: 1;
-}
-
-.delete-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-</style> 
+</script> 
