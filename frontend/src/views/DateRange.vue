@@ -5,6 +5,8 @@
       <div class="mb-8 pb-6 border-b border-white/10">
         <h3 class="text-primary mb-3 text-xl">Company ID: {{ companyId }}</h3>
         <h3 class="text-primary text-xl">Employee ID: {{ employeeId === 'all' ? 'All Employees' : employeeId }}</h3>
+        <h3 v-if="payrollGroupId" class="text-primary text-xl">Payroll Group: {{ payrollGroupId }}</h3>
+        <h3 v-if="filterDisplay" class="text-primary text-xl">{{ filterDisplay }}</h3>
       </div>
       <h3 class="text-primary mb-6 text-2xl">Choose Period</h3>
       <div class="mb-6 text-left">
@@ -67,17 +69,43 @@ export default {
     return {
       companyId: '',
       employeeId: '',
+      payrollGroupId: '',
       selectedFromDate: '',
       selectedToDate: '',
       error: '',
       fromDates: [],
       toDates: [],
-      loading: false
+      loading: false,
+      // Additional filter parameters
+      departmentId: '',
+      rankId: '',
+      employmentTypeId: '',
+      positionId: '',
+      costCenterId: '',
+      projectId: '',
+      locationId: '',
+      filterDisplay: ''
     }
   },
   created() {
     this.companyId = this.$route.params.companyId;
     this.employeeId = this.$route.params.employeeId;
+    
+    // Get payroll group ID from query parameters or sessionStorage
+    this.payrollGroupId = this.$route.query.payroll_group_id || sessionStorage.getItem('selectedPayrollGroup') || '';
+    
+    // Get additional filter parameters from query
+    this.departmentId = this.$route.query.department_id || '';
+    this.rankId = this.$route.query.rank_id || '';
+    this.employmentTypeId = this.$route.query.employment_type_id || '';
+    this.positionId = this.$route.query.position_id || '';
+    this.costCenterId = this.$route.query.cost_center_id || '';
+    this.projectId = this.$route.query.project_id || '';
+    this.locationId = this.$route.query.location_id || '';
+    
+    // Build filter display text
+    this.buildFilterDisplay();
+    
     this.fetchDates();
   },
   computed: {
@@ -97,7 +125,13 @@ export default {
           ? `/api/dates/${this.companyId}`
           : `/api/dates/${this.companyId}/${this.employeeId}`;
         
-        const response = await axios.get(endpoint);
+        // Add payroll group parameter if available
+        const params = {};
+        if (this.payrollGroupId) {
+          params.payroll_group_id = this.payrollGroupId;
+        }
+        
+        const response = await axios.get(endpoint, { params });
         this.fromDates = response.data.period_from_dates;
         this.toDates = response.data.period_to_dates;
         this.updateToDateOptions();
@@ -125,7 +159,13 @@ export default {
           ? `/api/dates/${this.companyId}`
           : `/api/dates/${this.companyId}/${this.employeeId}`;
         
-        const response = await axios.get(endpoint);
+        // Add payroll group parameter if available
+        const params = {};
+        if (this.payrollGroupId) {
+          params.payroll_group_id = this.payrollGroupId;
+        }
+        
+        const response = await axios.get(endpoint, { params });
         const periodFromDates = response.data.period_from_dates;
         
         // Find if there's any period_from date that falls between our selected range
@@ -137,28 +177,59 @@ export default {
           return periodFrom > selectedFromDate && periodFrom <= selectedToDate;
         });
 
+        // Prepare route parameters
+        const routeParams = {
+          companyId: this.companyId,
+          employeeId: this.employeeId,
+          periodFrom: this.selectedFromDate,
+          periodTo: this.selectedToDate
+        };
+
+        // Add query parameters for payroll group if available
+        const queryParams = {};
+        if (this.payrollGroupId) {
+          queryParams.payroll_group_id = this.payrollGroupId;
+        }
+        
+        // Add additional filter parameters
+        if (this.departmentId) {
+          queryParams.department_id = this.departmentId;
+        }
+        if (this.rankId) {
+          queryParams.rank_id = this.rankId;
+        }
+        if (this.employmentTypeId) {
+          queryParams.employment_type_id = this.employmentTypeId;
+        }
+        if (this.positionId) {
+          queryParams.position_id = this.positionId;
+        }
+        if (this.costCenterId) {
+          queryParams.cost_center_id = this.costCenterId;
+        }
+        if (this.projectId) {
+          queryParams.project_id = this.projectId;
+        }
+        if (this.locationId) {
+          queryParams.location_id = this.locationId;
+        }
+
         if (hasMultiplePeriods) {
           // Navigate to aggregation choice page
           await this.router.push({
             name: 'AggregationChoice',
-            params: {
-              companyId: this.companyId,
-              employeeId: this.employeeId,
-              periodFrom: this.selectedFromDate,
-              periodTo: this.selectedToDate
-            }
+            params: routeParams,
+            query: queryParams
           });
         } else {
           // Navigate directly to analytics
           await this.router.push({
             name: 'Analytics',
             params: {
-              companyId: this.companyId,
-              employeeId: this.employeeId,
-              periodFrom: this.selectedFromDate,
-              periodTo: this.selectedToDate,
+              ...routeParams,
               aggregationType: 'single'
-            }
+            },
+            query: queryParams
           });
         }
       } catch (err) {
@@ -171,6 +242,33 @@ export default {
       // Reset selectedToDate when selectedFromDate changes
       this.selectedToDate = '';
       this.error = '';
+    },
+    buildFilterDisplay() {
+      const filters = [];
+      
+      if (this.departmentId) {
+        filters.push(`Department ID: ${this.departmentId}`);
+      }
+      if (this.rankId) {
+        filters.push(`Rank ID: ${this.rankId}`);
+      }
+      if (this.employmentTypeId) {
+        filters.push(`Employment Type ID: ${this.employmentTypeId}`);
+      }
+      if (this.positionId) {
+        filters.push(`Position ID: ${this.positionId}`);
+      }
+      if (this.costCenterId) {
+        filters.push(`Cost Center ID: ${this.costCenterId}`);
+      }
+      if (this.projectId) {
+        filters.push(`Project ID: ${this.projectId}`);
+      }
+      if (this.locationId) {
+        filters.push(`Location ID: ${this.locationId}`);
+      }
+      
+      this.filterDisplay = filters.length > 0 ? filters.join(', ') : '';
     }
   },
   watch: {

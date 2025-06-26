@@ -5,6 +5,8 @@
       <div class="bg-white/10 rounded-xl p-8 w-full max-w-6xl">
         <div class="text-center mb-8">
           <h3 class="text-primary mb-2 text-2xl">Employee ID: {{ employeeId }}</h3>
+          <h3 v-if="payrollGroupId" class="text-primary mb-2 text-xl">Payroll Group: {{ payrollGroupId }}</h3>
+          <h3 v-if="filterDisplay" class="text-primary mb-2 text-xl">{{ filterDisplay }}</h3>
           <h4 class="text-secondary text-lg">Period: {{ formatDate(periodFrom) }} - {{ formatDate(periodTo) }}</h4>
         </div>
         <div class="flex justify-end mb-4">
@@ -121,6 +123,36 @@ export default defineComponent({
     },
     periodTo() {
       return this.$route.params.periodTo
+    },
+    payrollGroupId() {
+      return this.$route.query.payroll_group_id || sessionStorage.getItem('selectedPayrollGroup') || '';
+    },
+    filterDisplay() {
+      const filters = [];
+      
+      if (this.$route.query.department_id) {
+        filters.push(`Department ID: ${this.$route.query.department_id}`);
+      }
+      if (this.$route.query.rank_id) {
+        filters.push(`Rank ID: ${this.$route.query.rank_id}`);
+      }
+      if (this.$route.query.employment_type_id) {
+        filters.push(`Employment Type ID: ${this.$route.query.employment_type_id}`);
+      }
+      if (this.$route.query.position_id) {
+        filters.push(`Position ID: ${this.$route.query.position_id}`);
+      }
+      if (this.$route.query.cost_center_id) {
+        filters.push(`Cost Center ID: ${this.$route.query.cost_center_id}`);
+      }
+      if (this.$route.query.project_id) {
+        filters.push(`Project ID: ${this.$route.query.project_id}`);
+      }
+      if (this.$route.query.location_id) {
+        filters.push(`Location ID: ${this.$route.query.location_id}`);
+      }
+      
+      return filters.length > 0 ? filters.join(', ') : '';
     },
     chartData() {
       const aggregationType = this.$route.params.aggregationType || 'single';
@@ -357,7 +389,35 @@ export default defineComponent({
         
         // Create URL with selected fields as query parameter
         const fieldsParam = encodeURIComponent(JSON.stringify(selectedFields));
-        const url = `/api/analytics/${this.companyId}/${this.employeeId}/${this.periodFrom}/${this.periodTo}/${this.$route.params.aggregationType || 'single'}?fields=${fieldsParam}`;
+        let url = `/api/analytics/${this.companyId}/${this.employeeId}/${this.periodFrom}/${this.periodTo}/${this.$route.params.aggregationType || 'single'}?fields=${fieldsParam}`;
+        
+        // Add payroll group parameter if available
+        if (this.payrollGroupId) {
+          url += `&payroll_group_id=${this.payrollGroupId}`;
+        }
+        
+        // Add additional filter parameters
+        if (this.$route.query.department_id) {
+          url += `&department_id=${this.$route.query.department_id}`;
+        }
+        if (this.$route.query.rank_id) {
+          url += `&rank_id=${this.$route.query.rank_id}`;
+        }
+        if (this.$route.query.employment_type_id) {
+          url += `&employment_type_id=${this.$route.query.employment_type_id}`;
+        }
+        if (this.$route.query.position_id) {
+          url += `&position_id=${this.$route.query.position_id}`;
+        }
+        if (this.$route.query.cost_center_id) {
+          url += `&cost_center_id=${this.$route.query.cost_center_id}`;
+        }
+        if (this.$route.query.project_id) {
+          url += `&project_id=${this.$route.query.project_id}`;
+        }
+        if (this.$route.query.location_id) {
+          url += `&location_id=${this.$route.query.location_id}`;
+        }
         
         const response = await fetch(url);
         
@@ -468,6 +528,12 @@ export default defineComponent({
   },
   watch: {
     '$route.params': {
+      handler() {
+        this.fetchAnalytics()
+      },
+      deep: true
+    },
+    '$route.query': {
       handler() {
         this.fetchAnalytics()
       },

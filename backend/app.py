@@ -58,6 +58,18 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
             except:
                 selected_fields = None
         
+        # Get payroll group ID from query parameters (optional)
+        payroll_group_id = request.args.get('payroll_group_id', None)
+        
+        # Get additional filter parameters from settings tables (optional)
+        department_id = request.args.get('department_id', None)
+        rank_id = request.args.get('rank_id', None)
+        employment_type_id = request.args.get('employment_type_id', None)
+        position_id = request.args.get('position_id', None)
+        cost_center_id = request.args.get('cost_center_id', None)
+        project_id = request.args.get('project_id', None)
+        location_id = request.args.get('location_id', None)
+        
         # Default fields if none provided
         if not selected_fields:
             selected_fields = [
@@ -81,12 +93,46 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
                 AND period_from >= %s AND period_to <= %s
             """
             
+            params = [company_id, period_from, period_to]
+            
             if emp_id != 'all':
                 periods_query += " AND emp_id = %s"
-                cursor.execute(periods_query, (company_id, period_from, period_to, emp_id))
-            else:
-                cursor.execute(periods_query, (company_id, period_from, period_to))
-                
+                params.append(emp_id)
+            
+            if payroll_group_id:
+                periods_query += " AND payroll_group_id = %s"
+                params.append(payroll_group_id)
+            
+            # Add additional filters from settings tables
+            if department_id:
+                periods_query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE department_id = %s)"
+                params.append(department_id)
+            
+            if rank_id:
+                periods_query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE rank_id = %s)"
+                params.append(rank_id)
+            
+            if employment_type_id:
+                periods_query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE employment_type = %s)"
+                params.append(employment_type_id)
+            
+            if position_id:
+                periods_query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE position = %s)"
+                params.append(position_id)
+            
+            if cost_center_id:
+                periods_query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE cost_center = %s)"
+                params.append(cost_center_id)
+            
+            if project_id:
+                periods_query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE project_id = %s)"
+                params.append(project_id)
+            
+            if location_id:
+                periods_query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE location_and_offices_id = %s)"
+                params.append(location_id)
+            
+            cursor.execute(periods_query, tuple(params))
             periods = cursor.fetchall()
             if not periods:
                 return jsonify({'error': 'No periods found'}), 404
@@ -110,7 +156,40 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
                 if emp_id != 'all':
                     query += " AND emp_id = %s"
                     params.append(emp_id)
+                
+                if payroll_group_id:
+                    query += " AND payroll_group_id = %s"
+                    params.append(payroll_group_id)
                     
+                # Add additional filters from settings tables
+                if department_id:
+                    query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE department_id = %s)"
+                    params.append(department_id)
+                
+                if rank_id:
+                    query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE rank_id = %s)"
+                    params.append(rank_id)
+                
+                if employment_type_id:
+                    query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE employment_type = %s)"
+                    params.append(employment_type_id)
+                
+                if position_id:
+                    query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE position = %s)"
+                    params.append(position_id)
+                
+                if cost_center_id:
+                    query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE cost_center = %s)"
+                    params.append(cost_center_id)
+                
+                if project_id:
+                    query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE project_id = %s)"
+                    params.append(project_id)
+                
+                if location_id:
+                    query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE location_and_offices_id = %s)"
+                    params.append(location_id)
+                
                 cursor.execute(query, params)
                 rows = cursor.fetchall()
                 
@@ -168,15 +247,50 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
             date_filter = " AND period_from >= %s AND period_to <= %s"
         query += date_filter
         
+        # Build parameters array
+        params = [company_id, period_from, period_to]
+        
         # Add employee filter if not 'all'
         if emp_id != 'all':
             emp_filter = " AND emp_id = %s"
             query += emp_filter
-            params = (company_id, period_from, period_to, emp_id)
-        else:
-            params = (company_id, period_from, period_to)
-            
-        cursor.execute(query, params)
+            params.append(emp_id)
+        
+        # Add payroll group filter if provided
+        if payroll_group_id:
+            query += " AND payroll_group_id = %s"
+            params.append(payroll_group_id)
+        
+        # Add additional filters from settings tables
+        if department_id:
+            query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE department_id = %s)"
+            params.append(department_id)
+        
+        if rank_id:
+            query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE rank_id = %s)"
+            params.append(rank_id)
+        
+        if employment_type_id:
+            query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE employment_type = %s)"
+            params.append(employment_type_id)
+        
+        if position_id:
+            query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE position = %s)"
+            params.append(position_id)
+        
+        if cost_center_id:
+            query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE cost_center = %s)"
+            params.append(cost_center_id)
+        
+        if project_id:
+            query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE project_id = %s)"
+            params.append(project_id)
+        
+        if location_id:
+            query += " AND emp_id IN (SELECT emp_id FROM employee_payroll_information WHERE location_and_offices_id = %s)"
+            params.append(location_id)
+        
+        cursor.execute(query, tuple(params))
         rows = cursor.fetchall()
         
         if not rows:
@@ -248,9 +362,31 @@ def search_employees(company_id, query):
     cursor.close()
     return jsonify({'employees': employees})
 
+@app.route('/api/payroll-groups/<int:company_id>', methods=['GET'])
+def get_payroll_groups(company_id):
+    cursor = mysql.connection.cursor()
+    
+    # Get distinct payroll groups for the company
+    query = """
+        SELECT DISTINCT payroll_group_id 
+        FROM payroll_payslip 
+        WHERE company_id = %s 
+        AND payroll_group_id IS NOT NULL
+        ORDER BY payroll_group_id
+    """
+    
+    cursor.execute(query, (company_id,))
+    payroll_groups = [str(row[0]) for row in cursor.fetchall()]  # Convert to string for consistency
+    
+    cursor.close()
+    return jsonify({'payroll_groups': payroll_groups})
+
 @app.route('/api/dates/<int:company_id>/<string:emp_id>', methods=['GET'])
 def get_employee_dates(company_id, emp_id):
     cursor = mysql.connection.cursor()
+    
+    # Get payroll group ID from query parameters (optional)
+    payroll_group_id = request.args.get('payroll_group_id', None)
     
     # First get period_from dates
     period_from_query = """
@@ -264,6 +400,10 @@ def get_employee_dates(company_id, emp_id):
     if emp_id != 'all':
         period_from_query += " AND emp_id = %s"
         params.append(emp_id)
+    
+    if payroll_group_id:
+        period_from_query += " AND payroll_group_id = %s"
+        params.append(payroll_group_id)
     
     period_from_query += " ORDER BY period_from DESC"
     cursor.execute(period_from_query, tuple(params))
@@ -281,6 +421,10 @@ def get_employee_dates(company_id, emp_id):
     if emp_id != 'all':
         period_to_query += " AND emp_id = %s"
         params.append(emp_id)
+    
+    if payroll_group_id:
+        period_to_query += " AND payroll_group_id = %s"
+        params.append(payroll_group_id)
     
     period_to_query += " ORDER BY period_to DESC"
     cursor.execute(period_to_query, tuple(params))
@@ -361,20 +505,71 @@ def get_company_dates(company_id):
 @app.route('/api/payslip-fields', methods=['GET'])
 def get_payslip_fields():
     try:
-        # Get field display names by category
-        amount_fields = get_field_display_names_by_category(FieldCategory.AMOUNTS)
-        hour_fields = get_field_display_names_by_category(FieldCategory.HOURS)
-        tax_fields = get_field_display_names_by_category(FieldCategory.TAXES)
-        
-        # Return the field mappings
+        # Get all field categories
+        categories = {}
+        for category in FieldCategory:
+            categories[category.value] = get_field_display_names_by_category(category)
+        # Also provide the old keys for compatibility
         return jsonify({
-            'amount_fields': amount_fields,
-            'hour_fields': hour_fields,
-            'tax_fields': tax_fields
+            'amount_fields': categories.get('AMOUNTS', {}),
+            'hour_fields': categories.get('HOURS', {}),
+            'tax_fields': categories.get('TAXES', {}),
+            **categories
         })
     except Exception as e:
-        app.logger.error(f"Error fetching payslip fields: {str(e)}")
-        return jsonify({'error': 'Failed to retrieve payslip fields'}), 500
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/settings-options/<int:company_id>/<string:table_name>', methods=['GET'])
+def get_settings_options(company_id, table_name):
+    try:
+        # Validate table name to prevent SQL injection
+        valid_tables = {
+            'department': {'id_field': 'dept_id', 'name_field': 'department_name'},
+            'rank': {'id_field': 'rank_id', 'name_field': 'rank_name'},
+            'employment_type': {'id_field': 'emp_type_id', 'name_field': 'name'},
+            'position': {'id_field': 'position_id', 'name_field': 'position_name'},
+            'cost_center': {'id_field': 'cost_center_id', 'name_field': 'cost_center_code'},
+            'project': {'id_field': 'project_id', 'name_field': 'project_name'},
+            'location_and_offices': {'id_field': 'location_and_offices_id', 'name_field': 'name'}
+        }
+        
+        if table_name not in valid_tables:
+            return jsonify({'error': 'Invalid table name'}), 400
+        
+        table_config = valid_tables[table_name]
+        id_field = table_config['id_field']
+        name_field = table_config['name_field']
+        
+        cursor = mysql.connection.cursor()
+        
+        # Query the settings table for active records
+        query = f"""
+            SELECT {id_field}, {name_field}
+            FROM `{table_name}`
+            WHERE company_id = %s AND status = 'Active'
+            ORDER BY {name_field}
+        """
+        
+        cursor.execute(query, (company_id,))
+        rows = cursor.fetchall()
+        cursor.close()
+        
+        # Format the response
+        options = []
+        for row in rows:
+            options.append({
+                'id': row[0],
+                'name': row[1]
+            })
+        
+        return jsonify({
+            'table_name': table_name,
+            'options': options,
+            'count': len(options)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 
