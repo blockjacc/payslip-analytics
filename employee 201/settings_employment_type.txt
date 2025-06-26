@@ -1,0 +1,31 @@
+table name	employment_type.sql	
+		
+Field	Description	Link identifier fields from other tables to employee_payroll_information
+emp_type_id	Primary identifier for the employment_type	emp_type_id
+company_id	Description of company_id	company_id
+name	Description of name	name
+description	Description of description	
+entitled_to_overtime	Description of entitled_to_overtime	
+entitled_to_holiday_pay	Description of entitled_to_holiday_pay	
+entitled_to_night_differential	Description of entitled_to_night_differential	
+entitled_to_rest_day	Description of entitled_to_rest_day	
+entitled_to_deminimis	Description of entitled_to_deminimis	
+entitled_to_basic_pay	Description of entitled_to_basic_pay	
+entitled_to_leaves	Description of entitled_to_leaves	
+entitled_to_sss	Description of entitled_to_sss	
+entitled_to_philhealth	Description of entitled_to_philhealth	
+entitled_to_hdmf	Description of entitled_to_hdmf	
+entitled_to_thirteen_month_pay	Description of entitled_to_thirteen_month_pay	
+entitled_to_service_charge	Description of entitled_to_service_charge	
+entitled_to_hazard_pay	Description of entitled_to_hazard_pay	
+entitled_to_regular_holiday	Description of entitled_to_regular_holiday	
+entitled_to_unwork_regular_holiday	Description of entitled_to_unwork_regular_holiday	
+entitled_to_special_holiday	Description of entitled_to_special_holiday	
+entitled_to_unwork_special_holiday	Description of entitled_to_unwork_special_holiday	
+created_by_account_id	Description of created_by_account_id	
+created_date	Description of created_date	
+updated_by_account_id	Description of updated_by_account_id	
+updated_date	Description of updated_date	
+status	Description of status	
+updated_by_name	Description of updated_by_name	
+created_by_name	Description of created_by_name	

@@ -14,3 +14,4 @@ do not mess with the port assignments. we just insure before starting up the bac
 there is python dictionary with nested dataclasses`payslip_fields.py` that reflects mapping from
     payslip_fields_mapping.txt
 
+when we push up to github, we add and commit at all the folder levels, but only push (everything) at root directory level

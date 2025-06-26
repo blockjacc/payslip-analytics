@@ -1,0 +1,60 @@
+LEGEND		Encrypted	
+table name	employee.sql		
+			
+Field Name	Purpose / Description		
+emp_id	Primary identifier for the employee		
+company_id	Reference to the company the employee belongs to		
+nickname	Employee’s preferred or casual name		
+last_name	Employee’s last (family) name		
+first_name	Employee’s first (given) name		
+middle_name	Employee’s middle name		
+address	Full residential address		
+mobile_no	Employee’s mobile phone number		
+home_no	Home landline number		
+state	State or region of residence		
+city	City of residence		
+zipcode	Postal or ZIP code		
+tin	Tax Identification Number		
+hdmf	"Home Development Mutual Fund number (e.g., Pag-IBIG)"		
+umid	Unified Multi-Purpose ID number		
+sss	Social Security System number		
+phil_health	PhilHealth number		
+gsis	Government Service Insurance System number		
+work_office_telephone_number	Office telephone number		
+work_mobile_telephone	Mobile work phone		
+work_office_telephone_extension	Extension number		
+emergency_contact_relation	Relation of emergency contact to employee		
+emergency_contact_email	Email of emergency contact		
+emergency_contact_home_num	Landline of emergency contact		
+emergency_contact_address	Address of emergency contact		
+emergency_contact_person	Name of emergency contact		
+employee_notes	Notes about employee (HR use)		
+hmo_number	Health Maintenance Organization number (if covered)		
+dob	Date of birth		
+gender	Gender identity		
+marital_status	"Marital status (e.g., Single, Married)"		
+emergency_contact_number	Emergency contact's phone number		
+no_of_dependents	Number of dependents claimed		
+citizenship_status	"citizenship (filipino , etc)"		
+marital_status_date	Date when marital status last changed		
+created_by_account_id	Who created the record		
+created_date	When the record was created		
+updated_by_account_id	Who last updated the record		
+updated_date	When the record was last updated		
+account_id	Login or user account reference		
+status	Active/inactive status of employee record		
+stop_status	flag for leave stop status		
+stop_status_date_update	Date when stop status was last updated		
+stop_status_updated_by	Who updated the stop status		
+confidential	Flag for confidential status		
+confidential_updated_by_account_id	Who updated the confidentiality flag		
+confidential_updated_date	When confidentiality status was updated		
+transfer	Transfer status or flag		
+stop_status_updated_by_name	Name of person who updated the stop status		
+confidential_updated_by_name	Name of person who updated confidential status		
+flag_termination	Flag indicating employee was terminated		
+			
+			
+			
+			
+			

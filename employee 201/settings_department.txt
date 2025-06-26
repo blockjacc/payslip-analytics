@@ -1,0 +1,14 @@
+table name	department.sql	
+		
+Field	Description	Link identifier fields from other tables to employee_payroll_information
+dept_id	Primary identifier for the department	dept_id
+company_id	Description of company_id	company_id
+department_name	Description of department_name	department_name
+description	Description of description	
+created_by_account_id	Description of created_by_account_id	
+created_date	Description of created_date	
+updated_by_account_id	Description of updated_by_account_id	
+updated_date	Description of updated_date	
+status	Description of status	
+updated_by_name	Description of updated_by_name	
+created_by_name	Description of created_by_name	

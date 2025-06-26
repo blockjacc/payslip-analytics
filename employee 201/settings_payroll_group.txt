@@ -1,0 +1,18 @@
+table name	payroll_group.sql	
+		
+Field	Description	Link identifier fields from other tables to employee_payroll_information
+payroll_group_id	Primary identifier for the payroll_group	payroll_group_id
+name	Description of name	company_id
+payroll_group_description	Description of payroll_group_description	name
+period_type	Description of period_type	
+pay_rate_type	Description of pay_rate_type	
+company_id	Description of company_id	
+work_schedule_id	Description of work_schedule_id	
+created_by_account_id	Description of created_by_account_id	
+created_date	Description of created_date	
+updated_by_account_id	Description of updated_by_account_id	
+updated_date	Description of updated_date	
+status	Description of status	
+confidential	identify payroll group confidential	
+created_by_name	Description of created_by_name	
+updated_by_name	Description of updated_by_name	

@@ -1,0 +1,19 @@
+table name	location_and_offices.sql	
+		
+Field	Description	Link identifier fields from other tables to employee_payroll_information
+location_and_offices_id	Primary identifier for the location	location_and_offices_id
+company_id	Description of company_id	company_id
+name	Description of name	name
+location_description	Description of location_description	
+street	Description of street	
+city	Description of city	
+state	Description of state	
+zipcode	Description of zipcode	
+created_by_account_id	Description of created_by_account_id	
+created_date	Description of created_date	
+updated_by_account_id	Description of updated_by_account_id	
+updated_date	Description of updated_date	
+status	Description of status	
+flag_type	Description of flag_type	
+updated_by_name	Description of updated_by_name	
+created_by_name	Description of created_by_name	

@@ -1,0 +1,174 @@
+LEGEND		
+Table located settings		
+department	position	
+rank	cost_center	
+payroll_group	project	
+employment_type	location_and_offices	
+		
+		
+table name	employee_payroll_information.sql	
+		
+Field	Description	
+employee_payroll_information_id	Primary key ID for the employee payroll information record	
+emp_id	Employee ID	
+company_id	Company ID	
+department_id	Unique identifier referencing the department from the department settings table.	employee_payroll_information.department_id = department.dept_id get the department settings
+rank_id	Unique identifier referencing the employee rank from the rank settings table.	employee_payroll_information.rank_id = rank.rank_id get the rank settings
+payroll_group_id	Identifier for the payroll group assigned to the employee.	employee_payroll_information.payroll_group_id = payroll_group.payroll_group_id get the employment settings
+employment_type	References the employment type defined in the employment type settings table.	employee_payroll_information.employment_type = employment_type.emp_type_id
+position	References the position title from the position settings table.	employee_payroll_information.position= position.position_id get the project settings
+cost_center	Identifier for the cost center used for accounting and tracking in settings.	employee_payroll_information.cost_center = cost_center.cost_center_id  on cost_center settings
+project_id	"	Unique identifier referencing the associated project from the project table."	employee_payroll_information.project_id = project.project_id get the project settings
+location_and_offices_id	References the employee's assigned location or office from the locations table.	employee_payroll_information.location_and_offices_id = location.location_and_offices get location
+date_hired	Date the employee was hired	
+last_date	Last working date (if applicable)	
+payment_method	Mode of salary payment	
+bank_route	Bank routing number	
+bank_account	Employee's bank account number	
+account_type	Type of bank account	
+sss_contribution_amount	HDMF contribution amount	
+hdmf_contribution_amount	PhilHealth contribution amount	
+philhealth_contribution_amount	Whether withholding tax is applied	
+witholding_tax	Date the employee resigned	
+resigned_date	Date the employee was regularized	
+regular_date	Current employment status	
+employee_status	Is the employee entitled to overtime?	
+entitled_to_overtime	Is the employee entitled to holiday pay?	
+entitled_to_holiday_pay	Is the employee entitled to night differential?	
+entitled_to_night_differential	Is the employee entitled to rest day benefits?	
+entitled_to_rest_day	Is the employee covered by SSS?	
+entitled_to_sss	Is the employee covered by PhilHealth?	
+entitled_to_philhealth	Is the employee covered by Pag-IBIG?	
+entitled_to_pagibig	Is the employee entitled to de minimis benefits?	
+entitled_to_deminimis	Is the employee covered by HDMF?	
+entitled_to_hdmf	Is the employee entitled to basic pay?	
+entitled_to_basic_pay	Is the employee entitled to leaves?	
+entitled_to_leaves	Is the employee entitled to hazard pay?	
+entitled_to_hazard_pay	Is the employee entitled to 13th month pay?	
+entitled_to_thirteen_month_pay	Is the employee entitled to service charge?	
+entitled_to_service_charge	Is the employee entitled to regular holiday pay?	
+entitled_to_regular_holiday	Entitlement to unworked regular holiday	
+entitled_to_unwork_regular_holiday	Entitlement to special holiday pay	
+entitled_to_special_holiday	Entitlement to unworked special holiday	
+entitled_to_unwork_special_holiday	Is the employee subject to tax?	
+entitled_to_tax	Fixed SSS contribution amount	
+entitled_to_hdmf_voluntary	Description of employee_share_hdmf_voluntary	
+entitled_to_hdmf_modified	Description of employee_share_hdmf_modified	
+fixed_sss	Fixed HDMF contribution amount	
+fixed_hdmf	Fixed PhilHealth contribution amount	
+fixed_philhealth	minimum wage earner  identifier	
+minimum_wage_earner	timesheet required identifier	
+timesheet_required	Group ID for attendance adjustment approval	
+attendance_adjustment_approval_grp	Description of location_base_login_approval_grp	
+location_base_login_approval_grp	Description of add_logs_approval_grp	
+add_logs_approval_grp	Description of shedule_request_approval_grp	
+shedule_request_approval_grp	Description of created_by_account_id	
+created_by_account_id	Description of created_date	
+created_date	Description of updated_by_account_id	
+updated_by_account_id	Description of updated_date	
+updated_date	Description of status	
+status	Description of deleted	
+date_terminated	Description of employment_status	
+employment_status	Description of regularization_date	
+regularization_date	Description of expense_group	
+expense_group	Description of overtime_group	
+overtime_group	Description of leave_group	
+leave_group	Description of shifts_group	
+shifts_group	Description of time_in_group	
+time_in_group	Description of timesheet_group	
+timesheet_group	Description of payroll_group	
+payroll_group	Description of effective_date	
+effective_date	Description of payroll_approval_grp	
+payroll_approval_grp	Description of deped_pds_approval_grp	
+project_id	Description of deped_pds_seminar_approval_grp	
+nightshift_differential_rule_name	Description of deped_pds_educational_approval_grp	
+deped_inventory_approval_grp	Description of flag_hdmf	
+flag_sss	Description of flag_philhealth	
+flag_hdmf	Description of tax_fixed	
+flag_philhealth	Description of employee_share_mixed_deduction	
+tax_fixed	Description of deped_service_record_approval_grp	
+employee_share_mixed_deduction	Description of entitled_to_hdmf_voluntary	
+deped_service_record_approval_grp	Description of entitled_to_hdmf_modified	
+employee_share_hdmf_voluntary	Description of document_approval_grp	
+employee_share_hdmf_modified	Description of termination_approval_grp	
+document_approval_grp	Description of deped_pds_dependents_approval_grp	
+termination_approval_grp	Description of account_id_desktop_time_entry	
+deped_pds_dependents_approval_grp	Description of account_id_desktop_photo_capture	
+account_id_desktop_time_entry	Description of account_id_desktop_individual_ip	
+account_id_desktop_photo_capture	Description of account_id_flags	
+account_id_desktop_individual_ip	Description of updated_date_flags	
+account_id_flags	Description of employee_clockin_mac_address	
+updated_date_flags	Description of employee_kiosk_with_full_context	
+employee_clockin_mac_address	Description of employee_mac_address_camera	
+employee_kiosk_with_full_context	Description of employee_kiosk_require_photo_capture	
+employee_mac_address_camera	Description of employee_desktop_clockin_with_photo	
+employee_kiosk_require_photo_capture	Description of employee_desktop_with_full_context	
+employee_desktop_clockin_with_photo	Description of employee_desktop_photo_capture	
+employee_desktop_with_full_context	Description of employee_desktop_require_photo_capture	
+employee_desktop_photo_capture	Description of employee_desktop_standard_ip	
+employee_desktop_require_photo_capture	Description of employee_desktop_individual_ip	
+employee_desktop_standard_ip	Description of employee_mobile_clockin	
+employee_desktop_individual_ip	Description of employee_mobile_face_id	
+employee_mobile_clockin	Description of employee_mobile_require_face_id	
+employee_mobile_face_id	Description of updated_date_individual_ip	
+employee_mobile_require_face_id	Description of updated_date_standard_ip	
+updated_date_individual_ip	Description of updated_date_desktop_photo_capture	
+updated_date_standard_ip	Description of updated_date_desktop_full_context	
+updated_date_desktop_photo_capture	Description of updated_date_kiosk_full_context	
+updated_date_desktop_full_context	Description of timesheet_required_advanced_settings	
+updated_date_kiosk_full_context	Description of retroactive_approval_group	
+timesheet_required_advanced_settings	Description of employee_status_updated_by_account_id	
+retroactive_approval_group	Description of employee_status_updated_date	
+employee_status_updated_by_account_id	Description of vat_registered	
+employee_status_updated_date	Description of expanded_withholding_rate	
+vat_registered	Description of expanded_withholding_tax	
+expanded_withholding_rate	Description of lump_sum_type	
+expanded_withholding_tax	Description of lump_sum_rate	
+lump_sum_type	Description of overtime_type	
+lump_sum_rate	Description of sss_contribution_payment_settings_flag	
+overtime_type	Description of sss_contribution_payment_settings	
+sss_contribution_payment_settings_flag	Description of philhealth_contribution_payment_settings_flag	
+sss_contribution_payment_settings	Description of philhealth_contribution_payment_settings	
+philhealth_contribution_payment_settings_flag	Description of hdmf_contribution_payment_settings_flag	
+philhealth_contribution_payment_settings	Description of hdmf_contribution_payment_settings	
+hdmf_contribution_payment_settings_flag	Description of allowance_approval_grp	
+hdmf_contribution_payment_settings	Rule or policy applied when an employee works on their scheduled rest day.	
+allowance_approval_grp	"Fixed rate or percentage used for compensation on rest days, if applicable."	
+rest_day_rule	Rule or compensation rate when a rest day coincides with a special holiday.	
+rd_rule_fixed_rate	Rule or compensation rate when a rest day coincides with a regular holiday.	
+rd_special_holiday	Rule or compensation rate when a rest day falls on both a regular and special holiday (double holiday).	
+rd_regular_holiday	Description of employee_desktop_authenticator	
+rd_double_holiday	Description of employee_desktop_authenticator_update	
+employee_desktop_authenticator	Description of employee_desktop_authenticator_account	
+employee_desktop_authenticator_update	Description of custom_termination_date	
+employee_desktop_authenticator_account	Fixed overtime compensation rate for working on a rest day.	
+custom_termination_date	Fixed overtime compensation rate for working on a special holiday.	
+ot_fixed_rd	Fixed overtime compensation rate for working on a regular holiday.	
+ot_fixed_special	Fixed overtime compensation rate for working on a double holiday.	
+ot_fixed_regular	Description of maternity_benefits_grp	
+ot_fixed_double	Description of flag_arnold_updated_date	
+maternity_benefits_grp	Description of mobile_geolocation	
+flag_arnold_updated_date	Description of mobile_geolocation_radius	
+mobile_geolocation	Description of mobile_geolocation_lat	
+mobile_geolocation_radius	Description of mobile_geolocation_long	
+mobile_geolocation_lat	Description of mobile_geolocation_add	
+mobile_geolocation_long	Description of mobile_geolocation_update	
+mobile_geolocation_add	Description of mobile_geolocation_update_by	
+mobile_geolocation_update	Description of employee_mobile_update	
+mobile_geolocation_update_by	Description of employee_mobile_update_by	
+employee_mobile_update	Description of ep_employee_level_restrict	
+employee_mobile_update_by	Description of mobile_employee_level_restrict	
+ep_employee_level_restrict	Description of fixed_hdmf_rate	
+mobile_employee_level_restrict	Description of updated_by_name	
+fixed_hdmf_rate	Description of created_by_name	
+updated_by_name	Description of time_entry_updated_by	
+created_by_name	Description of employee_status_updated_by_name	
+time_entry_updated_by	Description of employee_status_created_by_name	
+employee_status_updated_by_name	Description of ot_fixed_reg_workday	
+employee_status_created_by_name		
+ot_fixed_reg_workday		
+timeSheet_approval_grp	Overtime approval group ID	
+overtime_approval_grp	Leave approval group ID	
+leave_approval_grp	Expense approval group ID	
+expense_approval_grp	eBundy approval group ID	
+eBundy_approval_grp	SSS contribution amount	
