@@ -5,6 +5,7 @@ import Employees from '../views/Employees.vue'
 import DateRange from '../views/DateRange.vue'
 import Analytics from '../views/Analytics.vue'
 import AggregationChoice from '../views/AggregationChoice.vue'
+import DrillDown from '../views/DrillDown.vue'
 
 const routes = [
   {
@@ -41,6 +42,11 @@ const routes = [
     path: '/analytics-prefetch-test',
     name: 'AnalyticsPrefetchTest',
     component: () => import('../views/AnalyticsPrefetchTest.vue')
+  },
+  {
+    path: '/drilldown/:companyId/:employeeId/:periodFrom/:periodTo/:aggregationType',
+    name: 'DrillDown',
+    component: DrillDown
   }
 ]
 

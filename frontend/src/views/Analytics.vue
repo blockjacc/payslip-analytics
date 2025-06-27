@@ -11,6 +11,7 @@
         </div>
         <div class="flex justify-end mb-4">
           <button class="bg-primary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-500" @click="downloadCSV">Download CSV</button>
+          <button class="ml-4 bg-secondary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-indigo-600" @click="goToDrilldown">Drill Down</button>
         </div>
         <div class="h-[60vh] mb-12">
           <Bar :data="chartData" :options="chartOptions" />
@@ -592,6 +593,18 @@ export default defineComponent({
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
+    },
+    goToDrilldown() {
+      // Build route params and query
+      const params = {
+        companyId: this.companyId,
+        employeeId: this.employeeId,
+        periodFrom: this.periodFrom,
+        periodTo: this.periodTo,
+        aggregationType: this.$route.params.aggregationType || 'single'
+      };
+      const query = { ...this.$route.query };
+      this.$router.push({ name: 'DrillDown', params, query });
     }
   },
   mounted() {
