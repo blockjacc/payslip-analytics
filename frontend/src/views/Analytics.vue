@@ -51,7 +51,11 @@
               <button @click="downloadDrilldownCSV(drilldownPeriodIndex)" class="bg-secondary text-white px-4 py-2 rounded font-semibold hover:bg-indigo-600">Download CSV</button>
             </div>
             <div class="overflow-auto p-4">
-              <table class="min-w-full text-sm text-left">
+              <div v-if="sortedEmployeesForPeriod(drilldownPeriodIndex).length === 0" class="text-center text-gray-500 mb-4">
+                No employees found for this period.
+              </div>
+              <div class="text-xs text-gray-400 mb-2">Employee count: {{ sortedEmployeesForPeriod(drilldownPeriodIndex).length }}</div>
+              <table class="min-w-full text-sm text-left" v-if="sortedEmployeesForPeriod(drilldownPeriodIndex).length > 0">
                 <thead>
                   <tr class="bg-primary/10">
                     <th class="p-2">Last Name</th>
@@ -96,6 +100,7 @@ export default defineComponent({
       fieldDisplayNames: {},
       showDrilldown: false,
       drilldownPeriodIndex: null,
+      drilldownEmployees: [],
       baseYAxisMax: 40000,
       // Color mapping from payslip_field_colors.txt
       fieldColors: {
@@ -465,13 +470,56 @@ export default defineComponent({
         this.loading = false;
       }
     },
-    showDrilldownForPeriod(index) {
+    async showDrilldownForPeriod(idx) {
+      this.drilldownPeriodIndex = idx;
       this.showDrilldown = true;
-      this.drilldownPeriodIndex = index;
+      this.drilldownEmployees = [];
+      // Fetch drilldown data for this period
+      const period = this.periods[idx];
+      if (!period || !period.period) return;
+      try {
+        const fieldsParam = encodeURIComponent(JSON.stringify(this.selectedFields));
+        let url = `/api/analytics-prefetch/${this.companyId}/${period.period.from}/${period.period.to}/separate?fields=${fieldsParam}`;
+        if (this.payrollGroupId) {
+          url += `&payroll_group_id=${this.payrollGroupId}`;
+        }
+        if (this.$route.query.department_id) {
+          url += `&department_id=${this.$route.query.department_id}`;
+        }
+        if (this.$route.query.rank_id) {
+          url += `&rank_id=${this.$route.query.rank_id}`;
+        }
+        if (this.$route.query.employment_type_id) {
+          url += `&employment_type_id=${this.$route.query.employment_type_id}`;
+        }
+        if (this.$route.query.position_id) {
+          url += `&position_id=${this.$route.query.position_id}`;
+        }
+        if (this.$route.query.cost_center_id) {
+          url += `&cost_center_id=${this.$route.query.cost_center_id}`;
+        }
+        if (this.$route.query.project_id) {
+          url += `&project_id=${this.$route.query.project_id}`;
+        }
+        if (this.$route.query.location_id) {
+          url += `&location_id=${this.$route.query.location_id}`;
+        }
+        url += `&drilldown=true`;
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data && data.periods && data.periods.length > 0 && data.periods[0].employees) {
+          this.drilldownEmployees = data.periods[0].employees;
+        } else {
+          this.drilldownEmployees = [];
+        }
+      } catch (err) {
+        this.drilldownEmployees = [];
+      }
     },
     closeDrilldown() {
       this.showDrilldown = false;
       this.drilldownPeriodIndex = null;
+      this.drilldownEmployees = [];
     },
     downloadCSV() {
       const aggregationType = this.$route.params.aggregationType || 'single';
@@ -507,8 +555,8 @@ export default defineComponent({
       window.URL.revokeObjectURL(url);
     },
     sortedEmployeesForPeriod(idx) {
-      if (!this.periods[idx] || !this.periods[idx].employees) return [];
-      return [...this.periods[idx].employees].sort((a, b) => {
+      if (!this.showDrilldown || !this.drilldownEmployees) return [];
+      return [...this.drilldownEmployees].sort((a, b) => {
         const lastA = (a.last_name || '').toLowerCase();
         const lastB = (b.last_name || '').toLowerCase();
         if (lastA < lastB) return -1;
@@ -522,7 +570,7 @@ export default defineComponent({
       });
     },
     downloadDrilldownCSV(idx) {
-      if (!this.periods[idx] || !this.periods[idx].employees) return;
+      if (!this.showDrilldown || !this.drilldownEmployees) return;
       let csv = 'Last Name,First Name,Employee ID';
       this.selectedFields.forEach(field => {
         csv += ',' + this.formatLabel(field);
