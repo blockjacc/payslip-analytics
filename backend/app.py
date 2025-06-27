@@ -571,5 +571,107 @@ def get_settings_options(company_id, table_name):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/analytics-prefetch/<int:company_id>/<string:period_from>/<string:period_to>/<string:aggregation_type>', methods=['GET'])
+def analytics_prefetch(company_id, period_from, period_to, aggregation_type):
+    try:
+        import json
+        ENCRYPT_KEY = os.getenv('MYSQL_ENCRYPT_KEY')
+        # Parse fields from query param
+        selected_fields = request.args.get('fields', None)
+        if selected_fields:
+            try:
+                selected_fields = json.loads(selected_fields)
+                if not isinstance(selected_fields, list):
+                    selected_fields = None
+            except:
+                selected_fields = None
+        if not selected_fields:
+            return jsonify({'error': 'No fields specified'}), 400
+        # Optional filters
+        location_id = request.args.get('location_id', None)
+        department_id = request.args.get('department_id', None)
+        # ... add other filters as needed ...
+        drilldown = request.args.get('drilldown', 'false').lower() == 'true'
+        # Build SQL for selected fields
+        field_sql = ', '.join([
+            f"CAST(AES_DECRYPT(p.{field}, '{ENCRYPT_KEY}') AS DECIMAL(10,2)) AS {field}" for field in selected_fields
+        ])
+        # Employee name fields (decrypted)
+        name_fields = [
+            f"CAST(AES_DECRYPT(e.last_name, '{ENCRYPT_KEY}') AS CHAR(150) CHARACTER SET utf8) AS last_name",
+            f"CAST(AES_DECRYPT(e.first_name, '{ENCRYPT_KEY}') AS CHAR(150) CHARACTER SET utf8) AS first_name"
+        ]
+        # Build the query
+        query = f'''
+            SELECT p.emp_id, {', '.join(name_fields)}, p.period_from, p.period_to, {field_sql}
+            FROM payroll_payslip p
+            JOIN employee e ON p.emp_id = e.emp_id
+            WHERE p.company_id = %s
+              AND p.period_from >= %s AND p.period_to <= %s
+        '''
+        params = [company_id, period_from, period_to]
+        if location_id:
+            query += ''' AND p.emp_id IN (
+                SELECT emp_id FROM employee_payroll_information epi
+                WHERE epi.location_and_offices_id = %s
+            )'''
+            params.append(location_id)
+        # ... add other filters as needed ...
+        query += ' ORDER BY p.period_from, p.period_to, last_name, first_name'
+        cursor = mysql.connection.cursor()
+        cursor.execute(query, tuple(params))
+        rows = cursor.fetchall()
+        colnames = [desc[0] for desc in cursor.description]
+        data = [dict(zip(colnames, row)) for row in rows]
+        # Group by period if 'separate', else aggregate
+        if aggregation_type == 'separate':
+            periods = {}
+            for row in data:
+                period_key = (row['period_from'], row['period_to'])
+                if period_key not in periods:
+                    periods[period_key] = []
+                periods[period_key].append(row)
+            result = {'periods': []}
+            for (from_date, to_date), employees in sorted(periods.items()):
+                if drilldown:
+                    # Drill-down: return all employee rows for this period
+                    result['periods'].append({
+                        'period': {'from': str(from_date), 'to': str(to_date)},
+                        'employees': employees
+                    })
+                else:
+                    # Summary: aggregate by field
+                    summary = {field: 0.0 for field in selected_fields}
+                    for emp in employees:
+                        for field in selected_fields:
+                            summary[field] += float(emp[field] or 0)
+                    result['periods'].append({
+                        'period': {'from': str(from_date), 'to': str(to_date)},
+                        'summary': {k: round(v, 2) for k, v in summary.items()}
+                    })
+            if not drilldown:
+                # Add total across all periods
+                total = {field: 0.0 for field in selected_fields}
+                for period in result['periods']:
+                    for field in selected_fields:
+                        total[field] += period['summary'][field]
+                result['total'] = {k: round(v, 2) for k, v in total.items()}
+            return jsonify(result)
+        else:
+            # Aggregate or single: all data in one group
+            if drilldown:
+                # Drill-down: return all employee rows
+                return jsonify({'employees': data})
+            else:
+                # Summary: aggregate by field
+                summary = {field: 0.0 for field in selected_fields}
+                for row in data:
+                    for field in selected_fields:
+                        summary[field] += float(row[field] or 0)
+                return jsonify({'summary': {k: round(v, 2) for k, v in summary.items()}})
+    except Exception as e:
+        app.logger.error(f"Error in analytics-prefetch: {str(e)}")
+        return jsonify({'error': f'Failed to retrieve analytics-prefetch data: {str(e)}'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 

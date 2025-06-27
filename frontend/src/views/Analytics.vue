@@ -15,6 +15,12 @@
         <div class="h-[60vh] mb-12">
           <Bar :data="chartData" :options="chartOptions" />
         </div>
+        <div v-if="periods.length > 0" class="mb-8">
+          <div v-for="(period, idx) in periods" :key="idx" class="mb-2 flex items-center justify-between">
+            <span class="text-lg text-secondary">{{ formatDate(period.period.from) }} - {{ formatDate(period.period.to) }}</span>
+            <button class="bg-secondary text-white px-3 py-1 rounded text-sm font-semibold hover:bg-indigo-600" @click="showDrilldownForPeriod(idx)">Drill Down</button>
+          </div>
+        </div>
         <div class="mt-8 pt-8 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <div v-for="(value, key) in salaryData" :key="key" class="flex justify-between items-center p-2 px-4 bg-white/5 rounded-lg" v-if="value > 0">
             <span class="text-sm text-secondary">{{ formatLabel(key) }}:</span>
@@ -24,6 +30,45 @@
             <div class="flex justify-between items-center">
               <span class="text-xl font-bold text-primary">Total:</span>
               <span class="text-xl font-bold text-primary">{{ formatCurrency(totalSalary) }}</span>
+            </div>
+          </div>
+        </div>
+        <!-- Drill-Down Modal/Page -->
+        <div v-if="showDrilldown && drilldownPeriodIndex !== null" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div class="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b border-gray-200">
+              <div>
+                <span class="font-bold text-lg text-primary">Drill Down: </span>
+                <span class="text-secondary">{{ formatDate(periods[drilldownPeriodIndex].period.from) }} - {{ formatDate(periods[drilldownPeriodIndex].period.to) }}</span>
+              </div>
+              <button class="text-gray-500 hover:text-red-500 text-2xl font-bold" @click="closeDrilldown">&times;</button>
+            </div>
+            <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50">
+              <div>
+                <button v-if="drilldownPeriodIndex > 0" @click="showDrilldownForPeriod(drilldownPeriodIndex - 1)" class="mr-2 px-3 py-1 bg-primary text-white rounded hover:bg-emerald-600">&larr; Previous</button>
+                <button v-if="drilldownPeriodIndex < periods.length - 1" @click="showDrilldownForPeriod(drilldownPeriodIndex + 1)" class="px-3 py-1 bg-primary text-white rounded hover:bg-emerald-600">Next &rarr;</button>
+              </div>
+              <button @click="downloadDrilldownCSV(drilldownPeriodIndex)" class="bg-secondary text-white px-4 py-2 rounded font-semibold hover:bg-indigo-600">Download CSV</button>
+            </div>
+            <div class="overflow-auto p-4">
+              <table class="min-w-full text-sm text-left">
+                <thead>
+                  <tr class="bg-primary/10">
+                    <th class="p-2">Last Name</th>
+                    <th class="p-2">First Name</th>
+                    <th class="p-2">Employee ID</th>
+                    <th v-for="field in selectedFields" :key="field" class="p-2">{{ formatLabel(field) }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="emp in sortedEmployeesForPeriod(drilldownPeriodIndex)" :key="emp.emp_id">
+                    <td class="p-2">{{ emp.last_name }}</td>
+                    <td class="p-2">{{ emp.first_name }}</td>
+                    <td class="p-2">{{ emp.emp_id }}</td>
+                    <td v-for="field in selectedFields" :key="field" class="p-2">{{ formatCurrency(emp[field]) }}</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -46,26 +91,11 @@ export default defineComponent({
     return {
       loading: true,
       error: null,
-      analytics: {
-        basic: 0,
-        nsd: 0,
-        ot: 0,
-        holiday: 0,
-        paid_leave: 0,
-        allowances: 0,
-        deminimis: 0,
-        bonuses: 0,
-        other_comp: 0,
-        hazard_pay: 0,
-        retro: 0,
-        adj: 0,
-        total_salary: 0,
-        gross_pay: 0,
-        payslip_count: 0,
-        is_verified: false
-      },
+      analyticsPrefetchData: null,
       selectedFields: [],
       fieldDisplayNames: {},
+      showDrilldown: false,
+      drilldownPeriodIndex: null,
       baseYAxisMax: 40000,
       // Color mapping from payslip_field_colors.txt
       fieldColors: {
@@ -154,21 +184,26 @@ export default defineComponent({
       
       return filters.length > 0 ? filters.join(', ') : '';
     },
+    periods() {
+      return this.analyticsPrefetchData && this.analyticsPrefetchData.periods ? this.analyticsPrefetchData.periods : [];
+    },
+    summaryTotal() {
+      return this.analyticsPrefetchData && this.analyticsPrefetchData.total ? this.analyticsPrefetchData.total : {};
+    },
     chartData() {
       const aggregationType = this.$route.params.aggregationType || 'single';
-      if (aggregationType === 'separate' && this.analytics.periods) {
-        const periods = this.analytics.periods;
-        // Use only selected fields
+      if (aggregationType === 'separate' && this.periods.length) {
+        const periods = this.periods;
         const components = this.selectedFields.filter(field =>
-          periods.some(period => period.analytics[field] > 0)
+          periods.some(period => period.summary && period.summary[field] > 0)
         );
         const datasets = components.map(field => ({
           label: this.formatLabel(field),
-          data: periods.map(period => period.analytics[field] || 0),
+          data: periods.map(period => period.summary ? period.summary[field] || 0 : 0),
           backgroundColor: this.fieldColors[field] || '#24c2ab',
           borderColor: 'rgba(255, 255, 255, 0.1)',
           borderWidth: 1,
-          order: periods[0].analytics[field] || 0
+          order: periods[0].summary ? periods[0].summary[field] || 0 : 0
         }));
         return {
           labels: periods.map(period =>
@@ -176,68 +211,71 @@ export default defineComponent({
           ),
           datasets
         };
-      } else {
-        // For single period or aggregated view
+      } else if (this.analyticsPrefetchData && this.analyticsPrefetchData.summary) {
         const components = this.selectedFields.filter(field =>
-          this.analytics[field] > 0
+          this.analyticsPrefetchData.summary[field] > 0
         );
         return {
           labels: components.map(field => this.formatLabel(field)),
           datasets: [{
-            data: components.map(field => this.analytics[field] || 0),
+            data: components.map(field => this.analyticsPrefetchData.summary[field] || 0),
             backgroundColor: components.map(field => this.fieldColors[field] || '#24c2ab'),
             borderColor: 'rgba(255, 255, 255, 0.1)',
             borderWidth: 1
           }]
         };
+      } else {
+        return { labels: [], datasets: [] };
       }
     },
     salaryData() {
       const aggregationType = this.$route.params.aggregationType || 'single';
-      if (aggregationType === 'separate' && this.analytics.periods) {
-        // Sum up only selected fields
+      if (aggregationType === 'separate' && this.periods.length) {
         const sums = {};
         this.selectedFields.forEach(field => { sums[field] = 0; });
-        this.analytics.periods.forEach(period => {
+        this.periods.forEach(period => {
           this.selectedFields.forEach(field => {
-            sums[field] += period.analytics[field] || 0;
+            sums[field] += period.summary ? period.summary[field] || 0 : 0;
           });
         });
         return sums;
-      } else {
-        // Use analytics directly, only for selected fields
+      } else if (this.analyticsPrefetchData && this.analyticsPrefetchData.summary) {
         const result = {};
         this.selectedFields.forEach(field => {
-          result[field] = this.analytics[field] || 0;
+          result[field] = this.analyticsPrefetchData.summary[field] || 0;
         });
         return result;
+      } else {
+        return {};
       }
     },
     totalSalary() {
       const aggregationType = this.$route.params.aggregationType || 'single';
-      if (aggregationType === 'separate' && this.analytics.periods) {
+      if (aggregationType === 'separate' && this.periods.length) {
         return this.selectedFields.reduce((sum, field) => {
-          return sum + this.analytics.periods.reduce((pSum, period) => pSum + (period.analytics[field] || 0), 0);
+          return sum + this.periods.reduce((pSum, period) => pSum + (period.summary ? period.summary[field] || 0 : 0), 0);
         }, 0);
+      } else if (this.analyticsPrefetchData && this.analyticsPrefetchData.summary) {
+        return this.selectedFields.reduce((sum, field) => sum + (this.analyticsPrefetchData.summary[field] || 0), 0);
       } else {
-        return this.selectedFields.reduce((sum, field) => sum + (this.analytics[field] || 0), 0);
+        return 0;
       }
     },
     dynamicYAxisMax() {
       const aggregationType = this.$route.params.aggregationType || 'single';
       let maxValue = 0;
-      if (aggregationType === 'separate' && this.analytics.periods) {
+      if (aggregationType === 'separate' && this.periods.length) {
         // Find the highest value among all selected fields and all periods
-        this.analytics.periods.forEach(period => {
+        this.periods.forEach(period => {
           this.selectedFields.forEach(field => {
-            const value = period.analytics[field] || 0;
+            const value = period.summary ? period.summary[field] || 0 : 0;
             if (value > maxValue) maxValue = value;
           });
         });
       } else {
         // Find the highest value among all selected fields in the current analytics
         this.selectedFields.forEach(field => {
-          const value = this.analytics[field] || 0;
+          const value = this.analyticsPrefetchData && this.analyticsPrefetchData.summary ? this.analyticsPrefetchData.summary[field] || 0 : 0;
           if (value > maxValue) maxValue = value;
         });
       }
@@ -378,25 +416,18 @@ export default defineComponent({
     formatCurrency(value) {
       return new Intl.NumberFormat('en-US').format(value)
     },
-    async fetchAnalytics() {
+    async fetchAnalyticsPrefetch() {
       this.loading = true;
       this.error = null;
       try {
-        // Get selected fields from sessionStorage or use defaults
         const selectedFields = this.selectedFields.length > 0 
           ? this.selectedFields 
           : ['basic_pay', 'regular_pay', 'gross_pay', 'net_amount'];
-        
-        // Create URL with selected fields as query parameter
         const fieldsParam = encodeURIComponent(JSON.stringify(selectedFields));
-        let url = `/api/analytics/${this.companyId}/${this.employeeId}/${this.periodFrom}/${this.periodTo}/${this.$route.params.aggregationType || 'single'}?fields=${fieldsParam}`;
-        
-        // Add payroll group parameter if available
+        let url = `/api/analytics-prefetch/${this.companyId}/${this.periodFrom}/${this.periodTo}/${this.$route.params.aggregationType || 'single'}?fields=${fieldsParam}`;
         if (this.payrollGroupId) {
           url += `&payroll_group_id=${this.payrollGroupId}`;
         }
-        
-        // Add additional filter parameters
         if (this.$route.query.department_id) {
           url += `&department_id=${this.$route.query.department_id}`;
         }
@@ -418,84 +449,50 @@ export default defineComponent({
         if (this.$route.query.location_id) {
           url += `&location_id=${this.$route.query.location_id}`;
         }
-        
         const response = await fetch(url);
-        
         const data = await response.json();
-        
         if (!response.ok) {
           throw new Error(data.error || 'Failed to fetch analytics data');
         }
-        
         if (data.error) {
           throw new Error(data.error);
         }
-        
-        this.analytics = data;
+        this.analyticsPrefetchData = data;
       } catch (err) {
         this.error = err.message;
-        this.analytics = {
-          basic: 0,
-          nsd: 0,
-          ot: 0,
-          holiday: 0,
-          paid_leave: 0,
-          allowances: 0,
-          deminimis: 0,
-          bonuses: 0,
-          other_comp: 0,
-          hazard_pay: 0,
-          retro: 0,
-          adj: 0,
-          total_salary: 0
-        };
+        this.analyticsPrefetchData = null;
       } finally {
         this.loading = false;
       }
     },
-    getStackedDatasets() {
-      // Get non-zero components sorted by value
-      const components = Object.entries(this.analytics)
-        .filter(([key, value]) => 
-          key !== 'total_salary' && 
-          value > 0 && 
-          typeof value === 'number'
-        )
-        .sort((a, b) => a[1] - b[1]); // Sort by value ascending
-
-      const colors = this.getColors(components.length);
-      
-      return components.map(([key, value], index) => ({
-        label: this.formatLabel(key),
-        data: [value],
-        backgroundColor: colors[index],
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        borderWidth: 1
-      }));
+    showDrilldownForPeriod(index) {
+      this.showDrilldown = true;
+      this.drilldownPeriodIndex = index;
+    },
+    closeDrilldown() {
+      this.showDrilldown = false;
+      this.drilldownPeriodIndex = null;
     },
     downloadCSV() {
       const aggregationType = this.$route.params.aggregationType || 'single';
       let csv = '';
-      // Header row
-      if (aggregationType === 'separate' && this.analytics.periods) {
+      if (aggregationType === 'separate' && this.periods.length) {
         csv += 'Period From,Period To';
         this.selectedFields.forEach(field => {
           csv += ',' + this.formatLabel(field);
         });
         csv += '\n';
-        // Data rows
-        this.analytics.periods.forEach(period => {
+        this.periods.forEach(period => {
           csv += `${period.period.from},${period.period.to}`;
           this.selectedFields.forEach(field => {
-            csv += ',' + (period.analytics[field] !== undefined ? period.analytics[field] : '');
+            csv += ',' + (period.summary ? period.summary[field] : '');
           });
           csv += '\n';
         });
-      } else {
-        // Single/Aggregate view
+      } else if (this.analyticsPrefetchData && this.analyticsPrefetchData.summary) {
         csv += 'Field,Value\n';
         this.selectedFields.forEach(field => {
-          csv += `${this.formatLabel(field)},${this.analytics[field] !== undefined ? this.analytics[field] : ''}\n`;
+          csv += `${this.formatLabel(field)},${this.analyticsPrefetchData.summary[field] !== undefined ? this.analyticsPrefetchData.summary[field] : ''}\n`;
         });
       }
       // Download logic
@@ -503,7 +500,46 @@ export default defineComponent({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `analytics_${this.companyId}_${this.employeeId}_${this.periodFrom}_${this.periodTo}.csv`;
+      a.download = `analytics_${this.companyId}_${this.periodFrom}_${this.periodTo}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    },
+    sortedEmployeesForPeriod(idx) {
+      if (!this.periods[idx] || !this.periods[idx].employees) return [];
+      return [...this.periods[idx].employees].sort((a, b) => {
+        const lastA = (a.last_name || '').toLowerCase();
+        const lastB = (b.last_name || '').toLowerCase();
+        if (lastA < lastB) return -1;
+        if (lastA > lastB) return 1;
+        // If last names are equal, sort by first name
+        const firstA = (a.first_name || '').toLowerCase();
+        const firstB = (b.first_name || '').toLowerCase();
+        if (firstA < firstB) return -1;
+        if (firstA > firstB) return 1;
+        return 0;
+      });
+    },
+    downloadDrilldownCSV(idx) {
+      if (!this.periods[idx] || !this.periods[idx].employees) return;
+      let csv = 'Last Name,First Name,Employee ID';
+      this.selectedFields.forEach(field => {
+        csv += ',' + this.formatLabel(field);
+      });
+      csv += '\n';
+      this.sortedEmployeesForPeriod(idx).forEach(emp => {
+        csv += `${emp.last_name},${emp.first_name},${emp.emp_id}`;
+        this.selectedFields.forEach(field => {
+          csv += ',' + (emp[field] !== undefined ? emp[field] : '');
+        });
+        csv += '\n';
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `drilldown_${this.companyId}_${this.periods[idx].period.from}_${this.periods[idx].period.to}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -511,31 +547,25 @@ export default defineComponent({
     }
   },
   mounted() {
-    // Load selected fields from sessionStorage
     const storedFields = sessionStorage.getItem('selectedPayslipFields');
     if (storedFields) {
       this.selectedFields = JSON.parse(storedFields);
     } else {
-      // Default to some basic fields if nothing was selected
       this.selectedFields = ['basic_pay', 'regular_pay', 'gross_pay', 'net_amount'];
     }
-    
-    // Fetch field display names
     this.fetchFieldDisplayNames();
-    
-    // Fetch analytics data
-    this.fetchAnalytics();
+    this.fetchAnalyticsPrefetch();
   },
   watch: {
     '$route.params': {
       handler() {
-        this.fetchAnalytics()
+        this.fetchAnalyticsPrefetch();
       },
       deep: true
     },
     '$route.query': {
       handler() {
-        this.fetchAnalytics()
+        this.fetchAnalyticsPrefetch();
       },
       deep: true
     }

@@ -36,6 +36,11 @@ const routes = [
     path: '/analytics/:companyId/:employeeId/:periodFrom/:periodTo/:aggregationType?',
     name: 'Analytics',
     component: Analytics
+  },
+  {
+    path: '/analytics-prefetch-test',
+    name: 'AnalyticsPrefetchTest',
+    component: () => import('../views/AnalyticsPrefetchTest.vue')
   }
 ]
 
