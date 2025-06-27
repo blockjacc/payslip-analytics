@@ -1,261 +1,1 @@
-Employee Table			
-table name	employee		Encrypted
-			
-Field Name	Type	Purpose / Description	
-emp_id	int(11)	Primary identifier for the employee	
-company_id	int(11)	Reference to the company the employee belongs to	
-nickname	varbinary(150)	Employeeís preferred or casual name	
-last_name	varbinary(150)	Employeeís last (family) name	
-first_name	varbinary(150)	Employeeís first (given) name	
-middle_name	varbinary(150)	Employeeís middle name	
-address	varbinary(150)	Full residential address	
-mobile_no	varbinary(150)	Employeeís mobile phone number	
-home_no	varbinary(150)	Home landline number	
-state	varbinary(150)	State or region of residence	
-city	varbinary(150)	City of residence	
-zipcode	varbinary(150)	Postal or ZIP code	
-tin	varbinary(150)	Tax Identification Number	
-hdmf	varbinary(150)	"Home Development Mutual Fund number (e.g., Pag-IBIG)"	
-umid	varbinary(150)	Unified Multi-Purpose ID number	
-sss	varbinary(150)	Social Security System number	
-phil_health	varbinary(150)	PhilHealth number	
-work_office_telephone_number	varbinary(150)	Office telephone number	
-work_mobile_telephone	varbinary(150)	Mobile work phone	
-work_office_telephone_extension	varbinary(150)	Extension number	
-emergency_contact_relation	varbinary(150)	Relation of emergency contact to employee	
-emergency_contact_email	varbinary(150)	Email of emergency contact	
-emergency_contact_home_num	varbinary(150)	Landline of emergency contact	
-emergency_contact_address	varbinary(150)	Address of emergency contact	
-emergency_contact_person	varbinary(150)	Name of emergency contact	
-employee_notes	varbinary(150)	Notes about employee (HR use)	
-hmo_number	varbinary(150)	Health Maintenance Organization number (if covered)	
-dob	date	Date of birth	
-gender	varchar(50)	Gender identity	
-marital_status	"enum('Married','Single','Widow','Divorce')"	"Marital status (e.g., Single, Married)"	
-emergency_contact_number	varbinary(150)	Emergency contact's phone number	
-no_of_dependents	varbinary(150)	Number of dependents claimed	
-citizenship_status	varchar(150)	"citizenship (filipino , etc)"	
-marital_status_date	date	Date when marital status last changed	
-created_by_account_id	int(11)	Who created the record	
-created_date	datetime	When the record was created	
-updated_by_account_id	int(11)	Who last updated the record	
-updated_date	datetime	When the record was last updated	
-account_id	int(11)	Login or user account reference	
-status	"enum('Active','Inactive') default 'Active'"	Active/inactive status of employee record	
-confidential	"enum('Active','Inactive') default 'Active'"	Flag for confidential status	
-confidential_updated_by_account_id	int(11)	Who updated the confidentiality flag	
-			
-Employeee Payroll_information Table			
-table name	employee_payroll_information		
-			
-Field	Type	Description	
-employee_payroll_information_id	int(11)	Primary key ID for the employee payroll information record	
-emp_id	int(11)	Employee ID identifier 	employee_payroll_information.emp_id = employee.emp_id join to employee
-company_id	int(11)	Company identifier	
-department_id	int(11)	Unique identifier referencing the department from the department settings table	employee_payroll_information.department_id = department.dept_id get the department settings
-rank_id	int(11)	Unique identifier referencing the employee rank from the rank settings table	employee_payroll_information.rank_id = rank.rank_id get the rank settings
-payroll_group_id	int(11)	Identifier for the payroll group assigned to the employee	employee_payroll_information.payroll_group_id = payroll_group.payroll_group_id get the employment settings
-employment_type	int(11)	References the employment type defined in the employment type settings table	employee_payroll_information.employment_type = employment_type.emp_type_id
-position	int(11)	References the position title from the position settings table	employee_payroll_information.position= position.position_id get the project settings
-cost_center	int(11)	Identifier for the cost center used for accounting and tracking (from settings)	employee_payroll_information.cost_center = cost_center.cost_center_id  on cost_center settings
-project_id	int(11)	Unique identifier referencing the associated project from the project table	employee_payroll_information.project_id = project.project_id get the project settings
-location_and_offices_id	int(11)	References the employee's assigned location or office from the locations table	employee_payroll_information.location_and_offices_id = location.location_and_offices get location
-date_hired	date	Date the employee was hired	
-last_date	date	Last working date (if applicable)	
-payment_method	"enum('Cash','Debit','Electronic Transfer','Cheque','Bank Information') default null"	Mode of salary payment	
-bank_route	varbinary(150)	Bank routing number	
-bank_account	varbinary(150)	Employeeís bank account number	
-account_type	varbinary(150)	Type of bank account	
-sss_contribution_amount	varbinary(150)	SSS contribution amount	
-hdmf_contribution_amount	varbinary(150)	HDMF contribution amount	
-philhealth_contribution_amount	varbinary(150)	PhilHealth contribution amount	
-witholding_tax	"enum('yes','no)"	Withholding tax flag	
-resigned_date	date	Date the employee resigned	
-regular_date	date	Date the employee was regularized	
-employee_status	"enum('Active','Inactive','End of Employment') default 'Active'"	"Status of the employee (used for handling billing subscriptions, where ëactiveí and ëinactiveí are part of the subscription, while ëend of employmentí is not)"	
-entitled_to_overtime	"enum('yes','no) default 'no'"	Is the employee entitled to overtime?	
-entitled_to_holiday_pay	"enum('yes','no) default 'no'"	Is the employee entitled to holiday pay?	
-entitled_to_night_differential	"enum('yes','no) default 'no'"	Is the employee entitled to night differential?	
-entitled_to_rest_day	"enum('yes','no) default 'no'"	Is the employee entitled to rest day benefits?	
-entitled_to_sss	"enum('yes','no) default 'no'"	Is the employee covered by SSS?	
-entitled_to_philhealth	"enum('yes','no) default 'no'"	Is the employee covered by PhilHealth?	
-entitled_to_pagibig	"enum('yes','no) default 'no'"	Is the employee covered by Pag-IBIG?	
-entitled_to_deminimis	"enum('yes','no) default 'no'"	Is the employee entitled to de minimis benefits?	
-entitled_to_hdmf	"enum('yes','no) default 'no'"	Is the employee covered by HDMF?	
-entitled_to_basic_pay	"enum('yes','no) default 'no'"	Is the employee entitled to basic pay?	
-entitled_to_leaves	"enum('yes','no) default 'no'"	Is the employee entitled to leaves?	
-entitled_to_hazard_pay	"enum('yes','no) default 'no'"	Is the employee entitled to hazard pay?	
-entitled_to_thirteen_month_pay	"enum('yes','no) default 'no'"	Is the employee entitled to 13th-month pay?	
-entitled_to_service_charge	"enum('yes','no) default 'no'"	Is the employee entitled to service charge?	
-entitled_to_regular_holiday	"enum('yes','no) default 'no'"	Is the employee entitled to regular holiday pay?	
-entitled_to_unwork_regular_holiday	"enum('yes','no) default 'no'"	Entitlement to unworked regular holidays	
-entitled_to_special_holiday	"enum('yes','no) default 'no'"	Entitlement to special holiday pay	
-entitled_to_unwork_special_holiday	"enum('yes','no) default 'no'"	Entitlement to unworked special holidays	
-entitled_to_tax	"enum('yes','no) default 'no'"	Is the employee subject to tax?	
-entitled_to_hdmf_voluntary	"enum('yes','no) default 'no'"	Entitlement to voluntary HDMF contributions	
-entitled_to_hdmf_modified	"enum('yes','no) default 'no'"	Entitlement to modified HDMF contributions	
-fixed_sss	"decimal(11,2)"	Fixed SSS contribution amount	
-fixed_hdmf	"decimal(11,2)"	Fixed HDMF contribution amount	
-fixed_philhealth	"decimal(11,2)"	Fixed PhilHealth contribution amount	
-minimum_wage_earner	"enum('yes','no')"	Flag indicating if the employee is a minimum wage earner	
-timesheet_required	"enum('yes','no) default 'no'"	Flag indicating if timesheet submission is required for the employee	
-status	"enum('Active','Inactive') default 'Active'"	Status	
-date_terminated	datetime	Termination date	
-regularization_date	date	Regularization date	
-effective_date	date	Effective date of employment	
-employee_share_mixed_deduction	"decimal(11,2)"	HDMF mixed deduction value	
-employee_share_hdmf_voluntary	"decimal(11,2)"	HDMF voluntary contribution amount	
-employee_share_hdmf_modified	"decimal(11,2)"	HDMF modified contribution amount	
-fixed_hdmf_rate	"decimal(11,2)"	Fixed HDMF rate	
-			
-			
-Deparment table			
-table name	department		
-			
-Field	Type	Description	Link identifier fields from other tables to employee_payroll_information
-dept_id	int(11)	Primary identifier for the department	dept_id
-company_id	int(11)	Description of company_id	company_id
-department_name	varchar(150)	Description of department_name	department_name
-description	text	Description of description	
-created_by_account_id	int(11)	Description of created_by_account_id	
-created_date	datetime	Description of created_date	
-updated_by_account_id	int(11)	Description of updated_by_account_id	
-updated_date	datetime	Description of updated_date	
-status	"enum('Active','Inactive')"	Description of status	
-			
-			
-Rank Table			
-table name	rank		
-			
-Field	Type	Description	Link identifier fields from other tables to employee_payroll_information
-rank_id	int(11)	Primary identifier for the rank	rank_id
-rank_name	varchar(150)	Description of rank_name	company_id
-description	text	Description of description	rank_name
-company_id	int(11)	Description of company_id	
-created_by_account_id	int(11)	Description of created_by_account_id	
-created_date	datetime	Description of created_date	
-updated_by_account_id	int(11)	Description of updated_by_account_id	
-updated_date	datetime	Description of updated_date	
-status	"enum('Active','Inactive')"	Description of status	
-updated_by_name	varchar(150)	Description of updated_by_name	
-created_by_name	varchar(150)	Description of created_by_name	
-			
-			
-Payroll Group Table			
-table name	payroll_group		
-			
-Field	Type	Description	Link identifier fields from other tables to employee_payroll_information
-payroll_group_id	int(11)	Primary identifier for the payroll_group	payroll_group_id
-name	varchar(150)	Name of the payroll group	company_id
-payroll_group_description	text	Detailed description of the payroll group	name
-period_type	varchar(150)	Type of payroll period 	
-pay_rate_type	varchar(150)	Type of pay rate	
-company_id	int(11)	Associated company identifier	
-work_schedule_id	int(11)	Associated work schedule identifier	
-created_by_account_id	int(11)	the user who created the record	
-created_date	datetime	Date and time the record was created	
-updated_by_account_id	int(11)	Account ID of the user who last updated the record	
-updated_date	datetime	Date and time the record was last updated	
-status	"enum('Active','Inactive')"	Current status of the record (Active or Inactive)	
-confidential	"enum('yes','no')"	Flag indicating if the payroll group is confidential	
-			
-Employment Type Table			
-table name	employment_type		
-Field	Type	Description	Link identifier fields from other tables to employee_payroll_information
-emp_type_id	int(11)	Primary identifier for the employment_type	emp_type_id
-company_id	int(11)	Company identifier	company_id
-name	varchar(150)	Name of employee type	name
-description	text	Detailed description	
-entitled_to_overtime	"enum('yes','no')"	Entitled to overtime pay	
-entitled_to_holiday_pay	"enum('yes','no')"	Entitled to holiday pay	
-entitled_to_night_differential	"enum('yes','no')"	Entitled to night differential pay	
-entitled_to_rest_day	"enum('yes','no') "	Entitled to rest day pay	
-entitled_to_deminimis	"enum('yes','no')"	Entitled to de minimis benefits	
-entitled_to_basic_pay	"enum('yes','no')"	Entitled to basic pay	
-entitled_to_leaves	"enum('yes','no')"	Entitled to leave benefits	
-entitled_to_sss	"enum('yes','no')"	Entitled to SSS	
-entitled_to_philhealth	"enum('yes','no')"	Entitled to PhilHealth	
-entitled_to_hdmf	"enum('yes','no')"	Entitled to HDMF	
-entitled_to_thirteen_month_pay	"enum('yes','no')"	Entitled to 13th month pay	
-entitled_to_service_charge	"enum('yes','no')"	Entitled to service charge	
-entitled_to_hazard_pay	"enum('yes','no')"	Entitled to hazard pay	
-entitled_to_regular_holiday	"enum('yes','no')"	Entitled to regular holiday pay	
-entitled_to_unwork_regular_holiday	"enum('yes','no')"	Entitled to unworked regular holiday pay	
-entitled_to_special_holiday	"enum('yes','no')"	Entitled to special holiday pay	
-entitled_to_unwork_special_holiday	"enum('yes','no')"	Entitled to unworked special holiday pay	
-created_by_account_id	"enum('yes','no')"	Account ID who created	
-created_date	datetime	Record creation date	
-updated_by_account_id	int(11)	Account ID who last updated	
-updated_date	datetime	Record last updated date	
-status	"enum('Active','Inactive')"	set status	
-			
-			
-Position Table			
-table name	position		
-			
-Field	Type	Description	Link identifier fields from other tables to employee_payroll_information
-position_id	int(11)	Primary identifier for the position	position_id
-position_name	varchar(150)	Description of position_name	company_id
-description	text	Description of description	position_name
-company_id	int(11)	Description of company_id	
-created_by_account_id	int(11)	Description of created_by_account_id	
-created_date	datetime	Description of created_date	
-updated_by_account_id	int(11)	Description of updated_by_account_id	
-updated_date	datetime	Description of updated_date	
-status	"enum('Active','Inactive')"	Description of status	
-updated_by_name	varchar(150)	Description of updated_by_name	
-created_by_name	varchar(150)	Description of created_by_name	
-			
-Cost Center Table			
-table name	cost_center		
-			
-Field	Type	Description	Link identifier fields from other tables to employee_payroll_information
-cost_center_id	int(11)	Primary identifier for the cost_center	cost_center_id
-company_id	int(11)	Description of company_id	company_id
-cost_center_code	varchar(150)	Description of cost_center_code	cost_center_code
-description	text	Description of description	
-created_by_account_id	int(11)	Description of created_by_account_id	
-created_date	datetime	Description of created_date	
-date_created	int(11)	Description of date_created	
-updated_by_account_id	int(11)	Description of updated_by_account_id	
-updated_date	datetime	Description of updated_date	
-status	"enum('Active','Inactive')"	Description of status	
-deleted	varchar(150)	Description of deleted	
-updated_by_name	varchar(150)	Description of updated_by_name	
-created_by_name	varchar(150)	Description of created_by_name	
-			
-Project Table			
-table name	project		
-			
-Field	Type	Description	Link identifier fields from other tables to employee_payroll_information
-project_id	int(11)	Primary identifier for the project	project_id
-project_name	varchar(150)	Description of project_name	company_id
-project_description	text	Description of project_description	project_name
-company_id	int(11)	Description of company_id	
-status	"enum('Active','Inactive')"	Description of status	
-created_by_account_id	int(11)	Description of created_by_account_id	
-created_date	datetime	Description of created_date	
-updated_by_account_id	int(11)	Description of updated_by_account_id	
-updated_date	datetime	Description of updated_date	
-updated_by_name	varchar(150)	Description of updated_by_name	
-created_by_name	varchar(150)	Description of created_by_name	
-			
-Location and Offices Table			
-table name	location_and_offices		
-			
-Field	Type	Description	Link identifier fields from other tables to employee_payroll_information
-location_and_offices_id	int(11)	Primary identifier for the location	location_and_offices_id
-company_id	int(11)	Description of company_id	company_id
-name	varchar(150)	Description of name	name
-location_description	text	Description of location_description	
-street	varchar(150)	Description of street	
-city	varchar(150)	Description of city	
-state	varchar(150)	Description of state	
-zipcode	varchar(150)	Description of zipcode	
-created_by_account_id	int(11)	Description of created_by_account_id	
-created_date	datetime	Description of created_date	
-updated_by_account_id	int(11)	Description of updated_by_account_id	
-updated_date	datetime	Description of updated_date	
-status	"enum('Active','Inactive')"	Description of status	
-updated_by_name	varchar(150)	Description of updated_by_name	
-created_by_name	varchar(150)	Description of created_by_name	
+Employee Table				table name	employee		Encrypted					Field Name	Type	Purpose / Description		emp_id	int(11)	Primary identifier for the employee		ncompany_id	int(11)	Reference to the company the employee belongs to		nnickname	varbinary(150)	Employee’s preferred or casual name		elast_name	varbinary(150)	Employee’s last (family) name		efirst_name	varbinary(150)	Employee’s first (given) name		emiddle_name	varbinary(150)	Employee’s middle name		eaddress	varbinary(150)	Full residential address		emobile_no	varbinary(150)	Employee’s mobile phone number		ehome_no	varbinary(150)	Home landline number		estate	varbinary(150)	State or region of residence		ecity	varbinary(150)	City of residence		ezipcode	varbinary(150)	Postal or ZIP code		etin	varbinary(150)	Tax Identification Number		ehdmf	varbinary(150)	"Home Development Mutual Fund number (e.g., Pag-IBIG)"		eumid	varbinary(150)	Unified Multi-Purpose ID number		esss	varbinary(150)	Social Security System number		ephil_health	varbinary(150)	PhilHealth number		ework_office_telephone_number	varbinary(150)	Office telephone number		ework_mobile_telephone	varbinary(150)	Mobile work phone		ework_office_telephone_extension	varbinary(150)	Extension number		eemergency_contact_relation	varbinary(150)	Relation of emergency contact to employee		eemergency_contact_email	varbinary(150)	Email of emergency contact		eemergency_contact_home_num	varbinary(150)	Landline of emergency contact		eemergency_contact_address	varbinary(150)	Address of emergency contact		eemergency_contact_person	varbinary(150)	Name of emergency contact		eemployee_notes	varbinary(150)	Notes about employee (HR use)		ehmo_number	varbinary(150)	Health Maintenance Organization number (if covered)		edob	date	Date of birth		ngender	varchar(50)	Gender identity		nmarital_status	"enum('Married','Single','Widow','Divorce')"	"Marital status (e.g., Single, Married)"		nemergency_contact_number	varbinary(150)	Emergency contact's phone number		nno_of_dependents	varbinary(150)	Number of dependents claimed		ncitizenship_status	varchar(150)	"citizenship (filipino , etc)"		nmarital_status_date	date	Date when marital status last changed		ncreated_by_account_id	int(11)	Who created the record		ncreated_date	datetime	When the record was created		nupdated_by_account_id	int(11)	Who last updated the record		nupdated_date	datetime	When the record was last updated		naccount_id	int(11)	Login or user account reference		nstatus	"enum('Active','Inactive') default 'Active'"	Active/inactive status of employee record		nconfidential	"enum('Active','Inactive') default 'Active'"	Flag for confidential status		nconfidential_updated_by_account_id	int(11)	Who updated the confidentiality flag		n				nEmployeee Payroll_information Table				table name	employee_payroll_information							Field	Type	Description		employee_payroll_information_id	int(11)	Primary key ID for the employee payroll information record		nemp_id	int(11)	Employee ID identifier 	employee_payroll_information.emp_id = employee.emp_id join to employee	ncompany_id	int(11)	Company identifier		ndepartment_id	int(11)	Unique identifier referencing the department from the department settings table	employee_payroll_information.department_id = department.dept_id get the department settings	nrank_id	int(11)	Unique identifier referencing the employee rank from the rank settings table	employee_payroll_information.rank_id = rank.rank_id get the rank settings	npayroll_group_id	int(11)	Identifier for the payroll group assigned to the employee	employee_payroll_information.payroll_group_id = payroll_group.payroll_group_id get the employment settings	nemployment_type	int(11)	References the employment type defined in the employment type settings table	employee_payroll_information.employment_type = employment_type.emp_type_id	nposition	int(11)	References the position title from the position settings table	employee_payroll_information.position= position.position_id get the project settings	ncost_center	int(11)	Identifier for the cost center used for accounting and tracking (from settings)	employee_payroll_information.cost_center = cost_center.cost_center_id  on cost_center settings	nproject_id	int(11)	Unique identifier referencing the associated project from the project table	employee_payroll_information.project_id = project.project_id get the project settings	nlocation_and_offices_id	int(11)	References the employee's assigned location or office from the locations table	employee_payroll_information.location_and_offices_id = location.location_and_offices get location	ndate_hired	date	Date the employee was hired		nlast_date	date	Last working date (if applicable)		npayment_method	"enum('Cash','Debit','Electronic Transfer','Cheque','Bank Information') default null"	Mode of salary payment		nbank_route	varbinary(150)	Bank routing number		ebank_account	varbinary(150)	Employee’s bank account number		eaccount_type	varbinary(150)	Type of bank account		esss_contribution_amount	varbinary(150)	SSS contribution amount		ehdmf_contribution_amount	varbinary(150)	HDMF contribution amount		ephilhealth_contribution_amount	varbinary(150)	PhilHealth contribution amount		ewitholding_tax	"enum('yes','no)"	Withholding tax flag		nresigned_date	date	Date the employee resigned		nregular_date	date	Date the employee was regularized		nemployee_status	"enum('Active','Inactive','End of Employment') default 'Active'"	"Status of the employee (used for handling billing subscriptions, where ‘active’ and ‘inactive’ are part of the subscription, while ‘end of employment’ is not)"		nentitled_to_overtime	"enum('yes','no) default 'no'"	Is the employee entitled to overtime?		nentitled_to_holiday_pay	"enum('yes','no) default 'no'"	Is the employee entitled to holiday pay?		nentitled_to_night_differential	"enum('yes','no) default 'no'"	Is the employee entitled to night differential?		nentitled_to_rest_day	"enum('yes','no) default 'no'"	Is the employee entitled to rest day benefits?		nentitled_to_sss	"enum('yes','no) default 'no'"	Is the employee covered by SSS?		nentitled_to_philhealth	"enum('yes','no) default 'no'"	Is the employee covered by PhilHealth?		nentitled_to_pagibig	"enum('yes','no) default 'no'"	Is the employee covered by Pag-IBIG?		nentitled_to_deminimis	"enum('yes','no) default 'no'"	Is the employee entitled to de minimis benefits?		nentitled_to_hdmf	"enum('yes','no) default 'no'"	Is the employee covered by HDMF?		nentitled_to_basic_pay	"enum('yes','no) default 'no'"	Is the employee entitled to basic pay?		nentitled_to_leaves	"enum('yes','no) default 'no'"	Is the employee entitled to leaves?		nentitled_to_hazard_pay	"enum('yes','no) default 'no'"	Is the employee entitled to hazard pay?		nentitled_to_thirteen_month_pay	"enum('yes','no) default 'no'"	Is the employee entitled to 13th-month pay?		nentitled_to_service_charge	"enum('yes','no) default 'no'"	Is the employee entitled to service charge?		nentitled_to_regular_holiday	"enum('yes','no) default 'no'"	Is the employee entitled to regular holiday pay?		nentitled_to_unwork_regular_holiday	"enum('yes','no) default 'no'"	Entitlement to unworked regular holidays		nentitled_to_special_holiday	"enum('yes','no) default 'no'"	Entitlement to special holiday pay		nentitled_to_unwork_special_holiday	"enum('yes','no) default 'no'"	Entitlement to unworked special holidays		nentitled_to_tax	"enum('yes','no) default 'no'"	Is the employee subject to tax?		nentitled_to_hdmf_voluntary	"enum('yes','no) default 'no'"	Entitlement to voluntary HDMF contributions		nentitled_to_hdmf_modified	"enum('yes','no) default 'no'"	Entitlement to modified HDMF contributions		nfixed_sss	"decimal(11,2)"	Fixed SSS contribution amount		nfixed_hdmf	"decimal(11,2)"	Fixed HDMF contribution amount		nfixed_philhealth	"decimal(11,2)"	Fixed PhilHealth contribution amount		nminimum_wage_earner	"enum('yes','no')"	Flag indicating if the employee is a minimum wage earner		ntimesheet_required	"enum('yes','no) default 'no'"	Flag indicating if timesheet submission is required for the employee		nstatus	"enum('Active','Inactive') default 'Active'"	Status		ndate_terminated	datetime	Termination date		nregularization_date	date	Regularization date		neffective_date	date	Effective date of employment		nemployee_share_mixed_deduction	"decimal(11,2)"	HDMF mixed deduction value		nemployee_share_hdmf_voluntary	"decimal(11,2)"	HDMF voluntary contribution amount		nemployee_share_hdmf_modified	"decimal(11,2)"	HDMF modified contribution amount		nfixed_hdmf_rate	"decimal(11,2)"	Fixed HDMF rate		n								Deparment table				table name	department							Field	Type	Description	Link identifier fields from other tables to employee_payroll_information	dept_id	int(11)	Primary identifier for the department	dept_id	ncompany_id	int(11)	Description of company_id	company_id	ndepartment_name	varchar(150)	Description of department_name	department_name	ndescription	text	Description of description		ncreated_by_account_id	int(11)	Description of created_by_account_id		ncreated_date	datetime	Description of created_date		nupdated_by_account_id	int(11)	Description of updated_by_account_id		nupdated_date	datetime	Description of updated_date		nstatus	"enum('Active','Inactive')"	Description of status		n								Rank Table				table name	rank							Field	Type	Description	Link identifier fields from other tables to employee_payroll_information	rank_id	int(11)	Primary identifier for the rank	rank_id	nrank_name	varchar(150)	Description of rank_name	company_id	ndescription	text	Description of description	rank_name	ncompany_id	int(11)	Description of company_id		ncreated_by_account_id	int(11)	Description of created_by_account_id		ncreated_date	datetime	Description of created_date		nupdated_by_account_id	int(11)	Description of updated_by_account_id		nupdated_date	datetime	Description of updated_date		nstatus	"enum('Active','Inactive')"	Description of status		nupdated_by_name	varchar(150)	Description of updated_by_name		ncreated_by_name	varchar(150)	Description of created_by_name		n								Payroll Group Table				table name	payroll_group							Field	Type	Description	Link identifier fields from other tables to employee_payroll_information	payroll_group_id	int(11)	Primary identifier for the payroll_group	payroll_group_id	nname	varchar(150)	Name of the payroll group	company_id	npayroll_group_description	text	Detailed description of the payroll group	name	nperiod_type	varchar(150)	Type of payroll period 		npay_rate_type	varchar(150)	Type of pay rate		ncompany_id	int(11)	Associated company identifier		nwork_schedule_id	int(11)	Associated work schedule identifier		ncreated_by_account_id	int(11)	the user who created the record		ncreated_date	datetime	Date and time the record was created		nupdated_by_account_id	int(11)	Account ID of the user who last updated the record		nupdated_date	datetime	Date and time the record was last updated		nstatus	"enum('Active','Inactive')"	Current status of the record (Active or Inactive)		nconfidential	"enum('yes','no')"	Flag indicating if the payroll group is confidential		n				Employment Type Table				table name	employment_type			Field	Type	Description	Link identifier fields from other tables to employee_payroll_information	emp_type_id	int(11)	Primary identifier for the employment_type	emp_type_id	ncompany_id	int(11)	Company identifier	company_id	nname	varchar(150)	Name of employee type	name	ndescription	text	Detailed description		nentitled_to_overtime	"enum('yes','no')"	Entitled to overtime pay		nentitled_to_holiday_pay	"enum('yes','no')"	Entitled to holiday pay		nentitled_to_night_differential	"enum('yes','no')"	Entitled to night differential pay		nentitled_to_rest_day	"enum('yes','no') "	Entitled to rest day pay		nentitled_to_deminimis	"enum('yes','no')"	Entitled to de minimis benefits		nentitled_to_basic_pay	"enum('yes','no')"	Entitled to basic pay		nentitled_to_leaves	"enum('yes','no')"	Entitled to leave benefits		nentitled_to_sss	"enum('yes','no')"	Entitled to SSS		nentitled_to_philhealth	"enum('yes','no')"	Entitled to PhilHealth		nentitled_to_hdmf	"enum('yes','no')"	Entitled to HDMF		nentitled_to_thirteen_month_pay	"enum('yes','no')"	Entitled to 13th month pay		nentitled_to_service_charge	"enum('yes','no')"	Entitled to service charge		nentitled_to_hazard_pay	"enum('yes','no')"	Entitled to hazard pay		nentitled_to_regular_holiday	"enum('yes','no')"	Entitled to regular holiday pay		nentitled_to_unwork_regular_holiday	"enum('yes','no')"	Entitled to unworked regular holiday pay		nentitled_to_special_holiday	"enum('yes','no')"	Entitled to special holiday pay		nentitled_to_unwork_special_holiday	"enum('yes','no')"	Entitled to unworked special holiday pay		ncreated_by_account_id	"enum('yes','no')"	Account ID who created		ncreated_date	datetime	Record creation date		nupdated_by_account_id	int(11)	Account ID who last updated		nupdated_date	datetime	Record last updated date		nstatus	"enum('Active','Inactive')"	set status		n								Position Table				table name	position							Field	Type	Description	Link identifier fields from other tables to employee_payroll_information	position_id	int(11)	Primary identifier for the position	position_id	nposition_name	varchar(150)	Description of position_name	company_id	ndescription	text	Description of description	position_name	ncompany_id	int(11)	Description of company_id		ncreated_by_account_id	int(11)	Description of created_by_account_id		ncreated_date	datetime	Description of created_date		nupdated_by_account_id	int(11)	Description of updated_by_account_id		nupdated_date	datetime	Description of updated_date		nstatus	"enum('Active','Inactive')"	Description of status		nupdated_by_name	varchar(150)	Description of updated_by_name		ncreated_by_name	varchar(150)	Description of created_by_name		n				Cost Center Table				table name	cost_center							Field	Type	Description	Link identifier fields from other tables to employee_payroll_information	cost_center_id	int(11)	Primary identifier for the cost_center	cost_center_id	ncompany_id	int(11)	Description of company_id	company_id	ncost_center_code	varchar(150)	Description of cost_center_code	cost_center_code	ndescription	text	Description of description		ncreated_by_account_id	int(11)	Description of created_by_account_id		ncreated_date	datetime	Description of created_date		ndate_created	int(11)	Description of date_created		nupdated_by_account_id	int(11)	Description of updated_by_account_id		nupdated_date	datetime	Description of updated_date		nstatus	"enum('Active','Inactive')"	Description of status		ndeleted	varchar(150)	Description of deleted		nupdated_by_name	varchar(150)	Description of updated_by_name		ncreated_by_name	varchar(150)	Description of created_by_name		n				Project Table				table name	project							Field	Type	Description	Link identifier fields from other tables to employee_payroll_information	project_id	int(11)	Primary identifier for the project	project_id	nproject_name	varchar(150)	Description of project_name	company_id	nproject_description	text	Description of project_description	project_name	ncompany_id	int(11)	Description of company_id		nstatus	"enum('Active','Inactive')"	Description of status		ncreated_by_account_id	int(11)	Description of created_by_account_id		ncreated_date	datetime	Description of created_date		nupdated_by_account_id	int(11)	Description of updated_by_account_id		nupdated_date	datetime	Description of updated_date		nupdated_by_name	varchar(150)	Description of updated_by_name		ncreated_by_name	varchar(150)	Description of created_by_name		n				Location and Offices Table				table name	location_and_offices							Field	Type	Description	Link identifier fields from other tables to employee_payroll_information	location_and_offices_id	int(11)	Primary identifier for the location	location_and_offices_id	ncompany_id	int(11)	Description of company_id	company_id	nname	varchar(150)	Description of name	name	nlocation_description	text	Description of location_description		nstreet	varchar(150)	Description of street		ncity	varchar(150)	Description of city		nstate	varchar(150)	Description of state		nzipcode	varchar(150)	Description of zipcode		ncreated_by_account_id	int(11)	Description of created_by_account_id		ncreated_date	datetime	Description of created_date		nupdated_by_account_id	int(11)	Description of updated_by_account_id		nupdated_date	datetime	Description of updated_date		nstatus	"enum('Active','Inactive')"	Description of status		nupdated_by_name	varchar(150)	Description of updated_by_name		ncreated_by_name	varchar(150)	Description of created_by_name		n

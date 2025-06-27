@@ -1,0 +1,71 @@
+# Learnings from Payroll Analytics App Development
+
+## 1. Importance of Data Encryption Awareness
+- Always be aware of which fields in the database are encrypted, especially when writing SQL queries.
+- Use AES_DECRYPT in SQL for all encrypted fields, and ensure decrypted values are properly converted to strings or numbers before returning them in JSON responses.
+- Document encrypted fields clearly and keep this documentation up to date.
+
+## 2. Testing and Regression Prevention
+- Never change critical backend logic (such as encryption/decryption) without automated regression tests.
+- Add tests for all endpoints, especially those handling sensitive or complex data transformations.
+- Commit working code before making major changes, so you can easily revert to a known good state.
+
+## 3. Error Handling and Debugging
+- Always log full stack traces for backend errors, and ensure logs are accessible (not just printed to the terminal).
+- Add detailed error messages and debug prints when diagnosing issues, but remove or reduce them before deploying to production.
+- Use type checkers (like mypy) and linters (like flake8) to catch common mistakes early.
+
+## 4. Consistent Parameter Naming
+- Use consistent parameter names between frontend and backend (e.g., `empId` vs `employeeId`).
+- Document API contracts and keep frontend/backend in sync.
+
+## 5. Indexing and Performance
+- Add database indexes for all fields used in filtering, joining, or sorting, especially for analytics and drill-down features.
+- Test performance after adding indexes and monitor query plans if possible.
+
+## 6. Version Control Discipline
+- Commit early and often, especially before making experimental or risky changes.
+- Use branches for new features or refactors, and merge only after testing.
+
+## 7. Communication and Documentation
+- Keep documentation up to date, especially regarding data models, encryption, and API endpoints.
+- Communicate requirements and changes clearly within the team.
+
+## 8. Restore and Recovery
+- If a regression occurs, restore the last known good code from version control before attempting further fixes.
+- Use tags or release branches to mark stable versions.
+
+---
+
+## Post-Mortem: Where Things Went Wrong (and How to Avoid It)
+
+By comparing the restored, working codebase and the lessons above, we can clearly see the root causes of the issues encountered:
+
+### 1. AES Decryption Handling
+- **Mistake:** Changes were made that skipped or incorrectly implemented AES decryption for encrypted fields, causing analytics and drill-down endpoints to return encrypted bytes or zeros instead of real values.
+- **Prevention:** Always use `AES_DECRYPT` for all encrypted fields, and never change this logic without tests.
+
+### 2. Parameter Consistency
+- **Mistake:** Inconsistent parameter names between frontend and backend (e.g., `employeeId` vs `empId`) led to broken filters and failed queries.
+- **Prevention:** Maintain strict consistency in parameter naming and document API contracts.
+
+### 3. Testing and Regression Prevention
+- **Mistake:** Critical backend logic was changed without automated regression tests, so errors were not caught until after significant breakage and wasted debugging time.
+- **Prevention:** Add regression tests for all endpoints and commit working code before making major changes.
+
+### 4. Error Handling and Debugging
+- **Mistake:** Error logs were not always visible or detailed, making it hard to quickly diagnose issues.
+- **Prevention:** Always log full stack traces and make logs accessible for debugging.
+
+### Summary Table
+| Issue Area                | What Went Wrong (Earlier)                | How Current Code/Learnings Fix It         |
+|---------------------------|------------------------------------------|-------------------------------------------|
+| AES Decryption            | Skipped or incorrect decryption          | Always uses `AES_DECRYPT` for fields      |
+| Parameter Consistency     | Mismatched names, broken filters         | Consistent naming, correct filtering      |
+| Testing/Regression        | No tests, broke core logic               | Learnings.txt: add regression tests       |
+| Error Handling/Debugging  | Poor logs, hard to debug                 | Learnings.txt: log stack traces, errors   |
+
+**In short:**
+We "fluffed things" by changing critical, security-sensitive logic (encryption/decryption, parameter handling) without tests, documentation, or careful review. The restored code and learnings.txt now provide a clear path to avoid these mistakes in the future.
+
+These learnings should guide future development to avoid similar issues and improve reliability, security, and developer experience. 

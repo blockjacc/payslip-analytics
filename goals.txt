@@ -1,0 +1,59 @@
+# Goals for Drill-Down Feature Implementation
+
+## Original User Request
+"I want to add a drill-down feature. After viewing the totals, users should be able to click to see employee-level data in a table format. The table should be sorted by last name and show first name, emp_id, and the selected fields. There should also be a CSV download option. For non-aggregated data (separate periods), each pay period should be displayed separately with its own CSV download."
+
+## Confirmed Requirements
+
+### 1. Drill-Down Functionality
+- After viewing analytics totals, users can click to see detailed employee-level data
+- Seamless transition from aggregated view to detailed view
+
+### 2. Table Format Display
+- Display data in a sortable table with:
+  - Employee information (first name, last name, emp_id)
+  - Selected payslip fields from the analytics session
+  - Sorted by last name by default
+  - Clean, readable format
+
+### 3. CSV Download Functionality
+- Export functionality for the drill-down data
+- Download button for easy data export
+- Properly formatted CSV with headers
+
+### 4. Period Handling
+- For non-aggregated data (separate periods view):
+  - Show each pay period separately
+  - Individual CSV downloads for each period
+  - Clear period identification
+
+## Implementation Plan
+
+### Backend Components
+- New endpoints for drill-down data retrieval
+- CSV export functionality
+- Proper handling of encrypted fields with AES_DECRYPT
+- Support for all existing filters (payroll groups, departments, etc.)
+
+### Frontend Components
+- New DrillDown.vue component with table display
+- Download functionality integration
+- Router updates to support drill-down navigation
+- Integration with existing analytics flow
+
+### Technical Requirements
+- Maintain consistency with existing parameter naming
+- Handle encrypted payslip fields properly
+- Support all existing filter combinations
+- Responsive design matching existing UI patterns
+
+## Success Criteria
+- Users can navigate from analytics to drill-down seamlessly
+- Employee data is displayed in a clear, sortable table
+- CSV downloads work correctly for all data types
+- Performance is acceptable with proper database indexing
+- All existing functionality remains intact
+
+---
+
+This feature enhances the analytics workflow by providing detailed, employee-level insights after viewing aggregated data, enabling deeper analysis and data export capabilities. 
