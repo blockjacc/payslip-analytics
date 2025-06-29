@@ -1,12 +1,12 @@
 <template>
   <div class="p-8">
-    <h1 class="font-serif text-white mb-8 text-4xl">Analytics Prefetch Test</h1>
+    <h1 class="font-serif text-white mb-8 text-4xl">analytics prefetch test</h1>
     <div class="mb-4">
-      <button @click="fetchSummary" class="bg-primary text-white px-4 py-2 rounded mr-2">Fetch Summary</button>
-      <button @click="fetchDrilldown" class="bg-secondary text-white px-4 py-2 rounded">Fetch Drill-Down</button>
+      <button @click="fetchSummary" class="bg-primary text-white px-4 py-2 rounded mr-2">fetch summary</button>
+      <button @click="fetchDrilldown" class="bg-secondary text-white px-4 py-2 rounded">fetch drill-down</button>
     </div>
-    <div v-if="loading" class="text-white">Loading...</div>
-    <div v-if="error" class="text-red-400">Error: {{ error }}</div>
+    <div v-if="loading" class="text-white">loading...</div>
+    <div v-if="error" class="text-red-400">error: {{ error }}</div>
     <pre v-if="result" class="bg-gray-900 text-green-200 p-4 rounded overflow-x-auto max-h-[60vh]">{{ prettyResult }}</pre>
   </div>
 </template>

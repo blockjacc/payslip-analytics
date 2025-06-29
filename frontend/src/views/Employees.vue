@@ -1,13 +1,13 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-[80vh] p-8">
-    <h1 class="font-serif text-white mb-8 text-4xl text-center">Select Employee(s)</h1>
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">select employee(s)</h1>
     <div v-if="selectedCategory && selectedFields.length > 0" class="mb-6 bg-primary/8 rounded-lg p-2 px-4 text-primary text-lg flex flex-wrap items-center gap-2 max-w-2xl text-left">
-      <span class="font-bold">Selected:</span>
+      <span class="font-bold">selected:</span>
       <span class="font-bold text-white">{{ selectedCategoryDisplay }}:</span>
       <span class="text-primary">{{ selectedFieldLabels.join(', ') }}</span>
     </div>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-lg text-center">
-      <h3 class="text-primary mb-6 text-2xl">Company ID: {{ companyId }}</h3>
+      <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>
       
       <!-- Employee Search Section -->
       <div v-if="selectType === 'specific'" class="mb-6 relative">
@@ -15,7 +15,7 @@
           type="text" 
           class="text-center text-lg h-12 w-full rounded border border-white/20 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:border-primary transition"
           v-model="searchQuery"
-          placeholder="Enter employee ID"
+          placeholder="enter employee id"
           @input="debouncedSearch"
         >
         <div class="absolute top-full left-0 right-0 bg-primary/10 border border-primary/20 rounded-lg mt-1 max-h-[200px] overflow-y-auto z-50 backdrop-blur-md shadow-lg" v-if="filteredEmployees.length > 0">
@@ -32,42 +32,42 @@
 
       <!-- Payroll Group Selection Section -->
       <div v-if="selectType === 'payroll_group'" class="mb-6">
-        <label class="block mb-2 text-secondary text-sm">Select Payroll Group:</label>
+        <label class="block mb-2 text-secondary text-sm">select payroll group:</label>
         <select 
           v-model="selectedPayrollGroup"
           class="w-full h-12 text-base bg-white/10 border border-white/20 text-white rounded focus:outline-none focus:border-primary transition"
         >
-          <option value="">Choose a payroll group</option>
+          <option value="">choose a payroll group</option>
           <option 
             v-for="group in payrollGroups" 
             :key="group"
             :value="group"
           >
-            Payroll Group {{ group }}
+            payroll group {{ group }}
           </option>
         </select>
       </div>
 
       <!-- Secondary Filter Section (Only for All Employees) -->
       <div v-if="selectType === 'all'" class="mb-6">
-        <label class="block mb-2 text-secondary text-sm">Additional Filter (Optional):</label>
+        <label class="block mb-2 text-secondary text-sm">additional filter (optional):</label>
         <select 
           v-model="selectedFilterType"
           class="w-full h-12 text-base bg-white/10 border border-white/20 text-white rounded focus:outline-none focus:border-primary transition mb-3"
         >
-          <option value="">No additional filter</option>
-          <option value="department">Department</option>
-          <option value="rank">Rank</option>
-          <option value="employment_type">Employment Type</option>
-          <option value="position">Position</option>
-          <option value="cost_center">Cost Center</option>
-          <option value="project">Project</option>
-          <option value="location_and_offices">Location & Offices</option>
+          <option value="">no additional filter</option>
+          <option value="department">department</option>
+          <option value="rank">rank</option>
+          <option value="employment_type">employment type</option>
+          <option value="position">position</option>
+          <option value="cost_center">cost center</option>
+          <option value="project">project</option>
+          <option value="location_and_offices">location & offices</option>
         </select>
 
         <!-- Filter Options Dropdown -->
         <div v-if="selectedFilterType && filterOptions.length > 0" class="mb-3">
-          <label class="block mb-2 text-secondary text-sm">Select {{ getFilterDisplayName(selectedFilterType) }}:</label>
+          <label class="block mb-2 text-secondary text-sm">select {{ getFilterDisplayName(selectedFilterType) }}:</label>
           <select 
             v-model="selectedFilterValue"
             class="w-full h-12 text-base bg-white/10 border border-white/20 text-white rounded focus:outline-none focus:border-primary transition"
@@ -84,12 +84,12 @@
 
         <!-- No Options Message -->
         <div v-if="selectedFilterType && filterOptions.length === 0 && !loadingFilterOptions" class="mb-3 p-3 bg-yellow-500/20 border border-yellow-500/30 rounded text-yellow-300 text-sm">
-          No {{ getFilterDisplayName(selectedFilterType) }} defined for this company.
+          no {{ getFilterDisplayName(selectedFilterType) }} defined for this company.
         </div>
 
         <!-- Loading Message -->
         <div v-if="loadingFilterOptions" class="mb-3 p-3 bg-blue-500/20 border border-blue-500/30 rounded text-blue-300 text-sm">
-          Loading {{ getFilterDisplayName(selectedFilterType) }}...
+          loading {{ getFilterDisplayName(selectedFilterType) }}...
         </div>
       </div>
 
@@ -104,7 +104,7 @@
           ]"
           @click="selectAllEmployees"
         >
-          All Employees
+          all employees
         </button>
         <button 
           :class="[
@@ -115,7 +115,7 @@
           ]"
           @click="selectPayrollGroup"
         >
-          Payroll Group
+          payroll group
         </button>
         <button 
           :class="[
@@ -126,7 +126,7 @@
           ]"
           @click="selectSpecificEmployee"
         >
-          Specific Employee
+          specific employee
         </button>
       </div>
 
@@ -137,7 +137,7 @@
           @click="selectEmployee(searchQuery)"
           :disabled="!searchQuery"
         >
-          Select Employee
+          select employee
         </button>
       </div>
 
@@ -147,7 +147,7 @@
           @click="selectPayrollGroupEmployee"
           :disabled="!selectedPayrollGroup"
         >
-          Select Group
+          select group
         </button>
       </div>
 
@@ -157,7 +157,7 @@
           class="px-6 py-3 text-base bg-emerald-500 text-white font-semibold flex-1 max-w-[200px] disabled:opacity-70 disabled:cursor-not-allowed transition"
           @click="continueAllEmployees"
         >
-          Continue
+          continue
         </button>
       </div>
 

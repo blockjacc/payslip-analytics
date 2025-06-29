@@ -1,11 +1,13 @@
 <template>
   <div class="min-h-screen w-full bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#232526] p-8">
-    <h1 class="font-serif text-white mb-8 text-4xl">Drill Down</h1>
-    <div v-if="loading" class="text-white">Loading...</div>
-    <div v-if="error" class="text-red-400">Error: {{ error }}</div>
+    <h1 class="font-serif text-white mb-8 text-4xl">
+      drill down<span v-if="filterDisplay"> – {{ filterDisplay }}</span>
+    </h1>
+    <div v-if="loading" class="text-white">loading...</div>
+    <div v-if="error" class="text-red-400">error: {{ error }}</div>
     <div v-if="!loading && !error">
       <div v-if="periods.length > 1 && selectedPeriodIdx === null" class="mb-8">
-        <h2 class="text-white text-2xl mb-4">Select a Period</h2>
+        <h2 class="text-white text-2xl mb-4">select a period</h2>
         <div class="flex flex-col gap-3">
           <button v-for="(period, idx) in sortedPeriods" :key="idx" @click="selectPeriod(idx)" class="bg-white/10 hover:bg-primary/30 text-white rounded-lg p-4 text-lg font-semibold transition-colors text-left">
             {{ formatDate(period.period.from) }} - {{ formatDate(period.period.to) }}
@@ -26,16 +28,16 @@
           </button>
         </div>
         <div class="mb-4 flex justify-end">
-          <button @click="downloadDrilldownCSV" class="bg-secondary text-white px-4 py-2 rounded font-semibold hover:bg-indigo-600">Download CSV</button>
+          <button @click="downloadDrilldownCSV" class="bg-secondary text-white px-4 py-2 rounded font-semibold hover:bg-indigo-600">download csv</button>
         </div>
         <div class="overflow-auto bg-white/5 rounded-lg p-4">
-          <div class="text-xs text-gray-400 mb-2">Employee count: {{ currentPeriod.employees.length }}</div>
+          <div class="text-xs text-gray-400 mb-2">employee count: {{ currentPeriod.employees.length }}</div>
           <table class="min-w-full text-sm text-left">
             <thead>
               <tr class="bg-primary/10 text-white font-bold">
-                <th class="p-2">Last Name</th>
-                <th class="p-2">First Name</th>
-                <th class="p-2">Employee ID</th>
+                <th class="p-2">last name</th>
+                <th class="p-2">first name</th>
+                <th class="p-2">employee id</th>
                 <th v-for="field in selectedFields" :key="field" class="p-2">{{ formatLabel(field) }}</th>
               </tr>
             </thead>
@@ -68,6 +70,9 @@ export default {
     }
   },
   computed: {
+    locationId() {
+      return this.$route.query.location_id || '';
+    },
     periods() {
       return this.result && this.result.periods ? this.result.periods : [];
     },
@@ -107,6 +112,25 @@ export default {
     nextPeriod() {
       if (this.hasNextPeriod) return this.sortedPeriods[this.selectedPeriodIdx + 1];
       return null;
+    },
+    filterDisplay() {
+      if (this.result && this.result.filters) {
+        const filters = this.result.filters;
+        const labelMap = {
+          location_name: 'location',
+          department_name: 'department',
+          rank_name: 'rank',
+          employment_type_name: 'employment type',
+          position_name: 'position',
+          cost_center_code: 'cost center',
+          project_name: 'project'
+        };
+        return Object.entries(filters)
+          .filter(([_, v]) => v)
+          .map(([k, v]) => `${labelMap[k] || k}: ${v}`)
+          .join(' | ');
+      }
+      return '';
     }
   },
   methods: {

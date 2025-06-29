@@ -1,26 +1,23 @@
 <template>
   <div class="p-8">
-    <h1 class="font-serif text-white mb-8 text-4xl">Payroll Analytics</h1>
+    <h1 class="font-serif text-white mb-8 text-4xl">payroll analytics</h1>
     <div class="flex justify-center">
       <div class="bg-white/10 rounded-xl p-8 w-full max-w-6xl">
         <div class="text-center mb-8">
-          <h3 class="text-primary mb-2 text-2xl">Employee ID: {{ employeeId }}</h3>
-          <h3 v-if="payrollGroupId" class="text-primary mb-2 text-xl">Payroll Group: {{ payrollGroupId }}</h3>
+          <h3 class="text-primary mb-2 text-2xl">employee id: {{ employeeId }}</h3>
+          <h3 v-if="payrollGroupId" class="text-primary mb-2 text-xl">payroll group: {{ payrollGroupId }}</h3>
           <h3 v-if="filterDisplay" class="text-primary mb-2 text-xl">{{ filterDisplay }}</h3>
-          <h4 class="text-secondary text-lg">Period: {{ formatDate(periodFrom) }} - {{ formatDate(periodTo) }}</h4>
+          <h4 class="text-secondary text-lg">period: {{ formatDate(periodFrom) }} - {{ formatDate(periodTo) }}</h4>
         </div>
         <div class="flex justify-end mb-4">
-          <button class="bg-primary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-500" @click="downloadCSV">Download CSV</button>
-          <button class="ml-4 bg-secondary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-indigo-600" @click="goToDrilldown">Drill Down</button>
+          <button class="bg-primary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-500" @click="downloadCSV">download csv</button>
+          <button class="ml-4 bg-secondary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-indigo-600" @click="goToDrilldown">drill down</button>
         </div>
         <div class="h-[60vh] mb-12">
           <Bar :data="chartData" :options="chartOptions" />
         </div>
         <div v-if="periods.length > 0" class="mb-8">
-          <div v-for="(period, idx) in periods" :key="idx" class="mb-2 flex items-center justify-between">
-            <span class="text-lg text-secondary">{{ formatDate(period.period.from) }} - {{ formatDate(period.period.to) }}</span>
-            <button class="bg-secondary text-white px-3 py-1 rounded text-sm font-semibold hover:bg-indigo-600" @click="showDrilldownForPeriod(idx)">Drill Down</button>
-          </div>
+          <!-- Removed per-period drill down buttons -->
         </div>
         <div class="mt-8 pt-8 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           <div v-for="(value, key) in salaryData" :key="key" class="flex justify-between items-center p-2 px-4 bg-white/5 rounded-lg" v-if="value > 0">
@@ -29,7 +26,7 @@
           </div>
           <div class="col-span-full mt-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
             <div class="flex justify-between items-center">
-              <span class="text-xl font-bold text-primary">Total:</span>
+              <span class="text-xl font-bold text-primary">total:</span>
               <span class="text-xl font-bold text-primary">{{ formatCurrency(totalSalary) }}</span>
             </div>
           </div>
@@ -39,29 +36,29 @@
           <div class="bg-white rounded-lg shadow-lg w-full max-w-5xl max-h-[90vh] flex flex-col">
             <div class="flex justify-between items-center p-4 border-b border-gray-200">
               <div>
-                <span class="font-bold text-lg text-primary">Drill Down: </span>
+                <span class="font-bold text-lg text-primary">drill down: </span>
                 <span class="text-secondary">{{ formatDate(periods[drilldownPeriodIndex].period.from) }} - {{ formatDate(periods[drilldownPeriodIndex].period.to) }}</span>
               </div>
               <button class="text-gray-500 hover:text-red-500 text-2xl font-bold" @click="closeDrilldown">&times;</button>
             </div>
             <div class="flex justify-between items-center p-4 border-b border-gray-100 bg-gray-50">
               <div>
-                <button v-if="drilldownPeriodIndex > 0" @click="showDrilldownForPeriod(drilldownPeriodIndex - 1)" class="mr-2 px-3 py-1 bg-primary text-white rounded hover:bg-emerald-600">&larr; Previous</button>
-                <button v-if="drilldownPeriodIndex < periods.length - 1" @click="showDrilldownForPeriod(drilldownPeriodIndex + 1)" class="px-3 py-1 bg-primary text-white rounded hover:bg-emerald-600">Next &rarr;</button>
+                <button v-if="drilldownPeriodIndex > 0" @click="showDrilldownForPeriod(drilldownPeriodIndex - 1)" class="mr-2 px-3 py-1 bg-primary text-white rounded hover:bg-emerald-600">&larr; previous</button>
+                <button v-if="drilldownPeriodIndex < periods.length - 1" @click="showDrilldownForPeriod(drilldownPeriodIndex + 1)" class="px-3 py-1 bg-primary text-white rounded hover:bg-emerald-600">next &rarr;</button>
               </div>
-              <button @click="downloadDrilldownCSV(drilldownPeriodIndex)" class="bg-secondary text-white px-4 py-2 rounded font-semibold hover:bg-indigo-600">Download CSV</button>
+              <button @click="downloadDrilldownCSV(drilldownPeriodIndex)" class="bg-secondary text-white px-4 py-2 rounded font-semibold hover:bg-indigo-600">download csv</button>
             </div>
             <div class="overflow-auto p-4">
               <div v-if="sortedEmployeesForPeriod(drilldownPeriodIndex).length === 0" class="text-center text-gray-500 mb-4">
-                No employees found for this period.
+                no employees found for this period.
               </div>
-              <div class="text-xs text-gray-400 mb-2">Employee count: {{ sortedEmployeesForPeriod(drilldownPeriodIndex).length }}</div>
+              <div class="text-xs text-gray-400 mb-2">employee count: {{ sortedEmployeesForPeriod(drilldownPeriodIndex).length }}</div>
               <table class="min-w-full text-sm text-left" v-if="sortedEmployeesForPeriod(drilldownPeriodIndex).length > 0">
                 <thead>
                   <tr class="bg-primary/10">
-                    <th class="p-2">Last Name</th>
-                    <th class="p-2">First Name</th>
-                    <th class="p-2">Employee ID</th>
+                    <th class="p-2">last name</th>
+                    <th class="p-2">first name</th>
+                    <th class="p-2">employee id</th>
                     <th v-for="field in selectedFields" :key="field" class="p-2">{{ formatLabel(field) }}</th>
                   </tr>
                 </thead>
@@ -164,31 +161,26 @@ export default defineComponent({
       return this.$route.query.payroll_group_id || sessionStorage.getItem('selectedPayrollGroup') || '';
     },
     filterDisplay() {
-      const filters = [];
-      
-      if (this.$route.query.department_id) {
-        filters.push(`Department ID: ${this.$route.query.department_id}`);
+      // Use filters object from backend response if available
+      if (this.analyticsPrefetchData && this.analyticsPrefetchData.filters) {
+        const filters = this.analyticsPrefetchData.filters;
+        // Map backend keys to user-friendly labels
+        const labelMap = {
+          location_name: 'location',
+          department_name: 'department',
+          rank_name: 'rank',
+          employment_type_name: 'employment type',
+          position_name: 'position',
+          cost_center_code: 'cost center',
+          project_name: 'project'
+        };
+        return Object.entries(filters)
+          .filter(([_, v]) => v)
+          .map(([k, v]) => `${labelMap[k] || k}: ${v}`)
+          .join(' | ');
       }
-      if (this.$route.query.rank_id) {
-        filters.push(`Rank ID: ${this.$route.query.rank_id}`);
-      }
-      if (this.$route.query.employment_type_id) {
-        filters.push(`Employment Type ID: ${this.$route.query.employment_type_id}`);
-      }
-      if (this.$route.query.position_id) {
-        filters.push(`Position ID: ${this.$route.query.position_id}`);
-      }
-      if (this.$route.query.cost_center_id) {
-        filters.push(`Cost Center ID: ${this.$route.query.cost_center_id}`);
-      }
-      if (this.$route.query.project_id) {
-        filters.push(`Project ID: ${this.$route.query.project_id}`);
-      }
-      if (this.$route.query.location_id) {
-        filters.push(`Location ID: ${this.$route.query.location_id}`);
-      }
-      
-      return filters.length > 0 ? filters.join(', ') : '';
+      // fallback to old logic if needed
+      return '';
     },
     periods() {
       return this.analyticsPrefetchData && this.analyticsPrefetchData.periods ? this.analyticsPrefetchData.periods : [];

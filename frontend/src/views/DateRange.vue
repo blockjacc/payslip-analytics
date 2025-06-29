@@ -1,22 +1,22 @@
 <template>
   <div class="flex flex-col items-center justify-center min-h-[80vh] p-8">
-    <h1 class="font-serif text-white mb-8 text-4xl text-center">Select Date Range</h1>
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">select date range</h1>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-lg text-center">
       <div class="mb-8 pb-6 border-b border-white/10">
-        <h3 class="text-primary mb-3 text-xl">Company ID: {{ companyId }}</h3>
-        <h3 class="text-primary text-xl">Employee ID: {{ employeeId === 'all' ? 'All Employees' : employeeId }}</h3>
-        <h3 v-if="payrollGroupId" class="text-primary text-xl">Payroll Group: {{ payrollGroupId }}</h3>
+        <h3 class="text-primary mb-3 text-xl">company id: {{ companyId }}</h3>
+        <h3 class="text-primary text-xl">employee id: {{ employeeId === 'all' ? 'all employees' : employeeId }}</h3>
+        <h3 v-if="payrollGroupId" class="text-primary text-xl">payroll group: {{ payrollGroupId }}</h3>
         <h3 v-if="filterDisplay" class="text-primary text-xl">{{ filterDisplay }}</h3>
       </div>
-      <h3 class="text-primary mb-6 text-2xl">Choose Period</h3>
+      <h3 class="text-primary mb-6 text-2xl">choose period</h3>
       <div class="mb-6 text-left">
-        <label class="block mb-2 text-secondary text-sm">From:</label>
+        <label class="block mb-2 text-secondary text-sm">from:</label>
         <select 
           class="w-full h-12 text-base bg-white/10 border border-white/20 text-white rounded focus:outline-none focus:border-primary transition"
           v-model="selectedFromDate"
           @change="updateToDateOptions"
         >
-          <option value="">Select start date</option>
+          <option value="">select start date</option>
           <option 
             v-for="date in fromDates" 
             :key="date"
@@ -27,13 +27,13 @@
         </select>
       </div>
       <div class="mb-6 text-left">
-        <label class="block mb-2 text-secondary text-sm">To:</label>
+        <label class="block mb-2 text-secondary text-sm">to:</label>
         <select 
           class="w-full h-12 text-base bg-white/10 border border-white/20 text-white rounded focus:outline-none focus:border-primary transition disabled:opacity-50"
           v-model="selectedToDate"
           :disabled="!selectedFromDate"
         >
-          <option value="">Select end date</option>
+          <option value="">select end date</option>
           <option 
             v-for="date in availableToDates" 
             :key="date"
@@ -48,7 +48,7 @@
         @click="submitDateRange"
         :disabled="!selectedFromDate || !selectedToDate"
       >
-        View Analytics
+        view analytics
       </button>
       <div v-if="error" class="text-red-400 text-sm mt-2">{{ error }}</div>
     </div>
@@ -245,30 +245,14 @@ export default {
     },
     buildFilterDisplay() {
       const filters = [];
-      
-      if (this.departmentId) {
-        filters.push(`Department ID: ${this.departmentId}`);
-      }
-      if (this.rankId) {
-        filters.push(`Rank ID: ${this.rankId}`);
-      }
-      if (this.employmentTypeId) {
-        filters.push(`Employment Type ID: ${this.employmentTypeId}`);
-      }
-      if (this.positionId) {
-        filters.push(`Position ID: ${this.positionId}`);
-      }
-      if (this.costCenterId) {
-        filters.push(`Cost Center ID: ${this.costCenterId}`);
-      }
-      if (this.projectId) {
-        filters.push(`Project ID: ${this.projectId}`);
-      }
-      if (this.locationId) {
-        filters.push(`Location ID: ${this.locationId}`);
-      }
-      
-      this.filterDisplay = filters.length > 0 ? filters.join(', ') : '';
+      if (this.departmentId) filters.push(`department id: ${this.departmentId}`);
+      if (this.rankId) filters.push(`rank id: ${this.rankId}`);
+      if (this.employmentTypeId) filters.push(`employment type id: ${this.employmentTypeId}`);
+      if (this.positionId) filters.push(`position id: ${this.positionId}`);
+      if (this.costCenterId) filters.push(`cost center id: ${this.costCenterId}`);
+      if (this.projectId) filters.push(`project id: ${this.projectId}`);
+      if (this.locationId) filters.push(`location id: ${this.locationId}`);
+      this.filterDisplay = filters.join(' | ');
     }
   },
   watch: {

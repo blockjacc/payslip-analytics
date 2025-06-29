@@ -1,33 +1,33 @@
 <template>
   <div class="p-8">
-    <h1 class="font-serif text-white mb-8 text-4xl text-center">Select Fields to Analyze</h1>
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">select fields to analyze</h1>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-4xl text-center mx-auto">
-      <h3 class="text-primary mb-6 text-2xl">Company ID: {{ companyId }}</h3>
+      <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>
       
       <!-- Step 1: Category Selection -->
       <div v-if="currentStep === 1" class="category-selection">
-        <h4 class="text-white mb-6 text-lg">Select a category to analyze:</h4>
+        <h4 class="text-white mb-6 text-lg">select a category to analyze:</h4>
         <div class="flex justify-center gap-6 mb-8 flex-col md:flex-row items-center">
           <button 
             class="px-6 py-6 text-lg min-w-[180px] bg-white/5 text-white border border-white/20 transition-all duration-300 hover:bg-primary/10 hover:-translate-y-1"
             :class="{ 'bg-primary/20 border-primary/50 font-bold': selectedCategory === 'AMOUNTS' }"
             @click="selectCategory('AMOUNTS')"
           >
-            Amounts
+            amounts
           </button>
           <button 
             class="px-6 py-6 text-lg min-w-[180px] bg-white/5 text-white border border-white/20 transition-all duration-300 hover:bg-primary/10 hover:-translate-y-1"
             :class="{ 'bg-primary/20 border-primary/50 font-bold': selectedCategory === 'HOURS' }"
             @click="selectCategory('HOURS')"
           >
-            Hours
+            hours
           </button>
           <button 
             class="px-6 py-6 text-lg min-w-[180px] bg-white/5 text-white border border-white/20 transition-all duration-300 hover:bg-primary/10 hover:-translate-y-1"
             :class="{ 'bg-primary/20 border-primary/50 font-bold': selectedCategory === 'TAXES' }"
             @click="selectCategory('TAXES')"
           >
-            Taxes & Deductions
+            taxes & deductions
           </button>
         </div>
         
@@ -36,21 +36,21 @@
             class="px-6 py-3 text-base bg-white/10 text-white border border-white/20 hover:bg-white/20 transition flex-1 max-w-[200px]"
             @click="goBack"
           >
-            Back
+            back
           </button>
           <button 
             class="px-6 py-3 text-base bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold disabled:opacity-70 disabled:cursor-not-allowed transition flex-1 max-w-[200px]"
             @click="goToFieldSelection"
             :disabled="!selectedCategory"
           >
-            Continue
+            continue
           </button>
         </div>
       </div>
       
       <!-- Step 2: Field Selection -->
       <div v-if="currentStep === 2" class="field-selection">
-        <h4 class="text-white mb-6 text-lg">Select fields to analyze from {{ getCategoryDisplayName(selectedCategory) }}:</h4>
+        <h4 class="text-white mb-6 text-lg">select fields to analyze from {{ getCategoryDisplayName(selectedCategory) }}:</h4>
         
         <div class="flex flex-col gap-2 max-h-[300px] overflow-y-auto pr-2 mb-6">
           <div 
@@ -65,12 +65,12 @@
         </div>
         
         <div class="text-primary text-lg mb-4">
-          <p>Selected: {{ selectedFields.length }} fields</p>
+          <p>selected: {{ selectedFields.length }} fields</p>
         </div>
         
         <!-- Selected fields display with delete options -->
         <div v-if="selectedFields.length > 0" class="mb-6 text-left">
-          <h5 class="text-primary mb-2 text-base">Selected Fields:</h5>
+          <h5 class="text-primary mb-2 text-base">selected fields:</h5>
           <div class="flex flex-wrap gap-2">
             <div v-for="fieldName in selectedFields" :key="fieldName" class="flex items-center bg-primary/20 border border-primary/50 rounded-full px-3 py-1 text-sm text-white">
               <span>{{ getFieldDisplayName(fieldName) }}</span>
@@ -84,14 +84,14 @@
             class="px-6 py-3 text-base bg-white/10 text-white border border-white/20 hover:bg-white/20 transition flex-1 max-w-[200px]"
             @click="currentStep = 1"
           >
-            Back
+            back
           </button>
           <button 
             class="px-6 py-3 text-base bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-semibold disabled:opacity-70 disabled:cursor-not-allowed transition flex-1 max-w-[200px]"
             @click="continueToEmployees"
             :disabled="selectedFields.length === 0"
           >
-            Continue
+            continue
           </button>
         </div>
       </div>
