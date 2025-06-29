@@ -33,6 +33,15 @@ ENCRYPT_KEY = os.getenv('MYSQL_ENCRYPT_KEY')
 
 mysql = MySQL(app)
 
+# Utility function to get display name for a given id and table
+def get_display_name(cursor, table, id_field, name_field, id_value, company_id):
+    if not id_value:
+        return None
+    query = f"SELECT {name_field} FROM {table} WHERE {id_field} = %s AND company_id = %s AND status = 'Active' LIMIT 1"
+    cursor.execute(query, (id_value, company_id))
+    row = cursor.fetchone()
+    return row[0] if row else None
+
 @app.route('/api/analytics/<int:company_id>/<emp_id>/<string:period_from>/<string:period_to>/<string:aggregation_type>', methods=['GET'])
 def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='single'):
     try:
@@ -61,7 +70,7 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
         # Get payroll group ID from query parameters (optional)
         payroll_group_id = request.args.get('payroll_group_id', None)
         
-        # Get additional filter parameters from settings tables (optional)
+        # Ensure all filter variables are defined
         department_id = request.args.get('department_id', None)
         rank_id = request.args.get('rank_id', None)
         employment_type_id = request.args.get('employment_type_id', None)
@@ -84,7 +93,7 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
         # For separate view, first get all distinct periods in the range
         if aggregation_type == 'separate':
             # Initialize result structure for separate view
-            result = {'periods': []}
+            result = {'periods': [], 'filters': {}}
 
             periods_query = """
                 SELECT DISTINCT period_from, period_to
@@ -228,6 +237,24 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
                     'analytics': period_analytics
                 })
             
+            # Get display names for all filters
+            filter_display = {}
+            filter_map = [
+                (location_id, 'location_and_offices', 'location_and_offices_id', 'name', 'location_name'),
+                (department_id, 'department', 'dept_id', 'department_name', 'department_name'),
+                (rank_id, 'rank', 'rank_id', 'rank_name', 'rank_name'),
+                (employment_type_id, 'employment_type', 'emp_type_id', 'name', 'employment_type_name'),
+                (position_id, 'position', 'position_id', 'position_name', 'position_name'),
+                (cost_center_id, 'cost_center', 'cost_center_id', 'cost_center_code', 'cost_center_code'),
+                (project_id, 'project', 'project_id', 'project_name', 'project_name'),
+            ]
+            for id_value, table, id_field, name_field, resp_field in filter_map:
+                if id_value:
+                    display = get_display_name(cursor, table, id_field, name_field, id_value, company_id)
+                    filter_display[resp_field] = display
+            
+            result['filters'] = filter_display
+            
             cursor.close()
             return jsonify(result)
             
@@ -319,6 +346,24 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
         # Add total_salary (gross_pay) if it exists
         if 'gross_pay' in sums:
             result['total_salary'] = round(sums['gross_pay'], 2)
+        
+        # Get display names for all filters
+        filter_display = {}
+        filter_map = [
+            (location_id, 'location_and_offices', 'location_and_offices_id', 'name', 'location_name'),
+            (department_id, 'department', 'dept_id', 'department_name', 'department_name'),
+            (rank_id, 'rank', 'rank_id', 'rank_name', 'rank_name'),
+            (employment_type_id, 'employment_type', 'emp_type_id', 'name', 'employment_type_name'),
+            (position_id, 'position', 'position_id', 'position_name', 'position_name'),
+            (cost_center_id, 'cost_center', 'cost_center_id', 'cost_center_code', 'cost_center_code'),
+            (project_id, 'project', 'project_id', 'project_name', 'project_name'),
+        ]
+        for id_value, table, id_field, name_field, resp_field in filter_map:
+            if id_value:
+                display = get_display_name(cursor, table, id_field, name_field, id_value, company_id)
+                filter_display[resp_field] = display
+        
+        result['filters'] = filter_display
         
         cursor.close()
         return jsonify(result)
@@ -590,7 +635,11 @@ def analytics_prefetch(company_id, period_from, period_to, aggregation_type):
         # Optional filters
         location_id = request.args.get('location_id', None)
         department_id = request.args.get('department_id', None)
-        # ... add other filters as needed ...
+        rank_id = request.args.get('rank_id', None)
+        employment_type_id = request.args.get('employment_type_id', None)
+        position_id = request.args.get('position_id', None)
+        cost_center_id = request.args.get('cost_center_id', None)
+        project_id = request.args.get('project_id', None)
         drilldown = request.args.get('drilldown', 'false').lower() == 'true'
         # Build SQL for selected fields
         field_sql = ', '.join([
@@ -631,7 +680,7 @@ def analytics_prefetch(company_id, period_from, period_to, aggregation_type):
                 if period_key not in periods:
                     periods[period_key] = []
                 periods[period_key].append(row)
-            result = {'periods': []}
+            result = {'periods': [], 'filters': {}}
             for (from_date, to_date), employees in sorted(periods.items()):
                 if drilldown:
                     # Drill-down: return all employee rows for this period
@@ -656,6 +705,22 @@ def analytics_prefetch(company_id, period_from, period_to, aggregation_type):
                     for field in selected_fields:
                         total[field] += period['summary'][field]
                 result['total'] = {k: round(v, 2) for k, v in total.items()}
+            # Get display names for all filters
+            filter_display = {}
+            filter_map = [
+                (location_id, 'location_and_offices', 'location_and_offices_id', 'name', 'location_name'),
+                (department_id, 'department', 'dept_id', 'department_name', 'department_name'),
+                (rank_id, 'rank', 'rank_id', 'rank_name', 'rank_name'),
+                (employment_type_id, 'employment_type', 'emp_type_id', 'name', 'employment_type_name'),
+                (position_id, 'position', 'position_id', 'position_name', 'position_name'),
+                (cost_center_id, 'cost_center', 'cost_center_id', 'cost_center_code', 'cost_center_code'),
+                (project_id, 'project', 'project_id', 'project_name', 'project_name'),
+            ]
+            for id_value, table, id_field, name_field, resp_field in filter_map:
+                if id_value:
+                    display = get_display_name(cursor, table, id_field, name_field, id_value, company_id)
+                    filter_display[resp_field] = display
+            result['filters'] = filter_display
             return jsonify(result)
         else:
             # Aggregate or single: all data in one group
@@ -668,7 +733,24 @@ def analytics_prefetch(company_id, period_from, period_to, aggregation_type):
                 for row in data:
                     for field in selected_fields:
                         summary[field] += float(row[field] or 0)
-                return jsonify({'summary': {k: round(v, 2) for k, v in summary.items()}})
+                # Get display names for all filters
+                filter_display = {}
+                filter_map = [
+                    (location_id, 'location_and_offices', 'location_and_offices_id', 'name', 'location_name'),
+                    (department_id, 'department', 'dept_id', 'department_name', 'department_name'),
+                    (rank_id, 'rank', 'rank_id', 'rank_name', 'rank_name'),
+                    (employment_type_id, 'employment_type', 'emp_type_id', 'name', 'employment_type_name'),
+                    (position_id, 'position', 'position_id', 'position_name', 'position_name'),
+                    (cost_center_id, 'cost_center', 'cost_center_id', 'cost_center_code', 'cost_center_code'),
+                    (project_id, 'project', 'project_id', 'project_name', 'project_name'),
+                ]
+                for id_value, table, id_field, name_field, resp_field in filter_map:
+                    if id_value:
+                        display = get_display_name(cursor, table, id_field, name_field, id_value, company_id)
+                        filter_display[resp_field] = display
+                result = {k: round(v, 2) for k, v in summary.items()}
+                result['filters'] = filter_display
+                return jsonify(result)
     except Exception as e:
         app.logger.error(f"Error in analytics-prefetch: {str(e)}")
         return jsonify({'error': f'Failed to retrieve analytics-prefetch data: {str(e)}'}), 500
