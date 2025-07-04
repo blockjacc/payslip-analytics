@@ -1,0 +1,133 @@
+shift related tables
+
+work_schedule table																										
+table name	work_schedule																									
+Field Name	Data Type	flagging	Description	Link identifier																						
+work_schedule_id	int(11)	n	Unique identifier for each work schedule configuration	work_schedule_id																						
+name	varchar(255)	n	Name of the work schedule	comp_id																						
+work_type_name	varchar(255)	n	"Type or classification of the work schedule (e.g., regular, flexible)"																							
+comp_id	int(11)	n	Identifier for the company the schedule belongs to																							
+flag_custom	"enum('1’,'0’)"	n	"Indicates if the schedule is custom-made (1 = yes, 0 = no)"																							
+status	"enum('Active’,'Inactive’)"	n	Whether the schedule is currently active or inactive																							
+default	"enum('0’,'1’,'2’)"	n	"Defines if this is a default schedule (0 = no, 1/2 = default levels)"																							
+category_id	int(11)	n	Reference to schedule category grouping																							
+employees_required	int(11)	n	Number of employees required to follow this schedule																							
+notes	varchar(1000)	n	Additional notes or description for the schedule																							
+bg_color	varchar(255)	n	Background color used for UI display																							
+break_rules	"enum('assumed’,'disable’,'capture’)"	n	Defines how break times are handled																							
+assumed_breaks	"decimal(11,0)"	n	Total assumed break time in hours if breaks are not captured																							
+advanced_settings	"enum('no’,'yes’)"	n	Indicates if advanced schedule settings are enabled																							
+account_id	int(11)	n	Identifier for the account who created or owns the schedule																							
+enable_lunch_break	"enum('no’,'yes’)"	n	Whether lunch break is enabled																							
+break_type_1	"enum('paid’,'unpaid’)"	n	Type of first break (paid or unpaid)																							
+track_break_1	"enum('yes’,'no’)"	n	Whether to track the first break duration																							
+break_schedule_1	"enum('fixed’,'flexi’)"	n	Whether the first break is on a fixed or flexible schedule																							
+break_started_after	"decimal(11,2)"	n	"Time after which the break begins, in hours"																							
+subtract_breaks_1	"enum('yes’,'no’)"	n	Whether the first break is subtracted from total hours																							
+enable_additional_breaks	"enum('yes’,'no’)"	n	Whether to allow additional breaks																							
+num_of_additional_breaks	int(11)	n	Number of additional breaks allowed																							
+break_type_2	"enum('paid’,'unpaid’)"	n	Type of second break (paid or unpaid)																							
+track_break_2	"enum('yes’,'no’)"	n	Whether to track the second break duration																							
+break_schedule_2	"enum('fixed’,'flexi’)"	n	Whether the second break is fixed or flexible																							
+additional_break_started_after_1	"decimal(11,0)"	n	Time after which the first additional break starts																							
+additional_break_started_after_2	"decimal(11,0)"	n	Time after which the second additional break starts																							
+subtract_breaks_2	"enum('yes’,'no’)"	n	Whether the second break is subtracted from total hours																							
+enable_shift_threshold	"enum('yes’,'no’)"	n	Indicates if a shift start threshold is enabled																							
+enable_grace_period	"enum('yes’,'no’)"	n	Indicates if a grace period for tardiness is enabled																							
+tardiness_rule	enum(…)	n	Defines how tardiness is calculated																							
+disable_premium_payments	"enum('yes’,'no’)"	n	Flag to disable premium pay computation																							
+enable_premium_payments_starts_on_holiday_restday	"enum('yes’,'no’)"	n	Allows premium pay to start on a holiday or rest day																							
+flag_migrate	"enum('1’,'0’)"	n	Migration tracking flag																							
+enable_breaks_on_holiday	"enum('yes’,'no’)"	n	Specifies if breaks apply even on holidays																							
+enable_working_on_restday	"enum('yes’,'no’)"	n	Specifies if working on rest days is allowed																							
+total_hrs_per_pay_period	"decimal(11,0)"	n	Total number of working hours in a pay period																							
+total_hrs_per_day	"decimal(11,0)"	n	Total number of hours worked per day																							
+period_type	varchar(255)	n	Defines the type of pay or schedule period																							
+cost_center	varchar(255)	n	Cost center reference																							
+advanced_rules_premium_pay	"enum('yes’,'no’)"	n	Enables advanced computation rules for premium pay																							
+pay_holiday_premium_on_regular_workday	"enum('yes’,'no’)"	n	Pays holiday premium when working on a regular workday																							
+pay_holiday_premium_on_regular_workday_nsd	"enum('yes’,'no’)"	n	Pays night shift differential (NSD) premium on holiday-workdays																							
+pay_holiday_premium_on_holiday	"enum('yes’,'no’)"	n	Pays premium when working on a holiday																							
+pay_holiday_premium_on_holiday_nsd	"enum('yes’,'no’,'yes_full_shift’)"	n	NSD holiday premium on holidays																							
+pay_restday_premium_on_regular_workday	"enum('yes’,'no’)"	n	Pays rest day premium on a regular workday																							
+pay_restday_premium_on_regular_workday_nsd	"enum('yes’,'no’)"	n	Pays NSD premium on rest day that falls on a regular workday																							
+pay_holiday_premium_on_restday	"enum('yes’,'no’)"	n	Pays holiday premium when working on a rest day																							
+pay_holiday_premium_on_restday_nsd	"enum('yes’,'no’,'yes_full_shift’)"	n	NSD holiday premium when the holiday falls on a rest day																							
+total_hrs_per_week	"decimal(11,2)"	n	Total working hours expected per week																							
+created_date	datetime	n	Timestamp when the schedule was created																							
+updated_date	datetime	n	Timestamp of the most recent update																							
+created_by_account_id	int(11)	n	Account ID of the user who created the schedule																							
+updated_by_account_id	int(11)	n	Account ID of the user who last updated the schedule																							
+flag_default_restday	int(5)	n	Indicator if this schedule includes a default rest day configuration																							
+pay_ot_holiday_rates_workday_holiday	"enum('yes’,'no’)"	n	Pays overtime using holiday rates on workday-holiday crossovers																							
+pay_ot_holiday_rates_holiday_workday	"enum('yes’,'no’)"	n	Pays overtime using holiday rates on holiday-workday crossovers																							
+pay_ot_rest_day_rates_workday_restday	"enum('yes’,'no’)"	n	Pays OT using rest day rates when working on a rest day from a workday																							
+pay_ot_rest_day_rates_restday_workday	"enum('yes’,'no’)"	n	Pays OT using rest day rates when transitioning from rest day to workday																							
+paycheck_total_hrs_per_pay_period	"decimal(11,2)"	n	Total number of hours that should be reflected in the paycheck per pay period																							
+enable_advance_break_rules	"enum('yes’,'no’)"	n	Enables advanced rules for managing breaks																							
+archive	"enum('yes’,'no’)"	n	Marks whether this schedule is archived																							
+archived_date	datetime	n	Timestamp when the schedule was archived																							
+																										
+																										
+																										
+flexible_hours table																										
+table name	flexible_hours																									
+Field Name	Data Type	flagging	Description	Link identifier																						
+workday_settings_id	int(11)	n	Unique identifier for each flexible workday settings entry	work_schedule_id																						
+not_required_login	tinyint(4)	n	"Flag to indicate if login is not required (0 = required, 1 = not required)"	company_id																						
+total_hours_for_the_day	"decimal(11,0)"	n	Total required working hours in a day																							
+total_hours_for_the_week	"decimal(11,0)"	n	Total required working hours in a week																							
+total_days_per_year	int(11)	n	Total number of workdays expected per year																							
+latest_time_in_allowed	time	n	Latest time an employee is allowed to clock in																							
+number_of_breaks_per_day	int(11)	n	Number of breaks allowed per day																							
+duration_of_lunch_break_per_day	int(11)	n	Duration of the daily lunch break in minutes																							
+duration_of_short_break_per_day	int(11)	n	Duration of short breaks per day in minutes																							
+work_schedule_id	int(11)	n	Reference to a work schedule																							
+company_id	int(11)	n	Identifier of the company the setting is for																							
+																										
+																										
+																										
+regular_schedule table																										
+table name	regular_schedule																									
+Field Name	Data Type	flagging	Description	Link identifier																						
+reg_work_sched_id	int(11)	n	Unique identifier for the regular work schedule entry	work_schedule_id																						
+work_schedule_id	int(11)	n	Optional reference to the work schedule template	company_id																						
+work_schedule_name	varchar(225)	n	Name or label of the work schedule																							
+days_of_work	varchar(80)	n	"Days of the week the employee is expected to work (e.g., Mon-Fri)"																							
+work_start_time	time	n	Scheduled starting time of the workday																							
+work_end_time	time	n	Scheduled end time of the workday																							
+total_work_hours	"decimal(11,2)"	n	Total number of work hours per day (excluding breaks)																							
+company_id	int(11)	n	Identifier for the company to which the schedule belongs																							
+break_in_min	int(11)	n	Total break duration in minutes																							
+latest_time_in_allowed	int(11)	n	Latest time (in minutes past start?) an employee can clock in																							
+status	"enum('Active’,'Inactive’)"	n	Status of the schedule (Active or Inactive)																							
+break_1	"decimal(11,2)"	n	Duration of the first break in hours																							
+break_2	"decimal(11,2)"	n	Duration of the second break in hours																							
+flag_half_day	"enum('1’,'0’)"	n	"Indicates if this is a half-day schedule (1 = yes, 0 = no)"																							
+																										
+																										
+																										
+rest_day table																										
+table name	rest_day																									
+Field Name	Data Type	flagging	Description	Link identifier																						
+rest_day_id	int(11)	n	Unique identifier for each rest day entry	work_schedule_id																						
+rest_day	varchar(80)	n	"Name or label for the rest day (e.g., 'Sunday’, 'Holiday’)"	company_id																						
+company_id	int(11)	n	Identifier for the company this rest day configuration belongs to																							
+work_schedule_id	int(11)	n	Optional identifier referencing the related work schedule																							
+status	"enum('Active’,'Inactive’)"	n	Indicates whether the rest day setup is currently active or not																							
+deleted	"enum('0’,'1’)"	n	"Logical deletion flag (0 = not deleted, 1 = deleted)"																							
+																										
+																										
+																										
+employee_shifts_schedule table																										
+table name	employee_shifts_schedule																									
+Field Name	Data Type	flagging	Description	Link identifier																						
+shifts_schedule_id	int(11)	n	Unique identifier for the employee shift schedule entry	work_schedule_id																						
+company_id	int(11)	n	Identifier of the company the shift schedule applies to	company_id																						
+emp_id	int(11)	n	Employee identifier	emp_id																						
+valid_from	date	n	Start date when the shift schedule becomes valid																							
+until	date	n	End date until the shift schedule is valid																							
+status	"enum('Active’,'Inactive’)"	n	Current status of the shift schedule (Active or Inactive)																							
+work_schedule_id	int(11)	n	Optional reference to the work schedule associated with the shift																							
+deleted	"enum('0’,'1’)"	n	"Flag for logical deletion (0 = not deleted, 1 = deleted)"																							
+cost_center_id	int(11)	n	Optional reference to a cost center		
