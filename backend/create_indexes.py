@@ -21,25 +21,25 @@ app.config['MYSQL_DB'] = os.getenv('DB_NAME')
 
 mysql = MySQL(app)
 
-def index_exists(cursor, index_name):
-    """Check if an index already exists"""
+def index_exists(cursor, index_name, table_name):
+    """Check if an index already exists on a given table"""
     cursor.execute("""
         SELECT COUNT(*) 
         FROM information_schema.statistics 
         WHERE table_schema = %s 
-        AND table_name = 'payroll_payslip' 
+        AND table_name = %s 
         AND index_name = %s
-    """, (os.getenv('DB_NAME'), index_name))
+    """, (os.getenv('DB_NAME'), table_name, index_name))
     return cursor.fetchone()[0] > 0
 
 def create_indexes():
-    """Create performance indexes for the payroll_payslip table"""
+    """Create performance indexes for the payroll_payslip and employee_payroll_information tables"""
     try:
         with app.app_context():
             cursor = mysql.connection.cursor()
             
             # Index for main analytics queries (company + period)
-            if not index_exists(cursor, 'idx_company_period'):
+            if not index_exists(cursor, 'idx_company_period', 'payroll_payslip'):
                 print("Creating index for company and period queries...")
                 cursor.execute("""
                     CREATE INDEX idx_company_period 
@@ -50,7 +50,7 @@ def create_indexes():
                 print("⏭️  Index idx_company_period already exists")
             
             # Index for employee-specific queries
-            if not index_exists(cursor, 'idx_company_emp'):
+            if not index_exists(cursor, 'idx_company_emp', 'payroll_payslip'):
                 print("Creating index for employee queries...")
                 cursor.execute("""
                     CREATE INDEX idx_company_emp 
@@ -61,7 +61,7 @@ def create_indexes():
                 print("⏭️  Index idx_company_emp already exists")
             
             # Composite index for both use cases
-            if not index_exists(cursor, 'idx_company_emp_period'):
+            if not index_exists(cursor, 'idx_company_emp_period', 'payroll_payslip'):
                 print("Creating composite index...")
                 cursor.execute("""
                     CREATE INDEX idx_company_emp_period 
@@ -70,6 +70,27 @@ def create_indexes():
                 print("✅ Created idx_company_emp_period")
             else:
                 print("⏭️  Index idx_company_emp_period already exists")
+            
+            # New indexes for employee_payroll_information
+            epi_indexes = [
+                ('idx_epi_company_department', 'department_id'),
+                ('idx_epi_company_rank', 'rank_id'),
+                ('idx_epi_company_employment_type', 'employment_type'),
+                ('idx_epi_company_position', 'position'),
+                ('idx_epi_company_cost_center', 'cost_center'),
+                ('idx_epi_company_project', 'project_id'),
+                ('idx_epi_company_location', 'location_and_offices_id'),
+            ]
+            for idx_name, col in epi_indexes:
+                if not index_exists(cursor, idx_name, 'employee_payroll_information'):
+                    print(f"Creating index {idx_name} on employee_payroll_information({col})...")
+                    cursor.execute(f"""
+                        CREATE INDEX {idx_name}
+                        ON employee_payroll_information(company_id, {col})
+                    """)
+                    print(f"✅ Created {idx_name}")
+                else:
+                    print(f"⏭️  Index {idx_name} already exists")
             
             mysql.connection.commit()
             cursor.close()
