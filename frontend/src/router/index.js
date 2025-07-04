@@ -7,6 +7,10 @@ import DateRange from '../views/DateRange.vue'
 import Analytics from '../views/Analytics.vue'
 import AggregationChoice from '../views/AggregationChoice.vue'
 import DrillDown from '../views/DrillDown.vue'
+import ShiftsSelection from '../views/ShiftsSelection.vue'
+import ShiftsScheduleTypeAnalytics from '../views/ShiftsScheduleTypeAnalytics.vue'
+import ShiftsAllocationSelection from '../views/ShiftsAllocationSelection.vue'
+import ShiftsAllocationAnalytics from '../views/ShiftsAllocationAnalytics.vue'
 
 const routes = [
   {
@@ -53,6 +57,26 @@ const routes = [
     path: '/drilldown/:companyId/:employeeId/:periodFrom/:periodTo/:aggregationType',
     name: 'DrillDown',
     component: DrillDown
+  },
+  {
+    path: '/shifts-selection/:companyId',
+    name: 'ShiftsSelection',
+    component: ShiftsSelection
+  },
+  {
+    path: '/shifts-schedule-type/:companyId',
+    name: 'ShiftsScheduleTypeAnalytics',
+    component: ShiftsScheduleTypeAnalytics
+  },
+  {
+    path: '/shifts-allocation-selection/:companyId',
+    name: 'ShiftsAllocationSelection',
+    component: ShiftsAllocationSelection
+  },
+  {
+    path: '/shifts-allocation-analytics/:companyId/:scheduleType/:shiftIds',
+    name: 'ShiftsAllocationAnalytics',
+    component: ShiftsAllocationAnalytics
   }
 ]
 

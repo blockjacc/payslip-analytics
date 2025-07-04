@@ -1,0 +1,159 @@
+<template>
+  <div class="p-8">
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">shifts allocation analytics</h1>
+    <div class="flex justify-center">
+      <div class="bg-white/10 rounded-xl p-8 w-full max-w-6xl">
+        <div class="text-center mb-8">
+          <h3 class="text-primary mb-2 text-2xl">company id: {{ companyId }}</h3>
+          <h3 class="text-primary mb-2 text-xl">schedule type: {{ scheduleType }}</h3>
+          <h4 class="text-secondary text-lg">selected shifts: {{ selectedShiftNames.join(', ') }}</h4>
+        </div>
+        <div class="flex justify-end mb-4">
+          <button class="bg-primary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-500" @click="downloadCSV">download csv</button>
+          <button class="ml-4 bg-secondary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-indigo-600" @click="goToDrilldown">drill down</button>
+        </div>
+        <div class="h-[60vh] mb-12 flex flex-col items-center justify-center">
+          <Bar v-if="chartData && chartData.labels.length" :data="chartData" :options="chartOptions" />
+          <div v-else class="text-white mt-6">No data to display.</div>
+        </div>
+        <div class="mt-8 pt-8 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div v-for="shift in schedules" :key="shift && shift.work_schedule_id" class="flex justify-between items-center p-2 px-4 bg-white/5 rounded-lg" v-if="shift && shift.employee_count > 0">
+            <span class="text-sm text-secondary">{{ shift.name }}:</span>
+            <span class="font-sans font-semibold text-white">{{ formatNumber(shift.employee_count) }}</span>
+          </div>
+          <div class="col-span-full mt-4 p-4 bg-primary/10 border border-primary/20 rounded-lg">
+            <div class="flex justify-between items-center">
+              <span class="text-xl font-bold text-primary">total:</span>
+              <span class="text-xl font-bold text-primary">{{ formatNumber(totalEmployees) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { defineComponent } from 'vue';
+import { Bar } from 'vue-chartjs';
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+
+const shiftColors = [
+  '#38bdf8', '#06b6d4', '#818cf8', '#f472b6', '#facc15', '#4ade80', '#f87171', '#eab308', '#a3e635', '#f472b6'
+];
+
+export default defineComponent({
+  name: 'ShiftsAllocationAnalytics',
+  components: { Bar },
+  data() {
+    return {
+      companyId: '',
+      scheduleType: '',
+      shiftIds: '',
+      loading: true,
+      schedules: []
+    }
+  },
+  async created() {
+    this.companyId = this.$route.params.companyId;
+    this.scheduleType = this.$route.params.scheduleType;
+    this.shiftIds = this.$route.params.shiftIds;
+    await this.fetchShiftData();
+  },
+  computed: {
+    selectedShiftNames() {
+      return this.schedules.map(s => s.name);
+    },
+    chartData() {
+      if (!this.schedules.length) return { labels: [], datasets: [] };
+      const sorted = [...this.schedules].sort((a, b) => a.employee_count - b.employee_count);
+      return {
+        labels: ['Employees Assigned'],
+        datasets: sorted.map((s, i) => ({
+          label: s.name,
+          data: [s.employee_count],
+          backgroundColor: shiftColors[i % shiftColors.length],
+          borderRadius: 8
+        }))
+      };
+    },
+    chartOptions() {
+      return {
+        responsive: true,
+        plugins: {
+          legend: { display: true, position: 'right', labels: { color: '#fff', font: { family: 'IBM Plex Mono', size: 14 } } },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          x: {
+            stacked: true,
+            beginAtZero: true,
+            ticks: { color: '#fff', font: { family: 'IBM Plex Mono', size: 14 } },
+            grid: { color: 'rgba(255,255,255,0.1)' }
+          },
+          y: {
+            stacked: true,
+            type: 'logarithmic',
+            beginAtZero: true,
+            ticks: { color: '#fff', font: { family: 'IBM Plex Mono', size: 14 } },
+            grid: { color: 'rgba(255,255,255,0.1)' }
+          }
+        },
+        onClick: (e, elements, chart) => {
+          if (elements.length > 0) {
+            const idx = elements[0].datasetIndex;
+            const shiftId = this.schedules[idx].work_schedule_id;
+            this.goToDrilldown(shiftId);
+          }
+        }
+      };
+    },
+    totalEmployees() {
+      return this.schedules.reduce((sum, s) => sum + s.employee_count, 0);
+    }
+  },
+  methods: {
+    async fetchShiftData() {
+      this.loading = true;
+      try {
+        const response = await fetch(`/api/shifts/schedules/${this.companyId}/${encodeURIComponent(this.scheduleType)}`);
+        if (response.ok) {
+          const data = await response.json();
+          const selectedIds = this.shiftIds.split(',').map(id => id.trim());
+          this.schedules = (data.schedules || []).filter(s => s && selectedIds.includes(String(s.work_schedule_id)));
+        } else {
+          this.schedules = [];
+        }
+      } catch (e) {
+        this.schedules = [];
+      } finally {
+        this.loading = false;
+      }
+    },
+    formatNumber(val) {
+      return new Intl.NumberFormat('en-US').format(val);
+    },
+    downloadCSV() {
+      let csv = 'Shift,Employees Assigned\n';
+      this.schedules.forEach(s => {
+        csv += `${s.name},${s.employee_count}\n`;
+      });
+      csv += `Total,${this.totalEmployees}\n`;
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `shifts_allocation_analytics_${this.companyId}_${this.scheduleType}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    },
+    goToDrilldown(shiftId) {
+      this.$router.push(`/shifts-allocation-drilldown/${this.companyId}/${this.scheduleType}/${shiftId}`);
+    }
+  }
+});
+</script> 
