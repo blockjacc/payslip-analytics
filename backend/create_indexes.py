@@ -92,6 +92,28 @@ def create_indexes():
                 else:
                     print(f"⏭️  Index {idx_name} already exists")
             
+            # New index for work_schedule (for allocation analytics)
+            if not index_exists(cursor, 'idx_ws_company_type_status', 'work_schedule'):
+                print("Creating index idx_ws_company_type_status on work_schedule(company_id, work_type_name, status)...")
+                cursor.execute("""
+                    CREATE INDEX idx_ws_company_type_status
+                    ON work_schedule(comp_id, work_type_name, status)
+                """)
+                print("✅ Created idx_ws_company_type_status")
+            else:
+                print("⏭️  Index idx_ws_company_type_status already exists")
+
+            # New index for employee_shifts_schedule (for allocation analytics)
+            if not index_exists(cursor, 'idx_ess_company_sched_status', 'employee_shifts_schedule'):
+                print("Creating index idx_ess_company_sched_status on employee_shifts_schedule(company_id, work_schedule_id, status)...")
+                cursor.execute("""
+                    CREATE INDEX idx_ess_company_sched_status
+                    ON employee_shifts_schedule(company_id, work_schedule_id, status)
+                """)
+                print("✅ Created idx_ess_company_sched_status")
+            else:
+                print("⏭️  Index idx_ess_company_sched_status already exists")
+            
             mysql.connection.commit()
             cursor.close()
             

@@ -755,5 +755,54 @@ def analytics_prefetch(company_id, period_from, period_to, aggregation_type):
         app.logger.error(f"Error in analytics-prefetch: {str(e)}")
         return jsonify({'error': f'Failed to retrieve analytics-prefetch data: {str(e)}'}), 500
 
+@app.route('/api/shifts/schedule-type-counts/<int:company_id>', methods=['GET'])
+def get_schedule_type_counts(company_id):
+    try:
+        cursor = mysql.connection.cursor()
+        # Query for active work schedules by type
+        query = '''
+            SELECT work_type_name, COUNT(*) as count
+            FROM work_schedule
+            WHERE comp_id = %s AND status = 'Active'
+            GROUP BY work_type_name
+            ORDER BY count ASC, work_type_name ASC
+        '''
+        cursor.execute(query, (company_id,))
+        results = cursor.fetchall()
+        cursor.close()
+        # Format as list of dicts
+        data = [
+            {"work_type_name": row[0], "count": row[1]} for row in results
+        ]
+        return jsonify({"schedule_types": data})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/shifts/schedules/<int:company_id>/<string:schedule_type>', methods=['GET'])
+def get_schedules_by_type(company_id, schedule_type):
+    try:
+        cursor = mysql.connection.cursor()
+        # Query for all active schedules of the given type, with employee count
+        query = '''
+            SELECT ws.work_schedule_id, ws.name, COUNT(DISTINCT ess.emp_id) as employee_count
+            FROM work_schedule ws
+            LEFT JOIN employee_shifts_schedule ess
+                ON ws.work_schedule_id = ess.work_schedule_id
+                AND ess.status = 'Active'
+                AND ess.company_id = %s
+            WHERE ws.comp_id = %s AND ws.status = 'Active' AND ws.work_type_name = %s
+            GROUP BY ws.work_schedule_id, ws.name
+            ORDER BY employee_count DESC, ws.name ASC
+        '''
+        cursor.execute(query, (company_id, company_id, schedule_type))
+        results = cursor.fetchall()
+        cursor.close()
+        data = [
+            {"work_schedule_id": row[0], "name": row[1], "employee_count": row[2]} for row in results
+        ]
+        return jsonify({"schedules": data})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 
