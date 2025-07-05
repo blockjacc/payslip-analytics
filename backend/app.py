@@ -810,10 +810,10 @@ def get_shifts_allocation_drilldown(company_id, schedule_type, shift_id):
         ENCRYPT_KEY = os.getenv('MYSQL_ENCRYPT_KEY')
         cursor = mysql.connection.cursor()
         
-        # Query to get all employees assigned to the specific shift
+        # Query to get all unique employees assigned to the specific shift
         # Join with employee and location_and_offices to get all required fields
         query = '''
-            SELECT 
+            SELECT DISTINCT
                 ess.emp_id,
                 CAST(AES_DECRYPT(e.last_name, %s) AS CHAR(150) CHARACTER SET utf8) AS last_name,
                 CAST(AES_DECRYPT(e.first_name, %s) AS CHAR(150) CHARACTER SET utf8) AS first_name,
