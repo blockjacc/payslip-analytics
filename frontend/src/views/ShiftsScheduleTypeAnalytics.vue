@@ -1,36 +1,38 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-[80vh] p-8">
-    <div class="rounded-xl p-8 w-full max-w-3xl text-center mx-auto bg-gradient-to-br from-[#1a233a] to-[#2c365a] shadow-2xl">
-      <div class="flex flex-col items-center justify-center mb-2">
-        <h3 class="text-primary mb-1 text-2xl font-serif" style="font-weight: 500;">employee id: all</h3>
-        <h3 class="text-primary text-xl font-serif" style="font-weight: 500;">shift type: all</h3>
-      </div>
-      <div class="flex gap-4 justify-end mb-4">
-        <button
-          class="bg-primary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-500"
-          @click="downloadCSV"
-        >
-          download csv
-        </button>
-      </div>
-      <h2 class="text-3xl font-bold text-primary mb-8 text-left">Schedule Types (Active)</h2>
-      <div v-if="loading" class="text-center text-gray-300 py-8">Loading...</div>
-      <div v-else-if="error" class="text-center text-red-400 py-8">{{ error }}</div>
-      <div v-else>
-        <div v-if="chartData.labels.length">
-          <div class="flex flex-col md:flex-row items-start gap-8">
-            <div class="flex-1 min-w-0 h-[400px]">
-              <Bar :data="chartData" :options="chartOptions" />
-            </div>
-            <div class="flex flex-col items-start gap-3 mt-6 md:mt-0">
-              <div v-for="(color, idx) in chartColors" :key="scheduleTypes[idx]?.work_type_name" class="flex items-center gap-2 mb-1">
-                <span :style="{ backgroundColor: color, width: '28px', height: '12px', display: 'inline-block', borderRadius: '2px', border: 'none', marginRight: '10px' }"></span>
-                <span class="text-base text-white font-sans" style="font-weight: 400; letter-spacing:0.2px;">{{ scheduleTypes[idx]?.work_type_name }}</span>
+  <div class="min-h-screen w-full bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#232526] p-8">
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">shifts schedule type analytics</h1>
+    <div class="flex justify-center">
+      <div class="bg-white/10 rounded-xl p-8 w-full max-w-6xl">
+        <div class="flex justify-end mb-4">
+          <button
+            class="bg-primary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-500"
+            @click="downloadCSV"
+          >
+            download csv
+          </button>
+        </div>
+        <div class="text-center mb-8">
+          <h3 class="text-primary mb-2 text-2xl font-serif" style="font-weight: 500;">company id: {{ companyId }}</h3>
+        </div>
+        <h2 class="text-xl font-bold text-primary mb-8 text-left">schedule types (active)</h2>
+        <div v-if="loading" class="text-center text-gray-300 py-8">Loading...</div>
+        <div v-else-if="error" class="text-center text-red-400 py-8">{{ error }}</div>
+        <div v-else>
+          <div v-if="chartData.labels.length">
+            <div class="flex flex-col md:flex-row items-start gap-8">
+              <div class="flex-1 min-w-0 h-[400px] flex items-center justify-center">
+                <Bar :data="chartData" :options="chartOptions" />
+              </div>
+              <div class="flex flex-col items-start gap-3 mt-6 md:mt-0 min-w-[220px]">
+                <div v-for="(color, idx) in chartColors" :key="scheduleTypes[idx]?.work_type_name" class="flex items-center gap-2 mb-1">
+                  <span :style="{ backgroundColor: color, width: '28px', height: '12px', display: 'inline-block', borderRadius: '2px', border: 'none', marginRight: '10px' }"></span>
+                  <span class="text-base text-white font-sans" style="font-weight: 400; letter-spacing:0.2px;">{{ scheduleTypes[idx]?.work_type_name }}</span>
+                </div>
               </div>
             </div>
           </div>
+          <div v-if="chartData.labels.length === 0" class="text-center text-gray-300 py-8">No active schedule types found.</div>
         </div>
-        <div v-if="chartData.labels.length === 0" class="text-center text-gray-300 py-8">No active schedule types found.</div>
       </div>
     </div>
   </div>
