@@ -10,7 +10,13 @@
         </div>
         <div class="flex justify-end mb-4">
           <button class="bg-primary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-emerald-500" @click="downloadCSV">download csv</button>
-          <button class="ml-4 bg-secondary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-indigo-600" @click="goToDrilldown">drill down</button>
+          <button 
+            class="ml-4 bg-secondary text-white border-none px-6 py-2 rounded-md text-base font-semibold cursor-pointer transition-colors hover:bg-indigo-600"
+            :disabled="!schedules.length"
+            @click="goToDrilldownPicker"
+          >
+            drill down
+          </button>
         </div>
         <div class="h-[60vh] mb-12 flex flex-col items-center justify-center">
           <Bar v-if="chartData && chartData.labels.length" :data="chartData" :options="chartOptions" />
@@ -151,8 +157,10 @@ export default defineComponent({
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
     },
-    goToDrilldown(shiftId) {
-      this.$router.push(`/shifts-allocation-drilldown/${this.companyId}/${this.scheduleType}/${shiftId}`);
+    goToDrilldownPicker() {
+      if (!this.schedules.length) return;
+      const shiftIds = this.schedules.map(s => s.work_schedule_id).join(',');
+      this.$router.push(`/shifts-allocation-drilldown/${this.companyId}/${this.scheduleType}/${shiftIds}`);
     }
   }
 });

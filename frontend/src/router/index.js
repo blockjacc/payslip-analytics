@@ -11,6 +11,9 @@ import ShiftsSelection from '../views/ShiftsSelection.vue'
 import ShiftsScheduleTypeAnalytics from '../views/ShiftsScheduleTypeAnalytics.vue'
 import ShiftsAllocationSelection from '../views/ShiftsAllocationSelection.vue'
 import ShiftsAllocationAnalytics from '../views/ShiftsAllocationAnalytics.vue'
+import ShiftsAllocationDrilldown from '../views/ShiftsAllocationDrilldown.vue'
+import ShiftsAllocationDrilldownPicker from '../views/ShiftsAllocationDrilldownPicker.vue'
+import ShiftsAllocationDrilldownTable from '../views/ShiftsAllocationDrilldownTable.vue'
 
 const routes = [
   {
@@ -77,6 +80,16 @@ const routes = [
     path: '/shifts-allocation-analytics/:companyId/:scheduleType/:shiftIds',
     name: 'ShiftsAllocationAnalytics',
     component: ShiftsAllocationAnalytics
+  },
+  {
+    path: '/shifts-allocation-drilldown/:companyId/:scheduleType/:shiftIds',
+    name: 'ShiftsAllocationDrilldownPicker',
+    component: ShiftsAllocationDrilldownPicker
+  },
+  {
+    path: '/shifts-allocation-drilldown/:companyId/:scheduleType/:shiftIds/:shiftId',
+    name: 'ShiftsAllocationDrilldownTable',
+    component: ShiftsAllocationDrilldownTable
   }
 ]
 
