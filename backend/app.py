@@ -804,5 +804,66 @@ def get_schedules_by_type(company_id, schedule_type):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/shifts/allocation-drilldown/<int:company_id>/<string:schedule_type>/<int:shift_id>', methods=['GET'])
+def get_shifts_allocation_drilldown(company_id, schedule_type, shift_id):
+    try:
+        ENCRYPT_KEY = os.getenv('MYSQL_ENCRYPT_KEY')
+        cursor = mysql.connection.cursor()
+        
+        # Query to get all employees assigned to the specific shift
+        # Join with employee and location_and_offices to get all required fields
+        query = '''
+            SELECT 
+                ess.emp_id,
+                CAST(AES_DECRYPT(e.last_name, %s) AS CHAR(150) CHARACTER SET utf8) AS last_name,
+                CAST(AES_DECRYPT(e.first_name, %s) AS CHAR(150) CHARACTER SET utf8) AS first_name,
+                COALESCE(lao.name, 'N/A') AS location_office
+            FROM employee_shifts_schedule ess
+            JOIN employee e ON ess.emp_id = e.emp_id
+            LEFT JOIN employee_payroll_information epi ON ess.emp_id = epi.emp_id AND epi.company_id = %s
+            LEFT JOIN location_and_offices lao ON epi.location_and_offices_id = lao.location_and_offices_id
+            WHERE ess.company_id = %s 
+                AND ess.work_schedule_id = %s 
+                AND ess.status = 'Active'
+            ORDER BY last_name ASC, first_name ASC
+        '''
+        
+        cursor.execute(query, (ENCRYPT_KEY, ENCRYPT_KEY, company_id, company_id, shift_id))
+        results = cursor.fetchall()
+        
+        # Get shift name for context
+        shift_query = '''
+            SELECT name FROM work_schedule 
+            WHERE work_schedule_id = %s AND comp_id = %s AND status = 'Active'
+        '''
+        cursor.execute(shift_query, (shift_id, company_id))
+        shift_result = cursor.fetchone()
+        shift_name = shift_result[0] if shift_result else 'Unknown Shift'
+        
+        cursor.close()
+        
+        # Format the response
+        employees = []
+        for row in results:
+            employees.append({
+                'emp_id': row[0],
+                'last_name': row[1] if row[1] else 'N/A',
+                'first_name': row[2] if row[2] else 'N/A',
+                'location_office': row[3] if row[3] else 'N/A'
+            })
+        
+        return jsonify({
+            'shift_id': shift_id,
+            'shift_name': shift_name,
+            'schedule_type': schedule_type,
+            'company_id': company_id,
+            'employees': employees,
+            'employee_count': len(employees)
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error in shifts allocation drilldown: {str(e)}")
+        return jsonify({'error': f'Failed to retrieve shifts allocation drilldown data: {str(e)}'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 
