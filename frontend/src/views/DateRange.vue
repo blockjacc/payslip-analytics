@@ -84,7 +84,8 @@ export default {
       costCenterId: '',
       projectId: '',
       locationId: '',
-      filterDisplay: ''
+      filterDisplay: '',
+      locationName: '',
     }
   },
   created() {
@@ -102,6 +103,10 @@ export default {
     this.costCenterId = this.$route.query.cost_center_id || '';
     this.projectId = this.$route.query.project_id || '';
     this.locationId = this.$route.query.location_id || '';
+    
+    if (this.locationId) {
+      this.fetchLocationName();
+    }
     
     // Build filter display text
     this.buildFilterDisplay();
@@ -243,6 +248,19 @@ export default {
       this.selectedToDate = '';
       this.error = '';
     },
+    async fetchLocationName() {
+      try {
+        const response = await axios.get(`/api/settings-options/${this.companyId}/location_and_offices`);
+        const options = response.data.options || [];
+        const found = options.find(opt => String(opt.id) === String(this.locationId));
+        if (found) {
+          this.locationName = found.name;
+          this.buildFilterDisplay();
+        }
+      } catch (err) {
+        // fallback: leave as ID
+      }
+    },
     buildFilterDisplay() {
       const filters = [];
       if (this.departmentId) filters.push(`department id: ${this.departmentId}`);
@@ -251,7 +269,9 @@ export default {
       if (this.positionId) filters.push(`position id: ${this.positionId}`);
       if (this.costCenterId) filters.push(`cost center id: ${this.costCenterId}`);
       if (this.projectId) filters.push(`project id: ${this.projectId}`);
-      if (this.locationId) filters.push(`location id: ${this.locationId}`);
+      if (this.locationId) {
+        filters.push(this.locationName ? `location: ${this.locationName}` : `location id: ${this.locationId}`);
+      }
       this.filterDisplay = filters.join(' | ');
     }
   },

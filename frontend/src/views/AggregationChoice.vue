@@ -34,8 +34,15 @@
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   name: 'AggregationChoice',
+  data() {
+    return {
+      locationName: '',
+    }
+  },
   computed: {
     companyId() {
       return this.$route.params.companyId;
@@ -74,7 +81,7 @@ export default {
         filters.push(`Project ID: ${this.$route.query.project_id}`);
       }
       if (this.$route.query.location_id) {
-        filters.push(`Location ID: ${this.$route.query.location_id}`);
+        filters.push(this.locationName ? `Location: ${this.locationName}` : `Location ID: ${this.$route.query.location_id}`);
       }
       
       return filters.length > 0 ? filters.join(', ') : '';
@@ -87,6 +94,18 @@ export default {
         month: 'long',
         day: 'numeric'
       });
+    },
+    async fetchLocationName() {
+      try {
+        const response = await axios.get(`/api/settings-options/${this.companyId}/location_and_offices`);
+        const options = response.data.options || [];
+        const found = options.find(opt => String(opt.id) === String(this.$route.query.location_id));
+        if (found) {
+          this.locationName = found.name;
+        }
+      } catch (err) {
+        // fallback: leave as ID
+      }
     },
     selectAggregation(type) {
       // Prepare route parameters
@@ -133,6 +152,11 @@ export default {
         query: queryParams
       });
     }
-  }
+  },
+  created() {
+    if (this.$route.query.location_id) {
+      this.fetchLocationName();
+    }
+  },
 }
 </script> 

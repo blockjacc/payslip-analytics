@@ -83,6 +83,7 @@
 import { defineComponent } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LogarithmicScale } from 'chart.js'
+import { getLogYAxisConfig, getYAxisStartAndFirstTick, getSimpleYAxis } from '../utils/chartAxis'
 
 ChartJS.register(CategoryScale, LinearScale, LogarithmicScale, BarElement, Title, Tooltip, Legend)
 
@@ -272,78 +273,55 @@ export default defineComponent({
         return 0;
       }
     },
-    dynamicYAxisMin() {
-      // Find the smallest non-zero value among all selected fields and periods
+    chartOptions() {
+      // Gather all values to be displayed for y-axis config
       const aggregationType = this.$route.params.aggregationType || 'single';
-      let minValue = Infinity;
+      let values = [];
       if (aggregationType === 'separate' && this.periods.length) {
         this.periods.forEach(period => {
           this.selectedFields.forEach(field => {
-            const value = period.summary ? period.summary[field] || 0 : 0;
-            if (value > 0 && value < minValue) minValue = value;
+            values.push(period.summary ? period.summary[field] || 0 : 0);
           });
         });
       } else {
         this.selectedFields.forEach(field => {
-          const value = this.summaryTotal[field] || 0;
-          if (value > 0 && value < minValue) minValue = value;
+          values.push(this.summaryTotal[field] || 0);
         });
       }
-      return minValue === Infinity ? 1 : minValue;
-    },
-    dynamicYAxisMax() {
-      // The topmost y-axis value is the total sum of all selected fields (for aggregate) or the max period sum (for separate)
-      const aggregationType = this.$route.params.aggregationType || 'single';
-      let maxValue = 0;
-      if (aggregationType === 'separate' && this.periods.length) {
-        this.periods.forEach(period => {
-          let periodSum = 0;
-          this.selectedFields.forEach(field => {
-            periodSum += period.summary ? period.summary[field] || 0 : 0;
-          });
-          if (periodSum > maxValue) maxValue = periodSum;
-        });
-      } else {
-        maxValue = this.selectedFields.reduce((sum, field) => sum + (this.summaryTotal[field] || 0), 0);
-      }
-      return maxValue > 0 ? maxValue : 1000;
-    },
-    chartOptions() {
-      const aggregationType = this.$route.params.aggregationType || 'single';
-      const minY = this.dynamicYAxisMin;
-      const maxY = this.dynamicYAxisMax;
-      // Generate exactly 11 logarithmically spaced ticks: 0, minY, ..., maxY
-      const logTicks = [0];
-      if (minY > 0 && maxY > minY) {
-        for (let i = 0; i <= 9; i++) {
-          const tick = minY * Math.pow(maxY / minY, i / 9);
-          logTicks.push(Math.round(tick));
-        }
-        // Ensure the last tick is exactly maxY (total)
-        logTicks[logTicks.length - 1] = Math.round(maxY);
-      }
+      // Use the simple axis function
+      const { min, max, ticks } = getSimpleYAxis(values);
+      console.log('Analytics aggregationType:', aggregationType);
+      console.log('Analytics selectedFields:', this.selectedFields);
+      console.log('Analytics summaryTotal:', this.summaryTotal);
+      console.log('Analytics periods:', this.periods);
+      console.log('Analytics values passed to getSimpleYAxis:', values, 'actual values:', JSON.stringify(values));
+      console.log('Analytics ticks returned:', ticks);
+      console.log('Analytics min/max:', min, max);
       const baseOptions = {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
           y: {
-            type: 'logarithmic',
+            type: 'linear',
             display: true,
             min: 0,
-            max: maxY,
+            max: max,
             ticks: {
+              stepSize: max / 10,
+              count: 11,
               color: '#fff',
               font: {
                 family: "'Open Sans', sans-serif",
                 size: 12
               },
-              callback: function(value) {
-                return value.toLocaleString('en-US');
+              callback: function(value, index, values) {
+                console.log('Tick callback - value:', value, 'index:', index, 'total values:', values.length);
+                // Map Chart.js tick positions to our exact values
+                if (index < ticks.length) {
+                  return ticks[index].toLocaleString('en-US');
+                }
+                return '';
               }
-            },
-            afterBuildTicks: (axis) => {
-              axis.ticks = logTicks.map(v => ({ value: v }));
-              return axis.ticks;
             },
             grid: {
               color: 'rgba(255, 255, 255, 0.1)'

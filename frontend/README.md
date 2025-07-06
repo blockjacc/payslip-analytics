@@ -15,8 +15,8 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ### 1. Chart Structure
 - **Type:** Vertical stacked bar chart (Chart.js Bar with `stacked: true`)
 - **X-Axis:**
-  - For aggregate/single-period: one label, e.g., 'Total'
-  - For separate/multi-period: one label per period (e.g., 'March 3, 2025 - March 17, 2025')
+  - Aggregate/single-period: one label, e.g., 'Total'
+  - Separate/multi-period: one label per period (e.g., 'March 3, 2025 - March 17, 2025')
 - **Y-Axis:**
   - **Type:** Logarithmic
   - **Start:** Always at 0
@@ -24,11 +24,11 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
   - **Top Tick:** Total sum (for aggregate) or max period sum (for separate)
   - **Ticks:** Exactly 11 ticks (including 0 and the top), spaced logarithmically
   - **Tick Values:** [0, min, ..., max] (10 log steps between min and max)
-  - **No extra ticks**—only these 11 are shown (enforced with `afterBuildTicks`)
+  - **No extra ticks**—only these 11 are shown (**strictly enforced with `afterBuildTicks` due to Chart.js behavior**)
 - **Bar Segments:**
   - Each selected field is a segment in the stack
   - All selected fields are always included, even if value is zero
-  - Smallest value is at the bottom, largest at the top
+  - **Segments are always stacked from lowest value (bottom) to highest (top)**
 - **Legend:** Always displayed on the right
 - **Font:** 'Open Sans' for all chart text
 

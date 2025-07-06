@@ -108,3 +108,11 @@ Thank you for the precise feedback. You are correct—the y-axis should:
 ### How to Fix
 - Use the `afterBuildTicks` callback in the y-axis options to strictly enforce only the 11 ticks (0 + 10 steps) you want.
 - This will override Chart.js’s default tick generation and display only your custom ticks.
+
+
+
+1. **Ensure the shared utility and all chart configs use `afterBuildTicks` to strictly enforce the 11 ticks.**
+2. **Sort datasets by value (lowest to highest) before rendering, so the lowest value is always at the bottom.**
+3. **Update the documentation to include both rules.**
+
+This will guarantee that both payslip and shifts (and any future charts) are always consistent and correct.

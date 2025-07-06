@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { getLogYAxisConfig, getYAxisStartAndFirstTick, getSimpleYAxis } from '../utils/chartAxis';
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, LogarithmicScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
 
@@ -76,6 +77,10 @@ export default {
       };
     },
     chartOptions() {
+      const values = this.scheduleTypes.map(s => s.count);
+      const { min, max, ticks } = getSimpleYAxis(values);
+      console.log('Shifts values:', values);
+      console.log('Shifts ticks:', ticks);
       return {
         responsive: true,
         maintainAspectRatio: false,
@@ -112,14 +117,24 @@ export default {
             ticks: { color: '#fff', font: { family: 'Open Sans', size: 16, weight: 'bold' } }
           },
           y: {
-            type: 'logarithmic',
+            type: 'linear',
             stacked: true,
-            min: 1,
+            min: 0,
+            max: max,
             grid: { color: 'rgba(255,255,255,0.12)' },
             ticks: {
+              stepSize: max / 10,
+              count: 11,
               color: '#fff',
               font: { family: 'Open Sans', size: 16, weight: 'bold' },
-              callback: function(value) { return Number(value).toLocaleString(); }
+              callback: function(value, index, values) {
+                console.log('Shifts tick callback - value:', value, 'index:', index, 'total values:', values.length);
+                // Map Chart.js tick positions to our exact values
+                if (index < ticks.length) {
+                  return ticks[index].toLocaleString('en-US');
+                }
+                return '';
+              }
             }
           }
         }
