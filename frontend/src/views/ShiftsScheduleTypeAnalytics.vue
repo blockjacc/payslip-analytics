@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { getLogYAxisConfig, getYAxisStartAndFirstTick, getSimpleYAxis } from '../utils/chartAxis';
+import { getLogYAxisConfig, getYAxisStartAndFirstTick, getSimpleYAxis, getUnifiedStackedBarChart } from '../utils/chartAxis';
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, LogarithmicScale, BarElement, Title, Tooltip, Legend } from 'chart.js'
 
@@ -64,81 +64,38 @@ export default {
       return this.scheduleTypes.map((_, idx) => palette[idx % palette.length]);
     },
     chartData() {
-      return {
-        labels: [''],
-        datasets: this.scheduleTypes.map((s, idx) => ({
-          label: s.work_type_name,
-          data: [s.count],
-          backgroundColor: this.chartColors[idx],
-          borderColor: '#222c44',
-          borderWidth: 2,
-          order: idx
-        }))
-      };
+      if (!this.scheduleTypes.length) return { labels: [], datasets: [] };
+      // Use unified chart configuration
+      const { chartData } = getUnifiedStackedBarChart(
+        this.scheduleTypes,
+        'count',
+        'work_type_name',
+        this.chartColors,
+        { 
+          chartName: 'Shifts Schedule Types',
+          showLegend: false,
+          fontSize: 16,
+          fontFamily: 'Open Sans'
+        }
+      );
+      return chartData;
     },
     chartOptions() {
-      const values = this.scheduleTypes.map(s => s.count);
-      const { min, max, ticks } = getSimpleYAxis(values);
-      console.log('Shifts values:', values);
-      console.log('Shifts ticks:', ticks);
-      return {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { display: false },
-          tooltip: {
-            enabled: true,
-            mode: 'index',
-            intersect: false,
-            backgroundColor: 'rgba(30, 41, 59, 0.95)',
-            titleColor: '#fff',
-            titleFont: {
-              family: 'Open Sans',
-              size: 16,
-              weight: 'bold'
-            },
-            bodyColor: '#fff',
-            bodyFont: {
-              family: 'Open Sans',
-              size: 15
-            },
-            padding: 12,
-            callbacks: {
-              label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}`
-            }
-          },
-          title: { display: false }
-        },
-        layout: { padding: { left: 0, right: 0, top: 0, bottom: 0 } },
-        scales: {
-          x: {
-            stacked: true,
-            grid: { color: 'rgba(255,255,255,0.08)' },
-            ticks: { color: '#fff', font: { family: 'Open Sans', size: 16, weight: 'bold' } }
-          },
-          y: {
-            type: 'linear',
-            stacked: true,
-            min: 0,
-            max: max,
-            grid: { color: 'rgba(255,255,255,0.12)' },
-            ticks: {
-              stepSize: max / 10,
-              count: 11,
-              color: '#fff',
-              font: { family: 'Open Sans', size: 16, weight: 'bold' },
-              callback: function(value, index, values) {
-                console.log('Shifts tick callback - value:', value, 'index:', index, 'total values:', values.length);
-                // Map Chart.js tick positions to our exact values
-                if (index < ticks.length) {
-                  return ticks[index].toLocaleString('en-US');
-                }
-                return '';
-              }
-            }
-          }
+      if (!this.scheduleTypes.length) return {};
+      // Use unified chart configuration
+      const { chartOptions } = getUnifiedStackedBarChart(
+        this.scheduleTypes,
+        'count',
+        'work_type_name',
+        this.chartColors,
+        { 
+          chartName: 'Shifts Schedule Types',
+          showLegend: false,
+          fontSize: 16,
+          fontFamily: 'Open Sans'
         }
-      };
+      );
+      return chartOptions;
     }
   },
   created() {

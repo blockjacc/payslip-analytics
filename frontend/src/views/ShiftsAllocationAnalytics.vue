@@ -43,6 +43,7 @@
 import { defineComponent } from 'vue';
 import { Bar } from 'vue-chartjs';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { getUnifiedStackedBarChart } from '../utils/chartAxis';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
@@ -74,47 +75,55 @@ export default defineComponent({
     },
     chartData() {
       if (!this.schedules.length) return { labels: [], datasets: [] };
-      const sorted = [...this.schedules].sort((a, b) => a.employee_count - b.employee_count);
-      return {
-        labels: ['Employees Assigned'],
-        datasets: sorted.map((s, i) => ({
-          label: s.name,
-          data: [s.employee_count],
-          backgroundColor: shiftColors[i % shiftColors.length],
-          borderRadius: 8
-        }))
-      };
+      // Use unified chart configuration for consistent behavior
+      const { chartData } = getUnifiedStackedBarChart(
+        this.schedules,
+        'employee_count',
+        'name',
+        shiftColors,
+        { 
+          labels: ['Employees Assigned'],
+          chartName: 'Shifts Allocation',
+          showLegend: true,
+          legendPosition: 'right',
+          fontSize: 14,
+          fontFamily: 'IBM Plex Mono',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          borderWidth: 1
+        }
+      );
+      return chartData;
     },
     chartOptions() {
-      return {
-        responsive: true,
-        plugins: {
-          legend: { display: true, position: 'right', labels: { color: '#fff', font: { family: 'IBM Plex Mono', size: 14 } } },
-          tooltip: { enabled: true }
-        },
-        scales: {
-          x: {
-            stacked: true,
-            beginAtZero: true,
-            ticks: { color: '#fff', font: { family: 'IBM Plex Mono', size: 14 } },
-            grid: { color: 'rgba(255,255,255,0.1)' }
-          },
-          y: {
-            stacked: true,
-            type: 'logarithmic',
-            beginAtZero: true,
-            ticks: { color: '#fff', font: { family: 'IBM Plex Mono', size: 14 } },
-            grid: { color: 'rgba(255,255,255,0.1)' }
-          }
-        },
-        onClick: (e, elements, chart) => {
-          if (elements.length > 0) {
-            const idx = elements[0].datasetIndex;
-            const shiftId = this.schedules[idx].work_schedule_id;
-            this.goToDrilldown(shiftId);
-          }
+      if (!this.schedules.length) return {};
+      // Use unified chart configuration for consistent behavior
+      const { chartOptions } = getUnifiedStackedBarChart(
+        this.schedules,
+        'employee_count',
+        'name',
+        shiftColors,
+        { 
+          labels: ['Employees Assigned'],
+          chartName: 'Shifts Allocation',
+          showLegend: true,
+          legendPosition: 'right',
+          fontSize: 14,
+          fontFamily: 'IBM Plex Mono',
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          borderWidth: 1
+        }
+      );
+      
+      // Add the onClick handler for drilldown navigation
+      chartOptions.onClick = (e, elements, chart) => {
+        if (elements.length > 0) {
+          const idx = elements[0].datasetIndex;
+          const shiftId = this.schedules[idx].work_schedule_id;
+          this.goToDrilldown(shiftId);
         }
       };
+      
+      return chartOptions;
     },
     totalEmployees() {
       return this.schedules.reduce((sum, s) => sum + s.employee_count, 0);
@@ -161,6 +170,9 @@ export default defineComponent({
       if (!this.schedules.length) return;
       const shiftIds = this.schedules.map(s => s.work_schedule_id).join(',');
       this.$router.push(`/shifts-allocation-drilldown/${this.companyId}/${this.scheduleType}/${shiftIds}`);
+    },
+    goToDrilldown(shiftId) {
+      this.$router.push(`/shifts-allocation-drilldown/${this.companyId}/${this.scheduleType}/${shiftId}`);
     }
   }
 });

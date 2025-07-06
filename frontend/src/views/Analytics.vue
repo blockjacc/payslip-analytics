@@ -83,7 +83,7 @@
 import { defineComponent } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, LogarithmicScale } from 'chart.js'
-import { getLogYAxisConfig, getYAxisStartAndFirstTick, getSimpleYAxis } from '../utils/chartAxis'
+import { getLogYAxisConfig, getYAxisStartAndFirstTick, getSimpleYAxis, getUnifiedPayslipChart } from '../utils/chartAxis'
 
 ChartJS.register(CategoryScale, LinearScale, LogarithmicScale, BarElement, Title, Tooltip, Legend)
 
@@ -223,19 +223,15 @@ export default defineComponent({
         }];
       }
       if (periods.length) {
-        // Always include all selected fields, even if value is zero
-        const components = this.selectedFields;
-        const datasets = components.map(field => ({
-          label: this.formatLabel(field),
-          data: periods.map(period => period.summary ? period.summary[field] || 0 : 0),
-          backgroundColor: this.fieldColors[field] || '#24c2ab',
-          borderColor: 'rgba(255, 255, 255, 0.1)',
-          borderWidth: 1
-        }));
-        return {
-          labels: periods.map(period => period.label),
-          datasets
-        };
+        // Use unified chart configuration
+        const { chartData } = getUnifiedPayslipChart(
+          this.selectedFields,
+          periods,
+          this.formatLabel,
+          this.fieldColors,
+          { aggregationType }
+        );
+        return chartData;
       } else {
         return { labels: [], datasets: [] };
       }
@@ -274,116 +270,34 @@ export default defineComponent({
       }
     },
     chartOptions() {
-      // Gather all values to be displayed for y-axis config
       const aggregationType = this.$route.params.aggregationType || 'single';
-      let values = [];
+      // Unified logic: treat aggregate as a single-period 'separate' case
+      let periods = [];
       if (aggregationType === 'separate' && this.periods.length) {
-        this.periods.forEach(period => {
-          this.selectedFields.forEach(field => {
-            values.push(period.summary ? period.summary[field] || 0 : 0);
-          });
-        });
-      } else {
-        this.selectedFields.forEach(field => {
-          values.push(this.summaryTotal[field] || 0);
-        });
+        periods = this.periods.map(period => ({
+          label: `${this.formatDate(period.period.from)} - ${this.formatDate(period.period.to)}`,
+          summary: period.summary
+        }));
+      } else if (Object.keys(this.summaryTotal).length > 0) {
+        // Aggregate or single: treat as one period
+        periods = [{
+          label: 'Total',
+          summary: this.summaryTotal
+        }];
       }
-      // Use the simple axis function
-      const { min, max, ticks } = getSimpleYAxis(values);
-      console.log('Analytics aggregationType:', aggregationType);
-      console.log('Analytics selectedFields:', this.selectedFields);
-      console.log('Analytics summaryTotal:', this.summaryTotal);
-      console.log('Analytics periods:', this.periods);
-      console.log('Analytics values passed to getSimpleYAxis:', values, 'actual values:', JSON.stringify(values));
-      console.log('Analytics ticks returned:', ticks);
-      console.log('Analytics min/max:', min, max);
-      const baseOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            type: 'linear',
-            display: true,
-            min: 0,
-            max: max,
-            ticks: {
-              stepSize: max / 10,
-              count: 11,
-              color: '#fff',
-              font: {
-                family: "'Open Sans', sans-serif",
-                size: 12
-              },
-              callback: function(value, index, values) {
-                console.log('Tick callback - value:', value, 'index:', index, 'total values:', values.length);
-                // Map Chart.js tick positions to our exact values
-                if (index < ticks.length) {
-                  return ticks[index].toLocaleString('en-US');
-                }
-                return '';
-              }
-            },
-            grid: {
-              color: 'rgba(255, 255, 255, 0.1)'
-            }
-          },
-          x: {
-            stacked: true,
-            ticks: {
-              color: '#fff',
-              font: {
-                family: "'Open Sans', sans-serif",
-                size: 12
-              },
-              maxRotation: 45,
-              minRotation: 45
-            },
-            grid: {
-              display: false
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'right',
-            labels: {
-              color: '#fff',
-              font: {
-                family: "'Open Sans', sans-serif",
-                size: 12
-              }
-            }
-          },
-          tooltip: {
-            enabled: true,
-            mode: aggregationType === 'separate' ? 'nearest' : 'index',
-            intersect: false,
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            titleColor: '#fff',
-            titleFont: {
-              family: "'Open Sans', sans-serif",
-              size: 12
-            },
-            bodyColor: '#fff',
-            bodyFont: {
-              family: "'Open Sans', sans-serif",
-              size: 12
-            },
-            padding: 10,
-            callbacks: {
-              label: function(context) {
-                const label = context.dataset.label || '';
-                const value = context.raw.toLocaleString('en-US');
-                return `${label}: ${value}`;
-              }
-            }
-          }
-        }
-      };
-      baseOptions.scales.x.stacked = true;
-      baseOptions.scales.y.stacked = true;
-      return baseOptions;
+      if (periods.length) {
+        // Use unified chart configuration
+        const { chartOptions } = getUnifiedPayslipChart(
+          this.selectedFields,
+          periods,
+          this.formatLabel,
+          this.fieldColors,
+          { aggregationType }
+        );
+        return chartOptions;
+      } else {
+        return {};
+      }
     }
   },
   methods: {

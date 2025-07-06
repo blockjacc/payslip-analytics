@@ -46,6 +46,29 @@ export function getYAxisStartAndFirstTick(values) {
   return { min: 0, max: min, ticks: [0, min] };
 }
 
+/**
+ * Maps a data value to its logarithmic position on a linear scale
+ * @param {number} value - The actual data value
+ * @param {number} min - The minimum non-zero value
+ * @param {number} max - The maximum value (total sum)
+ * @returns {number} - The position on the linear scale
+ */
+function mapValueToLogPosition(value, min, max) {
+  if (value <= 0) return 0;
+  if (value >= max) return max;
+  
+  // Find which logarithmic segment this value belongs to
+  const logMin = Math.log(min);
+  const logMax = Math.log(max);
+  const logValue = Math.log(value);
+  
+  // Map to position 1-10 (position 0 is reserved for zero)
+  const logPosition = ((logValue - logMin) / (logMax - logMin)) * 9 + 1;
+  
+  // Convert to linear scale position
+  return (logPosition / 10) * max;
+}
+
 // Simple y-axis configuration that forces chart to start at 0
 export function getSimpleYAxis(values) {
   const nonZero = values.filter(v => v > 0);
@@ -53,7 +76,7 @@ export function getSimpleYAxis(values) {
   
   if (nonZero.length === 0) {
     console.log('No nonzero values, returning default');
-    return { min: 0, max: 1, ticks: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1] };
+    return { min: 0, max: 1, ticks: [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], mapValue: (v) => v };
   }
   
   const min = Math.min(...nonZero);
@@ -62,22 +85,300 @@ export function getSimpleYAxis(values) {
   console.log('min:', min, 'totalSum:', totalSum);
   
   // 11 ticks: 0, min, then 9 more logarithmic steps to totalSum
-  const ticks = [0, min];
+  const ticks = [0, min]; // Keep exact min value, don't round
   
   // Generate 9 logarithmic steps from min to totalSum
   for (let i = 1; i <= 9; i++) {
     const t = min * Math.pow(totalSum / min, i / 9);
-    ticks.push(Math.round(t));
+    ticks.push(t); // Keep exact values for positioning
   }
   
   // Ensure last tick is exactly the total sum
   ticks[10] = totalSum;
   
   console.log('Generated ticks:', ticks);
+  console.log('First value should reach tick[1]:', ticks[1], 'min value is:', min);
   
   return {
     min: 0,
     max: totalSum,
-    ticks: ticks
+    ticks: ticks,
+    mapValue: (value) => mapValueToLogPosition(value, min, totalSum)
+  };
+}
+
+/**
+ * Unified chart configuration utility for consistent stacked bar charts
+ * Handles both tick generation and data sorting for proper stacking (lowest to highest)
+ * 
+ * @param {Array} items - Array of data items to be charted
+ * @param {string} valueKey - Key to access the numeric value in each item (e.g., 'count', 'value')
+ * @param {string} labelKey - Key to access the label in each item (e.g., 'work_type_name', 'field_name')
+ * @param {Array} colorPalette - Array of colors to use for the chart
+ * @param {Object} options - Additional options
+ * @returns {Object} Complete chart configuration with data and options
+ */
+export function getUnifiedStackedBarChart(items, valueKey, labelKey, colorPalette, options = {}) {
+  // Sort items by value (lowest to highest) for proper stacking
+  const sortedItems = [...items].sort((a, b) => a[valueKey] - b[valueKey]);
+  
+  // Extract values for tick generation
+  const values = sortedItems.map(item => item[valueKey]);
+  
+  // Generate ticks using our standard utility
+  const { min, max, ticks, mapValue } = getSimpleYAxis(values);
+  
+  // Create chart data with logarithmically positioned values
+  const chartData = {
+    labels: options.labels || [''],
+    datasets: sortedItems.map((item, idx) => ({
+      label: item[labelKey],
+      data: [mapValue(item[valueKey])], // Map to logarithmic position
+      backgroundColor: colorPalette[items.indexOf(item) % colorPalette.length], // Use original index for consistent colors
+      borderColor: options.borderColor || '#222c44',
+      borderWidth: options.borderWidth || 2,
+      order: idx
+    }))
+  };
+  
+  // Create chart options with our standard configuration
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { 
+        display: options.showLegend !== false,
+        position: options.legendPosition || 'right',
+        labels: { 
+          color: '#fff', 
+          font: { 
+            family: options.fontFamily || 'Open Sans', 
+            size: options.fontSize || 14 
+          } 
+        } 
+      },
+      tooltip: {
+        enabled: true,
+        mode: 'index',
+        intersect: false,
+        backgroundColor: 'rgba(30, 41, 59, 0.95)',
+        titleColor: '#fff',
+        titleFont: {
+          family: options.fontFamily || 'Open Sans',
+          size: options.fontSize || 16,
+          weight: 'bold'
+        },
+        bodyColor: '#fff',
+        bodyFont: {
+          family: options.fontFamily || 'Open Sans',
+          size: options.fontSize || 15
+        },
+        padding: 12,
+        callbacks: {
+          label: ctx => {
+            // Find the original value from the sorted items
+            const originalValue = sortedItems[ctx.datasetIndex][valueKey];
+            return `${ctx.dataset.label}: ${originalValue.toLocaleString('en-US')}`;
+          }
+        }
+      },
+      title: { display: false }
+    },
+    layout: { padding: { left: 0, right: 0, top: 0, bottom: 0 } },
+    scales: {
+      x: {
+        stacked: true,
+        grid: { color: 'rgba(255,255,255,0.08)' },
+        ticks: { 
+          color: '#fff', 
+          font: { 
+            family: options.fontFamily || 'Open Sans', 
+            size: options.fontSize || 16, 
+            weight: 'bold' 
+          } 
+        }
+      },
+      y: {
+        type: 'linear',
+        stacked: true,
+        min: 0,
+        max: max,
+        grid: { color: 'rgba(255,255,255,0.12)' },
+        ticks: {
+          stepSize: max / 10,
+          count: 11,
+          color: '#fff',
+          font: { 
+            family: options.fontFamily || 'Open Sans', 
+            size: options.fontSize || 16, 
+            weight: 'bold' 
+          },
+          callback: function(value, index, values) {
+            console.log(`${options.chartName || 'Chart'} tick callback - Chart.js value:`, value, 'index:', index, 'our tick value:', ticks[index]);
+            // Map Chart.js tick positions to our exact values
+            if (index < ticks.length) {
+              return Math.round(ticks[index]).toLocaleString('en-US');
+            }
+            return '';
+          }
+        }
+      }
+    }
+  };
+  
+  return {
+    chartData,
+    chartOptions,
+    sortedItems,
+    values,
+    ticks
+  };
+}
+
+/**
+ * Unified chart configuration for payslip analytics with multiple periods
+ * Handles field sorting by total values across all periods
+ * 
+ * @param {Array} selectedFields - Array of field names
+ * @param {Array} periods - Array of period objects with summary data
+ * @param {Function} formatLabel - Function to format field labels
+ * @param {Object} fieldColors - Object mapping field names to colors
+ * @param {Object} options - Additional options
+ * @returns {Object} Complete chart configuration with data and options
+ */
+export function getUnifiedPayslipChart(selectedFields, periods, formatLabel, fieldColors, options = {}) {
+  // Calculate total values for each field across all periods
+  const fieldTotals = {};
+  selectedFields.forEach(field => {
+    fieldTotals[field] = periods.reduce((sum, period) => 
+      sum + (period.summary ? period.summary[field] || 0 : 0), 0);
+  });
+  
+  // Sort fields by their total values (lowest to highest) for proper stacking
+  const sortedFields = [...selectedFields].sort((a, b) => fieldTotals[a] - fieldTotals[b]);
+  
+  // Extract all values for tick generation
+  const values = [];
+  periods.forEach(period => {
+    selectedFields.forEach(field => {
+      values.push(period.summary ? period.summary[field] || 0 : 0);
+    });
+  });
+  
+  // Generate ticks using our standard utility
+  const { min, max, ticks, mapValue } = getSimpleYAxis(values);
+  
+  // Create chart data with logarithmically positioned values
+  const chartData = {
+    labels: periods.map(period => period.label),
+    datasets: sortedFields.map(field => ({
+      label: formatLabel(field),
+      data: periods.map(period => {
+        const originalValue = period.summary ? period.summary[field] || 0 : 0;
+        return mapValue(originalValue); // Map to logarithmic position
+      }),
+      backgroundColor: fieldColors[field] || '#24c2ab',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      borderWidth: 1
+    }))
+  };
+  
+  // Create chart options with our standard configuration
+  const aggregationType = options.aggregationType || 'single';
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        type: 'linear',
+        display: true,
+        min: 0,
+        max: max,
+        stacked: true,
+        ticks: {
+          stepSize: max / 10,
+          count: 11,
+          color: '#fff',
+          font: {
+            family: "'Open Sans', sans-serif",
+            size: 12
+          },
+          callback: function(value, index, values) {
+            console.log('Payslip tick callback - Chart.js value:', value, 'index:', index, 'our tick value:', ticks[index]);
+            // Map Chart.js tick positions to our exact values
+            if (index < ticks.length) {
+              return Math.round(ticks[index]).toLocaleString('en-US');
+            }
+            return '';
+          }
+        },
+        grid: {
+          color: 'rgba(255, 255, 255, 0.1)'
+        }
+      },
+      x: {
+        stacked: true,
+        ticks: {
+          color: '#fff',
+          font: {
+            family: "'Open Sans', sans-serif",
+            size: 12
+          },
+          maxRotation: 45,
+          minRotation: 45
+        },
+        grid: {
+          display: false
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        display: true,
+        position: 'right',
+        labels: {
+          color: '#fff',
+          font: {
+            family: "'Open Sans', sans-serif",
+            size: 12
+          }
+        }
+      },
+      tooltip: {
+        enabled: true,
+        mode: aggregationType === 'separate' ? 'nearest' : 'index',
+        intersect: false,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        titleColor: '#fff',
+        titleFont: {
+          family: "'Open Sans', sans-serif",
+          size: 12
+        },
+        bodyColor: '#fff',
+        bodyFont: {
+          family: "'Open Sans', sans-serif",
+          size: 12
+        },
+        padding: 10,
+        callbacks: {
+          label: function(context) {
+            const label = context.dataset.label || '';
+            // Get the original value before logarithmic mapping
+            const fieldIndex = sortedFields.indexOf(selectedFields.find(f => formatLabel(f) === label));
+            const field = sortedFields[fieldIndex];
+            const originalValue = periods[context.dataIndex].summary ? periods[context.dataIndex].summary[field] || 0 : 0;
+            return `${label}: ${originalValue.toLocaleString('en-US')}`;
+          }
+        }
+      }
+    }
+  };
+  
+  return {
+    chartData,
+    chartOptions,
+    sortedFields,
+    values,
+    ticks
   };
 } 
