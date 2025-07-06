@@ -73,20 +73,64 @@ export default {
     locationId() {
       return this.$route.query.location_id || '';
     },
+    isAggregate() {
+      return this.$route.params.aggregationType === 'aggregate';
+    },
     periods() {
-      return this.result && this.result.periods ? this.result.periods : [];
+      if (this.result && this.result.periods) return this.result.periods;
+      if (this.isAggregate && this.result && this.result.employees) {
+        return [{
+          period: {
+            from: this.$route.params.periodFrom,
+            to: this.$route.params.periodTo
+          },
+          employees: this.result.employees
+        }];
+      }
+      return [];
     },
     sortedPeriods() {
       // Sort periods chronologically by from date
       return [...this.periods].sort((a, b) => new Date(a.period.from) - new Date(b.period.from));
     },
     currentPeriod() {
-      if (this.periods.length === 1) return this.periods[0];
-      if (this.selectedPeriodIdx !== null) return this.sortedPeriods[this.selectedPeriodIdx];
+      if (this.isAggregate) {
+        return this.periods[0];
+      }
+      if (this.selectedPeriodIdx !== null && this.periods.length > 0) {
+        return this.periods[this.selectedPeriodIdx];
+      }
       return null;
     },
     sortedEmployees() {
       if (!this.currentPeriod || !this.currentPeriod.employees) return [];
+      // For aggregate, group by emp_id and sum all fields
+      if (this.isAggregate) {
+        const empMap = {};
+        this.currentPeriod.employees.forEach(emp => {
+          if (!empMap[emp.emp_id]) {
+            empMap[emp.emp_id] = { ...emp };
+          } else {
+            // Sum all numeric fields
+            this.selectedFields.forEach(field => {
+              empMap[emp.emp_id][field] = (empMap[emp.emp_id][field] || 0) + (emp[field] || 0);
+            });
+          }
+        });
+        // Sort by last name, then first name
+        return Object.values(empMap).sort((a, b) => {
+          const lastA = (a.last_name || '').toLowerCase();
+          const lastB = (b.last_name || '').toLowerCase();
+          if (lastA < lastB) return -1;
+          if (lastA > lastB) return 1;
+          const firstA = (a.first_name || '').toLowerCase();
+          const firstB = (b.first_name || '').toLowerCase();
+          if (firstA < firstB) return -1;
+          if (firstA > firstB) return 1;
+          return 0;
+        });
+      }
+      // For separate, just sort as before
       return [...this.currentPeriod.employees].sort((a, b) => {
         const lastA = (a.last_name || '').toLowerCase();
         const lastB = (b.last_name || '').toLowerCase();
@@ -210,8 +254,10 @@ export default {
       const response = await fetch(url);
       if (!response.ok) throw new Error(await response.text());
       this.result = await response.json();
-      // If only one period, go straight to table
-      if (this.periods.length === 1) {
+      // For aggregate, go straight to table; for separate, select first period if only one
+      if (this.isAggregate) {
+        this.selectedPeriodIdx = 0;
+      } else if (this.periods.length === 1) {
         this.selectedPeriodIdx = 0;
       }
     } catch (err) {

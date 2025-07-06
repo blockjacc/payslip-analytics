@@ -62,3 +62,49 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ---
 
 **This documentation is the predicate for all charting in this app. Any new chart or analytics view must follow these standards for consistency, clarity, and maintainability.**
+
+## Drilldown Data Handling (Payslip Analytics)
+
+### Principle
+- The backend always returns period-separated employee records (one record per employee per period).
+- The frontend is responsible for all further computation and aggregation, in memory.
+
+### Drilldown Views
+- **Separate Drilldown:**
+  - The frontend displays the data as structured in memory: one row per employee per period.
+  - The user can select a period to view the breakdown for that period only.
+- **Aggregate Drilldown:**
+  - The frontend groups all employee records by `emp_id` and sums all numeric fields across all periods.
+  - Only one row per employee is displayed, with totals for each field for the full period.
+  - The CSV export for aggregate drilldown also uses these in-memory totals.
+
+### Rationale
+- This approach keeps the backend simple and stateless.
+- All analytics, aggregation, and drilldown logic is centralized in the frontend, making it easy to adapt and extend.
+- This is fully consistent with the in-memory compute principle described in `inmemorycompute.txt`.
+
+---
+
+## In-Memory Compute Principle (All Analytics & Drilldowns)
+
+### Principle
+- **Single Fetch:** The backend retrieves and decrypts all relevant records for a user's analytics/drilldown request in one query.
+- **No Backend Specialization:** The backend does not implement separate endpoints or logic for each visualization, aggregation, or drilldown type.
+- **In-Memory Processing:** All further computation—aggregation, grouping, filtering, drilldown, and transformation—is performed in memory (in the frontend or backend session), not in the database or via additional backend endpoints.
+
+### Application
+- **Analytics Views:** The frontend receives all necessary raw records and computes totals, groupings, and visualizations as needed.
+- **Drilldowns:** The frontend (or in-memory backend logic) can group, sum, or filter records for any drilldown or export, without requiring new backend code.
+- **CSV/Export:** Any export reflects the current in-memory view, not a new backend query.
+
+### Rationale
+- **Performance:** Minimizes database I/O and backend load by fetching once per request.
+- **Flexibility:** Enables new visualizations, aggregations, and drilldowns without backend changes.
+- **Maintainability:** Keeps backend simple, stateless, and focused on secure data retrieval and decryption.
+
+### Example
+- For payslip analytics, the backend returns all payslip records for the selected period(s). The frontend computes both aggregate and per-period views, as well as employee-level drilldowns, entirely in memory.
+
+---
+
+**This principle applies to all analytics and drilldown features in this app. Any new visualization or export should be implemented using in-memory compute, not new backend endpoints.**
