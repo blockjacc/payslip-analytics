@@ -186,41 +186,54 @@ export default defineComponent({
       return this.analyticsPrefetchData && this.analyticsPrefetchData.periods ? this.analyticsPrefetchData.periods : [];
     },
     summaryTotal() {
-      return this.analyticsPrefetchData && this.analyticsPrefetchData.total ? this.analyticsPrefetchData.total : {};
+      // Support both legacy (total) and new (summary) keys, and fallback to top-level fields
+      if (this.analyticsPrefetchData) {
+        if (this.analyticsPrefetchData.summary) {
+          return this.analyticsPrefetchData.summary;
+        }
+        if (this.analyticsPrefetchData.total) {
+          return this.analyticsPrefetchData.total;
+        }
+        // Fallback: if top-level fields match selectedFields, use them
+        const keys = Object.keys(this.analyticsPrefetchData);
+        const fieldKeys = this.selectedFields.filter(f => keys.includes(f));
+        if (fieldKeys.length > 0) {
+          const result = {};
+          fieldKeys.forEach(f => { result[f] = this.analyticsPrefetchData[f]; });
+          return result;
+        }
+      }
+      return {};
     },
     chartData() {
       const aggregationType = this.$route.params.aggregationType || 'single';
+      // Unified logic: treat aggregate as a single-period 'separate' case
+      let periods = [];
       if (aggregationType === 'separate' && this.periods.length) {
-        const periods = this.periods;
-        const components = this.selectedFields.filter(field =>
-          periods.some(period => period.summary && period.summary[field] > 0)
-        );
+        periods = this.periods.map(period => ({
+          label: `${this.formatDate(period.period.from)} - ${this.formatDate(period.period.to)}`,
+          summary: period.summary
+        }));
+      } else if (Object.keys(this.summaryTotal).length > 0) {
+        // Aggregate or single: treat as one period
+        periods = [{
+          label: 'Total',
+          summary: this.summaryTotal
+        }];
+      }
+      if (periods.length) {
+        // Always include all selected fields, even if value is zero
+        const components = this.selectedFields;
         const datasets = components.map(field => ({
           label: this.formatLabel(field),
           data: periods.map(period => period.summary ? period.summary[field] || 0 : 0),
           backgroundColor: this.fieldColors[field] || '#24c2ab',
           borderColor: 'rgba(255, 255, 255, 0.1)',
-          borderWidth: 1,
-          order: periods[0].summary ? periods[0].summary[field] || 0 : 0
+          borderWidth: 1
         }));
         return {
-          labels: periods.map(period =>
-            `${this.formatDate(period.period.from)} - ${this.formatDate(period.period.to)}`
-          ),
+          labels: periods.map(period => period.label),
           datasets
-        };
-      } else if (this.analyticsPrefetchData && this.analyticsPrefetchData.summary) {
-        const components = this.selectedFields.filter(field =>
-          this.analyticsPrefetchData.summary[field] > 0
-        );
-        return {
-          labels: components.map(field => this.formatLabel(field)),
-          datasets: [{
-            data: components.map(field => this.analyticsPrefetchData.summary[field] || 0),
-            backgroundColor: components.map(field => this.fieldColors[field] || '#24c2ab'),
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            borderWidth: 1
-          }]
         };
       } else {
         return { labels: [], datasets: [] };
@@ -237,10 +250,10 @@ export default defineComponent({
           });
         });
         return sums;
-      } else if (this.analyticsPrefetchData && this.analyticsPrefetchData.summary) {
+      } else if (Object.keys(this.summaryTotal).length > 0) {
         const result = {};
         this.selectedFields.forEach(field => {
-          result[field] = this.analyticsPrefetchData.summary[field] || 0;
+          result[field] = this.summaryTotal[field] || 0;
         });
         return result;
       } else {
@@ -253,36 +266,62 @@ export default defineComponent({
         return this.selectedFields.reduce((sum, field) => {
           return sum + this.periods.reduce((pSum, period) => pSum + (period.summary ? period.summary[field] || 0 : 0), 0);
         }, 0);
-      } else if (this.analyticsPrefetchData && this.analyticsPrefetchData.summary) {
-        return this.selectedFields.reduce((sum, field) => sum + (this.analyticsPrefetchData.summary[field] || 0), 0);
+      } else if (Object.keys(this.summaryTotal).length > 0) {
+        return this.selectedFields.reduce((sum, field) => sum + (this.summaryTotal[field] || 0), 0);
       } else {
         return 0;
       }
     },
-    dynamicYAxisMax() {
+    dynamicYAxisMin() {
+      // Find the smallest non-zero value among all selected fields and periods
       const aggregationType = this.$route.params.aggregationType || 'single';
-      let maxValue = 0;
+      let minValue = Infinity;
       if (aggregationType === 'separate' && this.periods.length) {
-        // Find the highest value among all selected fields and all periods
         this.periods.forEach(period => {
           this.selectedFields.forEach(field => {
             const value = period.summary ? period.summary[field] || 0 : 0;
-            if (value > maxValue) maxValue = value;
+            if (value > 0 && value < minValue) minValue = value;
           });
         });
       } else {
-        // Find the highest value among all selected fields in the current analytics
         this.selectedFields.forEach(field => {
-          const value = this.analyticsPrefetchData && this.analyticsPrefetchData.summary ? this.analyticsPrefetchData.summary[field] || 0 : 0;
-          if (value > maxValue) maxValue = value;
+          const value = this.summaryTotal[field] || 0;
+          if (value > 0 && value < minValue) minValue = value;
         });
       }
-      // If maxValue is 0, set a default (e.g., 1000) to avoid log scale issues
+      return minValue === Infinity ? 1 : minValue;
+    },
+    dynamicYAxisMax() {
+      // The topmost y-axis value is the total sum of all selected fields (for aggregate) or the max period sum (for separate)
+      const aggregationType = this.$route.params.aggregationType || 'single';
+      let maxValue = 0;
+      if (aggregationType === 'separate' && this.periods.length) {
+        this.periods.forEach(period => {
+          let periodSum = 0;
+          this.selectedFields.forEach(field => {
+            periodSum += period.summary ? period.summary[field] || 0 : 0;
+          });
+          if (periodSum > maxValue) maxValue = periodSum;
+        });
+      } else {
+        maxValue = this.selectedFields.reduce((sum, field) => sum + (this.summaryTotal[field] || 0), 0);
+      }
       return maxValue > 0 ? maxValue : 1000;
     },
     chartOptions() {
       const aggregationType = this.$route.params.aggregationType || 'single';
-      
+      const minY = this.dynamicYAxisMin;
+      const maxY = this.dynamicYAxisMax;
+      // Generate exactly 11 logarithmically spaced ticks: 0, minY, ..., maxY
+      const logTicks = [0];
+      if (minY > 0 && maxY > minY) {
+        for (let i = 0; i <= 9; i++) {
+          const tick = minY * Math.pow(maxY / minY, i / 9);
+          logTicks.push(Math.round(tick));
+        }
+        // Ensure the last tick is exactly maxY (total)
+        logTicks[logTicks.length - 1] = Math.round(maxY);
+      }
       const baseOptions = {
         responsive: true,
         maintainAspectRatio: false,
@@ -291,19 +330,27 @@ export default defineComponent({
             type: 'logarithmic',
             display: true,
             min: 0,
-            max: this.dynamicYAxisMax,
+            max: maxY,
             ticks: {
               color: '#fff',
               font: {
                 family: "'Open Sans', sans-serif",
                 size: 12
+              },
+              callback: function(value) {
+                return value.toLocaleString('en-US');
               }
+            },
+            afterBuildTicks: (axis) => {
+              axis.ticks = logTicks.map(v => ({ value: v }));
+              return axis.ticks;
             },
             grid: {
               color: 'rgba(255, 255, 255, 0.1)'
             }
           },
           x: {
+            stacked: true,
             ticks: {
               color: '#fff',
               font: {
@@ -320,7 +367,7 @@ export default defineComponent({
         },
         plugins: {
           legend: {
-            display: aggregationType === 'separate',
+            display: true,
             position: 'right',
             labels: {
               color: '#fff',
@@ -356,12 +403,8 @@ export default defineComponent({
           }
         }
       };
-
-      if (aggregationType === 'separate') {
-        baseOptions.scales.x.stacked = true;
-        baseOptions.scales.y.stacked = true;
-      }
-
+      baseOptions.scales.x.stacked = true;
+      baseOptions.scales.y.stacked = true;
       return baseOptions;
     }
   },
@@ -449,6 +492,8 @@ export default defineComponent({
         }
         const response = await fetch(url);
         const data = await response.json();
+        // Debug log: print the raw backend response
+        console.log('[DEBUG] Raw analyticsPrefetchData:', data);
         if (!response.ok) {
           throw new Error(data.error || 'Failed to fetch analytics data');
         }
@@ -530,10 +575,10 @@ export default defineComponent({
           });
           csv += '\n';
         });
-      } else if (this.analyticsPrefetchData && this.analyticsPrefetchData.summary) {
+      } else if (Object.keys(this.summaryTotal).length > 0) {
         csv += 'Field,Value\n';
         this.selectedFields.forEach(field => {
-          csv += `${this.formatLabel(field)},${this.analyticsPrefetchData.summary[field] !== undefined ? this.analyticsPrefetchData.summary[field] : ''}\n`;
+          csv += `${this.formatLabel(field)},${this.summaryTotal[field] !== undefined ? this.summaryTotal[field] : ''}\n`;
         });
       }
       // Download logic

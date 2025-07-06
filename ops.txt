@@ -18,4 +18,3 @@ there is python dictionary with nested dataclasses`payslip_fields.py` that refle
 
 we do lint and type-check on backend and scan for undefined variables before running all the time
 
-when we push up to github, we add and commit at all the folder levels, but only push (everything) at root directory level
