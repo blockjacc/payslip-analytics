@@ -267,6 +267,15 @@ this.chart = new Chart(ctx, chartConfig);
 - Implement proper error handling and loading states
 - Maintain consistent naming conventions across components
 
+### User Interface Standards
+- **Text Case Convention:** All system-generated text must be lowercase
+  - Button labels: "schedule type", "allocation", "by employee" (not "Schedule Type", "Allocation")
+  - Page titles: "payslip analytics", "shifts selection" (not "Payslip Analytics", "Shifts Selection")
+  - Menu items: "home", "analytics", "shifts" (not "Home", "Analytics", "Shifts")
+  - Chart labels and legends: use lowercase throughout
+  - **Exception:** User-entered data (names, company names) should preserve original case
+  - **Exception:** Proper nouns and acronyms (API, URL, etc.) maintain standard capitalization
+
 ### Testing
 - Test chart alignment by verifying first segment reaches first tick
 - Validate stacking order matches value sorting (lowest to highest)
@@ -278,6 +287,36 @@ this.chart = new Chart(ctx, chartConfig);
 - Minimize backend requests through single-fetch strategy
 - Use efficient data structures for large datasets
 - Implement proper component lifecycle management
+
+## Database Considerations
+
+### MySQL Reserved Keywords
+When working with database queries, be aware of MySQL reserved keywords that require special handling:
+
+#### `rank` Table
+- **Issue:** `rank` is a MySQL reserved keyword that can cause SQL syntax errors
+- **Solution:** Always use backticks when referencing the rank table in queries
+- **Correct Usage:** 
+  ```sql
+  LEFT JOIN `rank` rk ON epi.rank_id = rk.rank_id AND rk.company_id = %s
+  ```
+- **Incorrect Usage:**
+  ```sql
+  LEFT JOIN rank r ON epi.rank_id = r.rank_id AND r.company_id = %s
+  ```
+- **Best Practice:** Use descriptive table aliases (e.g., `rk` for rank) to avoid confusion
+
+#### Other Potential Reserved Keywords
+Be cautious with other table/column names that might conflict with MySQL reserved words:
+- `order`, `group`, `select`, `where`, `having`, `limit`, etc.
+- Always use backticks when in doubt: `` `table_name` ``
+- Reference: [MySQL Reserved Keywords Documentation](https://dev.mysql.com/doc/refman/8.0/en/keywords.html)
+
+### Query Development Guidelines
+1. **Test queries individually** before implementing in endpoints
+2. **Use table aliases** to make queries more readable and avoid conflicts
+3. **Escape table/column names** with backticks when they might be reserved keywords
+4. **Follow existing patterns** from working endpoints for consistency
 
 ---
 

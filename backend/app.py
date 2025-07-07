@@ -865,5 +865,178 @@ def get_shifts_allocation_drilldown(company_id, schedule_type, shift_id):
         app.logger.error(f"Error in shifts allocation drilldown: {str(e)}")
         return jsonify({'error': f'Failed to retrieve shifts allocation drilldown data: {str(e)}'}), 500
 
+@app.route('/api/employee-shifts/<int:company_id>/<string:name_search>', methods=['GET'])
+def get_employee_shifts(company_id, name_search):
+    """
+    Get shift assignment history for employees by first name or last name search.
+    Follows unified endpoint pattern with single fetch and in-memory processing.
+    """
+    try:
+        # Validate parameters
+        if not all([company_id, name_search]):
+            return jsonify({'error': 'Missing required parameters'}), 400
+            
+        # Optional query parameters for filtering
+        date_from = request.args.get('date_from', None)
+        date_to = request.args.get('date_to', None)
+        status_filter = request.args.get('status', 'Active')  # Default to Active only
+        drilldown = request.args.get('drilldown', 'false').lower() == 'true'
+        
+        cursor = mysql.connection.cursor()
+        
+        # Main query: Get all employee shift assignments with proper decryption
+        # Following pattern from existing shift allocation drilldown
+        query = '''
+            SELECT DISTINCT
+                ess.emp_id,
+                CAST(AES_DECRYPT(e.last_name, %s) AS CHAR(150) CHARACTER SET utf8) AS last_name,
+                CAST(AES_DECRYPT(e.first_name, %s) AS CHAR(150) CHARACTER SET utf8) AS first_name,
+                ws.work_schedule_id,
+                ws.name AS shift_name,
+                ws.work_type_name AS shift_type,
+                ess.valid_from,
+                ess.until,
+                ess.status,
+                COALESCE(lao.name, 'N/A') AS location_office,
+                COALESCE(d.department_name, 'N/A') AS department_name,
+                COALESCE(rk.rank_name, 'N/A') AS rank_name
+            FROM employee_shifts_schedule ess
+            JOIN employee e ON ess.emp_id = e.emp_id
+            JOIN work_schedule ws ON ess.work_schedule_id = ws.work_schedule_id
+            LEFT JOIN employee_payroll_information epi ON ess.emp_id = epi.emp_id AND epi.company_id = %s
+            LEFT JOIN location_and_offices lao ON epi.location_and_offices_id = lao.location_and_offices_id
+            LEFT JOIN department d ON epi.department_id = d.dept_id AND d.company_id = %s
+            LEFT JOIN `rank` rk ON epi.rank_id = rk.rank_id AND rk.company_id = %s
+            WHERE ess.company_id = %s 
+                AND ws.comp_id = %s
+                AND (CAST(AES_DECRYPT(e.last_name, %s) AS CHAR(150) CHARACTER SET utf8) LIKE %s
+                     OR CAST(AES_DECRYPT(e.first_name, %s) AS CHAR(150) CHARACTER SET utf8) LIKE %s)
+        '''
+        
+        # Build parameters array
+        search_param = f"%{name_search}%"
+        params = [
+            ENCRYPT_KEY, ENCRYPT_KEY,  # For name decryption
+            company_id, company_id, company_id,  # For joins
+            company_id, company_id,  # For main filters
+            ENCRYPT_KEY, search_param,  # For last_name search
+            ENCRYPT_KEY, search_param   # For first_name search
+        ]
+        
+        # Add optional filters
+        if status_filter and status_filter != 'all':
+            query += " AND ess.status = %s"
+            params.append(status_filter)
+            
+        if date_from:
+            query += " AND ess.valid_from >= %s"
+            params.append(date_from)
+            
+        if date_to:
+            query += " AND ess.until <= %s"
+            params.append(date_to)
+        
+        # Order by employee name and date range
+        query += " ORDER BY last_name ASC, first_name ASC, ess.valid_from DESC"
+        
+        cursor.execute(query, tuple(params))
+        results = cursor.fetchall()
+        cursor.close()
+        
+        if not results:
+            return jsonify({
+                'employees': [],
+                'search_term': name_search,
+                'company_id': company_id,
+                'total_employees': 0,
+                'total_assignments': 0
+            })
+        
+        # Process results following in-memory compute principle
+        employees_data = []
+        employee_summary = {}
+        
+        for row in results:
+            emp_id = row[0]
+            employee_record = {
+                'emp_id': emp_id,
+                'last_name': row[1] if row[1] else 'N/A',
+                'first_name': row[2] if row[2] else 'N/A',
+                'work_schedule_id': row[3],
+                'shift_name': row[4] if row[4] else 'Unknown Shift',
+                'shift_type': row[5] if row[5] else 'N/A',
+                'valid_from': row[6].strftime('%Y-%m-%d') if row[6] else None,
+                'until': row[7].strftime('%Y-%m-%d') if row[7] else None,
+                'status': row[8] if row[8] else 'N/A',
+                'location_office': row[9] if row[9] else 'N/A',
+                'department_name': row[10] if row[10] else 'N/A',
+                'rank_name': row[11] if row[11] else 'N/A'
+            }
+            
+            employees_data.append(employee_record)
+            
+            # Build employee summary for aggregated view
+            if emp_id not in employee_summary:
+                employee_summary[emp_id] = {
+                    'emp_id': emp_id,
+                    'last_name': employee_record['last_name'],
+                    'first_name': employee_record['first_name'],
+                    'location_office': employee_record['location_office'],
+                    'department_name': employee_record['department_name'],
+                    'rank_name': employee_record['rank_name'],
+                    'shift_assignments': [],
+                    'total_assignments': 0,
+                    'active_assignments': 0,
+                    'current_shifts': []
+                }
+            
+            # Add to summary
+            employee_summary[emp_id]['shift_assignments'].append({
+                'shift_name': employee_record['shift_name'],
+                'shift_type': employee_record['shift_type'],
+                'valid_from': employee_record['valid_from'],
+                'until': employee_record['until'],
+                'status': employee_record['status']
+            })
+            employee_summary[emp_id]['total_assignments'] += 1
+            
+            if employee_record['status'] == 'Active':
+                employee_summary[emp_id]['active_assignments'] += 1
+                employee_summary[emp_id]['current_shifts'].append(employee_record['shift_name'])
+        
+        # Format response following established patterns
+        if drilldown:
+            # Return detailed per-assignment view
+            return jsonify({
+                'shift_assignments': employees_data,
+                'search_term': name_search,
+                'company_id': company_id,
+                'total_assignments': len(employees_data),
+                'filters': {
+                    'status': status_filter,
+                    'date_from': date_from,
+                    'date_to': date_to
+                }
+            })
+        else:
+            # Return employee summary view
+            employees_list = list(employee_summary.values())
+            return jsonify({
+                'employees': employees_list,
+                'search_term': name_search,
+                'company_id': company_id,
+                'total_employees': len(employees_list),
+                'total_assignments': len(employees_data),
+                'filters': {
+                    'status': status_filter,
+                    'date_from': date_from,
+                    'date_to': date_to
+                }
+            })
+            
+    except Exception as e:
+        app.logger.error(f"Error in employee-shifts: {str(e)}")
+        return jsonify({'error': f'Failed to retrieve employee shifts data: {str(e)}'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 

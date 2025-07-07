@@ -14,6 +14,8 @@ import ShiftsAllocationAnalytics from '../views/ShiftsAllocationAnalytics.vue'
 import ShiftsAllocationDrilldown from '../views/ShiftsAllocationDrilldown.vue'
 import ShiftsAllocationDrilldownPicker from '../views/ShiftsAllocationDrilldownPicker.vue'
 import ShiftsAllocationDrilldownTable from '../views/ShiftsAllocationDrilldownTable.vue'
+import EmployeeShifts from '../views/EmployeeShifts.vue'
+import EmployeeShiftHistory from '../views/EmployeeShiftHistory.vue'
 
 const routes = [
   {
@@ -90,6 +92,16 @@ const routes = [
     path: '/shifts-allocation-drilldown/:companyId/:scheduleType/:shiftIds/:shiftId',
     name: 'ShiftsAllocationDrilldownTable',
     component: ShiftsAllocationDrilldownTable
+  },
+  {
+    path: '/employee-shifts/:companyId',
+    name: 'EmployeeShifts',
+    component: EmployeeShifts
+  },
+  {
+    path: '/employee-shift-history/:companyId/:empId',
+    name: 'EmployeeShiftHistory',
+    component: EmployeeShiftHistory
   }
 ]
 
