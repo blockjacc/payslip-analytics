@@ -1,6 +1,6 @@
 <template>
   <div class="p-8">
-    <h1 class="font-serif text-white mb-8 text-4xl">payroll analytics</h1>
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">payroll analytics</h1>
     <div class="flex justify-center">
       <div class="bg-white/10 rounded-xl p-8 w-full max-w-6xl">
         <div class="text-center mb-8">

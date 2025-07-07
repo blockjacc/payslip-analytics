@@ -1,6 +1,6 @@
 <template>
   <div class="p-8">
-    <h1 class="font-serif text-white mb-8 text-4xl">analytics prefetch test</h1>
+    <h1 class="font-serif text-white mb-8 text-4xl text-center">analytics prefetch test</h1>
     <div class="mb-4">
       <button @click="fetchSummary" class="bg-primary text-white px-4 py-2 rounded mr-2">fetch summary</button>
       <button @click="fetchDrilldown" class="bg-secondary text-white px-4 py-2 rounded">fetch drill-down</button>
