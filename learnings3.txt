@@ -187,6 +187,74 @@ const chartConfig = getUnifiedStackedBarChart({
 - **Solution:** Separate data tracking for display vs positioning
 - **Implementation:** Custom tooltip callbacks reference original data
 
+## Critical Stacking Algorithm Fix (December 2024)
+
+### Problem Discovered
+After implementing the unified chart system, a critical flaw was discovered in stacked charts:
+- **Issue:** Charts were not reaching their top tick marks
+- **Example:** Shifts allocation with values [91, 100, 114] totaling 305 only reached ~164
+- **Root Cause:** Individual value mapping was mathematically incorrect for stacking
+
+### Technical Analysis
+```
+Wrong Approach (Original):
+- Item 1 (91): mapValue(91) → position X
+- Item 2 (100): mapValue(100) → position Y  
+- Item 3 (114): mapValue(114) → position Z
+- Chart.js stacks: X + Y + Z ≠ correct total position
+
+Debug Output:
+Sum of mapped values: 164.0483950298424
+Total should be: 305
+Chart.js will stack these and get: 164.0483950298424 but should reach: 305
+```
+
+### Solution: Cumulative Position Mapping
+```javascript
+// Calculate cumulative values: [91, 191, 305]
+let cumulativeValues = [];
+let runningSum = 0;
+for (const item of sortedItems) {
+  runningSum += item[valueKey];
+  cumulativeValues.push(runningSum);
+}
+
+// Map cumulative sums to logarithmic positions
+const cumulativeLogPositions = cumulativeValues.map(cumVal => mapValue(cumVal));
+
+// Calculate incremental heights for each segment
+const incrementalHeights = [];
+for (let i = 0; i < cumulativeLogPositions.length; i++) {
+  if (i === 0) {
+    incrementalHeights.push(cumulativeLogPositions[0]); // First segment starts from 0
+  } else {
+    incrementalHeights.push(cumulativeLogPositions[i] - cumulativeLogPositions[i-1]); // Difference
+  }
+}
+```
+
+### Correct Implementation
+1. **Calculate cumulative values:** [91, 191, 305]
+2. **Map cumulative values to log positions:** [logPos(91), logPos(191), logPos(305)]
+3. **Calculate incremental heights:** 
+   - Segment 1: logPos(91) - 0
+   - Segment 2: logPos(191) - logPos(91)
+   - Segment 3: logPos(305) - logPos(191)
+4. **Chart.js stacks incremental heights** to reach exactly logPos(305)
+
+### Result
+- **Before Fix:** Charts stopped at ~164 (incorrect)
+- **After Fix:** Charts perfectly reach 305 (correct) ✅
+- **Validation:** Sum of incremental heights = mapValue(totalSum)
+
+### Mathematical Verification
+```
+Cumulative values: [91, 191, 305]
+Cumulative log positions: [logPos(91), logPos(191), logPos(305)]
+Incremental heights: [h1, h2, h3]
+where h1 + h2 + h3 = logPos(305) ✅
+```
+
 ---
 
-**This unified chart system is now the foundation for all charting in the Payslip Analytics App. The alignment issue has been completely resolved, and all charts now display with perfect visual consistency and mathematical accuracy.**
+**This unified chart system with corrected stacking algorithm is now the foundation for all charting in the Payslip Analytics App. Both the alignment issue and stacking mathematics have been completely resolved, ensuring all charts display with perfect visual consistency and mathematical accuracy.**

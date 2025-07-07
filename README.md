@@ -193,6 +193,17 @@ this.chart = new Chart(ctx, chartConfig);
 - **Root Cause:** Chart.js using linear positions vs logarithmic tick values
 - **Fix:** `mapValueToLogPosition()` transforms data values to correct linear positions
 
+#### Stacking Algorithm Fix (Critical)
+- **Problem:** Individual value mapping for stacked charts was mathematically incorrect
+- **Issue:** Mapping each value individually (91→X, 100→Y, 114→Z) then stacking X+Y+Z ≠ correct total
+- **Solution:** Cumulative position mapping with incremental heights
+- **Implementation:**
+  1. Calculate cumulative values: [91, 191, 305]
+  2. Map cumulative values to log positions: [logPos(91), logPos(191), logPos(305)]
+  3. Calculate incremental heights: [logPos(91), logPos(191)-logPos(91), logPos(305)-logPos(191)]
+  4. Chart.js stacks incremental heights to reach correct total
+- **Result:** Stacked bars now perfectly reach top tick marks
+
 #### Tooltip Handling
 - **Challenge:** Display original values instead of transformed positions
 - **Solution:** Custom tooltip callbacks that reference original data values
@@ -241,6 +252,12 @@ this.chart = new Chart(ctx, chartConfig);
 - **Generated Ticks:** [0, 1, 2, 3, 5, 9, 17, 29, 51, 90, 158]
 - **Stacking Order:** Open Shift (1), Rest Day (1), Workshift (1), Flexible Hours (7), Uniform Working Days (148)
 - **Result:** Consistent behavior with payslip charts
+
+#### Shifts Allocation Fix Example
+- **Values:** [91, 100, 114] (employee counts by shift)
+- **Problem (Before Fix):** Individual mappings summed to ~164, chart stopped mid-way
+- **Solution (After Fix):** Cumulative mapping [91, 191, 305] with incremental heights
+- **Result:** Chart perfectly reaches top tick at 305
 
 ## Development Guidelines
 
