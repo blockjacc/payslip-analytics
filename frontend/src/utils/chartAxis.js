@@ -128,12 +128,45 @@ export function getUnifiedStackedBarChart(items, valueKey, labelKey, colorPalett
   // Generate ticks using our standard utility
   const { min, max, ticks, mapValue } = getSimpleYAxis(values);
   
-  // Create chart data with logarithmically positioned values
+  // Calculate cumulative positions for proper stacking
+  let cumulativeValues = [];
+  let runningSum = 0;
+  
+  // Build cumulative sums: [91, 191, 305]
+  for (const item of sortedItems) {
+    runningSum += item[valueKey];
+    cumulativeValues.push(runningSum);
+  }
+  
+  // Map cumulative sums to logarithmic positions
+  const cumulativeLogPositions = cumulativeValues.map(cumVal => mapValue(cumVal));
+  
+  // Calculate incremental heights for each segment
+  const incrementalHeights = [];
+  for (let i = 0; i < cumulativeLogPositions.length; i++) {
+    if (i === 0) {
+      incrementalHeights.push(cumulativeLogPositions[0]); // First segment starts from 0
+    } else {
+      incrementalHeights.push(cumulativeLogPositions[i] - cumulativeLogPositions[i-1]); // Difference
+    }
+  }
+  
+  // DEBUG: Log corrected stacking logic
+  console.log('=== CORRECTED STACKING DEBUG ===');
+  console.log('sortedItems:', sortedItems.map(item => ({ label: item[labelKey], value: item[valueKey] })));
+  console.log('Cumulative values:', cumulativeValues);
+  console.log('Cumulative log positions:', cumulativeLogPositions);
+  console.log('Incremental heights:', incrementalHeights);
+  console.log('Sum of incremental heights:', incrementalHeights.reduce((sum, val) => sum + val, 0));
+  console.log('Should equal max log position:', mapValue(max));
+  console.log('====================================');
+
+  // Create chart data with corrected stacking
   const chartData = {
     labels: options.labels || [''],
     datasets: sortedItems.map((item, idx) => ({
       label: item[labelKey],
-      data: [mapValue(item[valueKey])], // Map to logarithmic position
+      data: [incrementalHeights[idx]], // Use incremental height, not individual mapping
       backgroundColor: colorPalette[items.indexOf(item) % colorPalette.length], // Use original index for consistent colors
       borderColor: options.borderColor || '#222c44',
       borderWidth: options.borderWidth || 2,
