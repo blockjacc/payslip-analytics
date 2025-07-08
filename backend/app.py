@@ -537,6 +537,150 @@ def search_employees_by_name_endpoint(company_id, name_search):
         app.logger.error(f"Error in search-employees-by-name: {str(e)}")
         return jsonify({'error': f'Failed to search employees: {str(e)}'}), 500
 
+@app.route('/api/shifts-changes-by-period/<int:company_id>/<string:date_from>/<string:date_to>', methods=['GET'])
+def get_shifts_changes_by_period(company_id, date_from, date_to):
+    """
+    Detect all employees who had shift changes during a specific period (max 7 days).
+    Uses efficient O(n) iteration to process shift data in memory.
+    """
+    try:
+        # Validate parameters
+        if not all([company_id, date_from, date_to]):
+            return jsonify({'error': 'Missing required parameters'}), 400
+            
+        # Validate dates
+        try:
+            start_date = datetime.strptime(date_from, '%Y-%m-%d')
+            end_date = datetime.strptime(date_to, '%Y-%m-%d')
+        except ValueError as e:
+            return jsonify({'error': f'Invalid date format: {str(e)}'}), 400
+            
+        # Validate date range (max 7 days)
+        diff_days = (end_date - start_date).days
+        if diff_days > 7:
+            return jsonify({'error': 'Date range cannot exceed 7 days'}), 400
+        if diff_days < 0:
+            return jsonify({'error': 'End date must be after start date'}), 400
+            
+        cursor = mysql.connection.cursor()
+        
+        # Single query to get all shift assignments during the period
+        # Include employee names with AES decryption and joins
+        query = '''
+            SELECT 
+                ess.emp_id,
+                CAST(AES_DECRYPT(e.last_name, %s) AS CHAR(150) CHARACTER SET utf8) AS last_name,
+                CAST(AES_DECRYPT(e.first_name, %s) AS CHAR(150) CHARACTER SET utf8) AS first_name,
+                ws.work_schedule_id,
+                ws.name AS shift_name,
+                ws.work_type_name AS shift_type,
+                ess.valid_from,
+                ess.until,
+                ess.status
+            FROM employee_shifts_schedule ess
+            JOIN employee e ON ess.emp_id = e.emp_id
+            JOIN work_schedule ws ON ess.work_schedule_id = ws.work_schedule_id
+            WHERE ess.company_id = %s 
+                AND ws.comp_id = %s
+                AND ess.status = 'Active'
+                AND (
+                    (ess.valid_from >= %s AND ess.valid_from <= %s) OR
+                    (ess.until >= %s AND ess.until <= %s) OR
+                    (ess.valid_from <= %s AND ess.until >= %s)
+                )
+            ORDER BY ess.emp_id ASC, ess.valid_from ASC
+        '''
+        
+        params = [
+            ENCRYPT_KEY, ENCRYPT_KEY,  # For name decryption
+            company_id, company_id,    # For main filters
+            date_from, date_to,        # For valid_from range
+            date_from, date_to,        # For until range  
+            date_from, date_to         # For overlapping assignments
+        ]
+        
+        cursor.execute(query, tuple(params))
+        shifts = cursor.fetchall()
+        cursor.close()
+        
+        if not shifts:
+            return jsonify({
+                'employees_with_changes': [],
+                'period': {'from': date_from, 'to': date_to},
+                'company_id': company_id,
+                'total_employees': 0,
+                'total_changes': 0
+            })
+        
+        # Efficient O(n) change detection
+        changes = []
+        last_shift_by_employee = {}
+        
+        for shift in shifts:
+            emp_id = shift[0]
+            last_name = shift[1] if shift[1] else 'N/A'
+            first_name = shift[2] if shift[2] else 'N/A'
+            work_schedule_id = shift[3]
+            shift_name = shift[4] if shift[4] else 'Unknown'
+            shift_type = shift[5] if shift[5] else 'N/A'
+            valid_from = shift[6]
+            until = shift[7]
+            status = shift[8]
+            
+            # Check if this employee had a previous shift
+            if emp_id in last_shift_by_employee:
+                last_shift = last_shift_by_employee[emp_id]
+                
+                # Detect change if shift type or shift name changed
+                if (last_shift['shift_type'] != shift_type or 
+                    last_shift['shift_name'] != shift_name):
+                    
+                    changes.append({
+                        'emp_id': emp_id,
+                        'last_name': last_name,
+                        'first_name': first_name,
+                        'change_date': valid_from.strftime('%Y-%m-%d') if valid_from else None,
+                        'from_shift_name': last_shift['shift_name'],
+                        'from_shift_type': last_shift['shift_type'],
+                        'to_shift_name': shift_name,
+                        'to_shift_type': shift_type
+                    })
+            
+            # Update tracking for this employee
+            last_shift_by_employee[emp_id] = {
+                'shift_name': shift_name,
+                'shift_type': shift_type,
+                'valid_from': valid_from,
+                'last_name': last_name,
+                'first_name': first_name
+            }
+        
+        # Remove duplicates (same employee, same change)
+        unique_changes = []
+        seen_changes = set()
+        
+        for change in changes:
+            change_key = (change['emp_id'], change['change_date'], 
+                         change['from_shift_type'], change['to_shift_type'])
+            if change_key not in seen_changes:
+                unique_changes.append(change)
+                seen_changes.add(change_key)
+        
+        # Sort by last name, then first name
+        unique_changes.sort(key=lambda x: (x['last_name'], x['first_name']))
+        
+        return jsonify({
+            'employees_with_changes': unique_changes,
+            'period': {'from': date_from, 'to': date_to},
+            'company_id': company_id,
+            'total_employees': len(set(change['emp_id'] for change in unique_changes)),
+            'total_changes': len(unique_changes)
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error in shifts-changes-by-period: {str(e)}")
+        return jsonify({'error': f'Failed to analyze shift changes: {str(e)}'}), 500
+
 @app.route('/api/payroll-groups/<int:company_id>', methods=['GET'])
 def get_payroll_groups(company_id):
     cursor = mysql.connection.cursor()
