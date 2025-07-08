@@ -10,39 +10,39 @@
       <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>
       
       <!-- Employee Name Search Section -->
-      <div v-if="!selectedEmployee" class="mb-6 relative">
-        <input 
-          type="text" 
-          class="text-center text-lg h-12 w-full rounded border border-white/20 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:border-primary transition"
-          v-model="searchQuery"
+      <div v-if="!selectedEmployee">
+        <EmployeeSearch
+          :company-id="companyId"
+          context="shifts"
           placeholder="first or last name"
-          @input="debouncedSearch"
-        >
-        <div class="absolute top-full left-0 right-0 bg-primary/10 border border-primary/20 rounded-lg mt-1 max-h-[200px] overflow-y-auto z-50 backdrop-blur-md shadow-lg" v-if="filteredEmployees.length > 0">
-          <div 
-            v-for="employee in filteredEmployees" 
-            :key="employee.emp_id"
-            class="p-3 cursor-pointer transition-all duration-200 text-white border-b border-primary/20 text-left text-lg hover:bg-primary/20 hover:translate-x-1 last:border-b-0"
-            @click="selectEmployee(employee)"
+          @employee-selected="selectEmployee"
+          @error="handleSearchError"
+        />
+      </div>
+
+      <!-- View Type Selection (shown after employee is selected) -->
+      <div v-if="selectedEmployee && !viewType" class="mb-6">
+        <label class="block mb-4 text-secondary text-sm">what would you like to view?</label>
+        <div class="grid grid-cols-1 gap-3">
+          <button 
+            class="p-4 bg-white/10 border border-white/20 rounded text-white hover:bg-white/20 transition text-left"
+            @click="selectViewType('daily')"
           >
-            {{ employee.first_name }} {{ employee.last_name }} ({{ employee.emp_id }})
-          </div>
+            <div class="font-semibold">daily shifts</div>
+            <div class="text-sm text-white/70">view daily shift assignments (max 30 days)</div>
+          </button>
+          <button 
+            class="p-4 bg-white/10 border border-white/20 rounded text-white hover:bg-white/20 transition text-left"
+            @click="selectViewType('changes')"
+          >
+            <div class="font-semibold">schedule changes</div>
+            <div class="text-sm text-white/70">detect shift assignment changes (365 days forward/backward)</div>
+          </button>
         </div>
       </div>
 
-      <!-- Search Button -->
-      <div v-if="!selectedEmployee" class="flex gap-4 justify-center mb-4">
-        <button 
-          class="px-6 py-3 text-base bg-emerald-500 text-white font-semibold flex-1 max-w-[200px] disabled:opacity-70 disabled:cursor-not-allowed transition"
-          @click="searchEmployees"
-          :disabled="!searchQuery || searchQuery.length < 2"
-        >
-          search employees
-        </button>
-      </div>
-
-      <!-- Date Range Selection Section (shown after employee is selected) -->
-      <div v-if="selectedEmployee" class="mb-6">
+      <!-- Date Range Selection Section (shown for daily view) -->
+      <div v-if="selectedEmployee && viewType === 'daily'" class="mb-6">
         <label class="block mb-2 text-secondary text-sm">select date range (max 30 days):</label>
         <div class="grid grid-cols-1 gap-3">
           <div>
@@ -67,20 +67,53 @@
         <div v-if="dateRangeError" class="text-red-400 text-sm mt-2">{{ dateRangeError }}</div>
       </div>
 
-      <!-- Continue Button (shown after employee and dates are selected) -->
-      <div v-if="selectedEmployee" class="flex gap-4 justify-center mb-4">
+      <!-- Change Detection Direction Selection (shown for changes view) -->
+      <div v-if="selectedEmployee && viewType === 'changes'" class="mb-6">
+        <label class="block mb-4 text-secondary text-sm">direction to analyze (365 days):</label>
+        <div class="grid grid-cols-2 gap-3">
+          <button 
+            class="p-3 border rounded text-white transition"
+            :class="changeDirection === 'forward' ? 'bg-primary border-primary' : 'bg-white/10 border-white/20 hover:bg-white/20'"
+            @click="selectChangeDirection('forward')"
+          >
+            <div class="font-semibold">forward</div>
+            <div class="text-xs">next 12 months</div>
+          </button>
+          <button 
+            class="p-3 border rounded text-white transition"
+            :class="changeDirection === 'backward' ? 'bg-primary border-primary' : 'bg-white/10 border-white/20 hover:bg-white/20'"
+            @click="selectChangeDirection('backward')"
+          >
+            <div class="font-semibold">backward</div>
+            <div class="text-xs">past 12 months</div>
+          </button>
+        </div>
+      </div>
+
+      <!-- Continue Button (shown after required selections are made) -->
+      <div v-if="selectedEmployee && isReadyToContinue" class="flex gap-4 justify-center mb-4">
         <button 
           class="px-6 py-3 text-base bg-emerald-500 text-white font-semibold flex-1 max-w-[200px] disabled:opacity-70 disabled:cursor-not-allowed transition"
           @click="viewShiftHistory"
-          :disabled="!dateFrom || !dateTo || !!dateRangeError"
+          :disabled="!isValidSelections"
         >
-          view shifts
+          {{ viewType === 'daily' ? 'view shifts' : 'analyze changes' }}
         </button>
         <button 
           class="px-6 py-3 text-base bg-white/10 text-white border border-white/20 hover:bg-white/20 transition flex-1 max-w-[200px]"
           @click="resetSelection"
         >
           change employee
+        </button>
+      </div>
+
+      <!-- Back to View Selection Button -->
+      <div v-if="selectedEmployee && viewType" class="flex gap-4 justify-center mb-4">
+        <button 
+          class="px-6 py-3 text-base bg-white/10 text-white border border-white/20 hover:bg-white/20 transition flex-1 max-w-[200px]"
+          @click="backToViewSelection"
+        >
+          back to options
         </button>
       </div>
 
@@ -100,21 +133,44 @@
 </template>
 
 <script>
-import axios from 'axios';
+import EmployeeSearch from '../components/EmployeeSearch.vue'
 
 export default {
   name: 'EmployeeShifts',
+  components: {
+    EmployeeSearch
+  },
   data() {
     return {
       companyId: '',
-      searchQuery: '',
-      filteredEmployees: [],
       selectedEmployee: null,
+      viewType: '', // 'daily' or 'changes'
       dateFrom: '',
       dateTo: '',
       dateRangeError: '',
-      error: null,
-      searchTimeout: null
+      changeDirection: '', // 'forward' or 'backward'
+      error: null
+    }
+  },
+  computed: {
+    isReadyToContinue() {
+      if (!this.selectedEmployee) return false;
+      if (this.viewType === 'daily') {
+        return this.dateFrom && this.dateTo && !this.dateRangeError;
+      }
+      if (this.viewType === 'changes') {
+        return this.changeDirection;
+      }
+      return false;
+    },
+    isValidSelections() {
+      if (this.viewType === 'daily') {
+        return this.dateFrom && this.dateTo && !this.dateRangeError;
+      }
+      if (this.viewType === 'changes') {
+        return this.changeDirection;
+      }
+      return false;
     }
   },
   created() {
@@ -128,80 +184,54 @@ export default {
     }
   },
   methods: {
-    debouncedSearch() {
-      // Clear any existing timeout
-      if (this.searchTimeout) {
-        clearTimeout(this.searchTimeout);
-      }
-      
-      // Set a new timeout
-      this.searchTimeout = setTimeout(() => {
-        if (this.searchQuery && this.searchQuery.length >= 2) {
-          this.searchEmployeesByName();
-        } else {
-          this.filteredEmployees = [];
-        }
-      }, 300); // 300ms delay
-    },
-    async searchEmployeesByName() {
-      if (!this.searchQuery || this.searchQuery.length < 2) {
-        this.filteredEmployees = [];
-        return;
-      }
-      
-      try {
-        // Call our new backend endpoint with a short date range for demo purposes
-        const currentDate = new Date().toISOString().split('T')[0];
-        const lastMonth = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-        
-        const response = await axios.get(
-          `/api/employee-shifts/${this.companyId}/${this.searchQuery}?date_from=${lastMonth}&date_to=${currentDate}`
-        );
-        
-        // Extract unique employees from the response
-        const employees = response.data.employees || [];
-        this.filteredEmployees = employees.map(emp => ({
-          emp_id: emp.emp_id,
-          first_name: emp.first_name,
-          last_name: emp.last_name
-        }));
-        
-        this.error = null;
-      } catch (err) {
-        this.error = 'Failed to search employees';
-        this.filteredEmployees = [];
-      }
-    },
-    async searchEmployees() {
-      // Trigger the same search when button is clicked
-      await this.searchEmployeesByName();
+    handleSearchError(errorMessage) {
+      this.error = errorMessage;
     },
     selectEmployee(employee) {
       if (!employee) return;
       
-      // Set selected employee and clear search results
+      // Set selected employee (now comes from reusable component)
       this.selectedEmployee = employee;
-      this.filteredEmployees = [];
-      this.searchQuery = '';
       
-      // Set default date range (last 30 days)
-      const today = new Date();
-      const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-      
-      this.dateTo = today.toISOString().split('T')[0];
-      this.dateFrom = thirtyDaysAgo.toISOString().split('T')[0];
-      
-      // Clear any previous errors
+      // Clear any previous errors and selections
       this.error = null;
+      this.viewType = '';
+      this.changeDirection = '';
+      this.dateRangeError = '';
+    },
+    selectViewType(type) {
+      this.viewType = type;
+      
+      if (type === 'daily') {
+        // Set default date range (last 30 days) for daily view
+        const today = new Date();
+        const thirtyDaysAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+        
+        this.dateTo = today.toISOString().split('T')[0];
+        this.dateFrom = thirtyDaysAgo.toISOString().split('T')[0];
+      } else {
+        // Clear date range for changes view
+        this.dateFrom = '';
+        this.dateTo = '';
+      }
+    },
+    selectChangeDirection(direction) {
+      this.changeDirection = direction;
+    },
+    backToViewSelection() {
+      this.viewType = '';
+      this.changeDirection = '';
+      this.dateFrom = '';
+      this.dateTo = '';
       this.dateRangeError = '';
     },
     resetSelection() {
       this.selectedEmployee = null;
+      this.viewType = '';
       this.dateFrom = '';
       this.dateTo = '';
       this.dateRangeError = '';
-      this.searchQuery = '';
-      this.filteredEmployees = [];
+      this.changeDirection = '';
     },
     validateDateRange() {
       this.dateRangeError = '';
@@ -229,19 +259,49 @@ export default {
       }
     },
     viewShiftHistory() {
-      if (!this.selectedEmployee || !this.dateFrom || !this.dateTo || this.dateRangeError) {
+      if (!this.isValidSelections) {
         return;
       }
       
-      // Store selected employee and date range info
+      // Store selected employee info
       sessionStorage.setItem('selectedEmployee', JSON.stringify(this.selectedEmployee));
-      sessionStorage.setItem('selectedDateRange', JSON.stringify({
-        dateFrom: this.dateFrom,
-        dateTo: this.dateTo
-      }));
       
-      // Navigate to employee shift history table view
-      this.$router.push(`/employee-shift-history/${this.companyId}/${this.selectedEmployee.emp_id}?date_from=${this.dateFrom}&date_to=${this.dateTo}`);
+      if (this.viewType === 'daily') {
+        // Existing daily shifts view
+        sessionStorage.setItem('selectedDateRange', JSON.stringify({
+          dateFrom: this.dateFrom,
+          dateTo: this.dateTo
+        }));
+        
+        // Navigate to employee shift history table view
+        this.$router.push(`/employee-shift-history/${this.companyId}/${this.selectedEmployee.emp_id}?date_from=${this.dateFrom}&date_to=${this.dateTo}`);
+        
+      } else if (this.viewType === 'changes') {
+        // New change detection view
+        const today = new Date();
+        let startDate, endDate;
+        
+        if (this.changeDirection === 'forward') {
+          startDate = today;
+          endDate = new Date(today.getTime() + 365 * 24 * 60 * 60 * 1000);
+        } else {
+          startDate = new Date(today.getTime() - 365 * 24 * 60 * 60 * 1000);
+          endDate = today;
+        }
+        
+        const dateFrom = startDate.toISOString().split('T')[0];
+        const dateTo = endDate.toISOString().split('T')[0];
+        
+        // Store change detection parameters
+        sessionStorage.setItem('scheduleChangeParams', JSON.stringify({
+          direction: this.changeDirection,
+          dateFrom: dateFrom,
+          dateTo: dateTo
+        }));
+        
+        // Navigate to schedule changes view
+        this.$router.push(`/employee-schedule-changes/${this.companyId}/${this.selectedEmployee.emp_id}?direction=${this.changeDirection}&date_from=${dateFrom}&date_to=${dateTo}`);
+      }
     },
     goBack() {
       this.$router.push(`/shifts-selection/${this.companyId}`);

@@ -1,0 +1,25 @@
+## TODO for Tomorrow
+
+### 1. Enhance Employee Shift Analysis (Schedule Change Detection)
+**Current Issue:** The 30-day shift display is not very useful for understanding schedule patterns.
+
+**New Feature:** Add option to scan employee schedule 12 months forward and identify schedule changes.
+- **Goal:** Instead of showing daily assignments, detect and display only the dates where an employee's shift schedule actually changes
+- **Output:** Show transition points (e.g., "Jan 15: Changed from 'Day Shift' to 'Night Shift'", "Mar 3: Changed from 'Full Time' to 'Part Time'")
+- **Use Case:** Managers can quickly see when employees are scheduled for different shifts/patterns without scrolling through hundreds of identical daily entries
+- **Implementation:** Analyze consecutive shift assignments and flag discontinuities/changes in shift type, schedule, or pattern
+
+### 2. Update Payslip Employee Selection (Name-Based Search)
+**Current Issue:** Payslip analytics still uses emp_id search, inconsistent with new shifts feature.
+
+**Update Required:** Replace emp_id input with first name/last name search capability.
+- **Goal:** Consistent user experience across both payslip and shifts modules
+- **Implementation:** Apply the same search pattern we just built for employee shifts
+- **Files to Update:** 
+  - `frontend/src/views/Employees.vue` - Replace emp_id input with name search
+  - Backend API integration for name-based employee lookup
+  - Update placeholder text and search logic
+- **Benefit:** Users can search employees by name across the entire platform
+
+---
+**Priority:** Both items should be implemented to improve user experience and platform consistency. 

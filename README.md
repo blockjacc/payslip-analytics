@@ -19,6 +19,32 @@ payslip-analytics/
 └── README.md         # This file
 ```
 
+## Operational Information
+
+### Python Version
+- **Python 3.13** is required for this project
+- Virtual environment is already configured - **do not recreate it**
+
+### Environment and Configuration
+- **Encryption**: AES decryption is used for sensitive data
+  - Encryption key is stored in `backend/.env`
+  - Database fields marked with 'e' are encrypted, 'n' are non-encrypted
+  - Follow existing encryption patterns - do not deviate from current implementation
+- **Database Credentials**: Located in `backend/.env` (not main repo)
+- **Field Mappings**: `payslip_fields.py` contains Python dictionary with nested dataclasses reflecting `payslip_fields_mapping.txt`
+
+### Port Management
+- **Backend**: Port 5000
+- **Frontend**: Port 3000
+- **Important**: Always kill existing processes before starting:
+  ```bash
+  kill -9 $(lsof -t -i:3000,5000) 2>/dev/null || true && pkill -f "node.*" && pkill -f "python.*app.py"
+  ```
+
+### Development Standards
+- Backend includes linting and type-checking with undefined variable scanning
+- Virtual environment **must be activated** before running backend operations
+
 ## Setup Instructions
 
 ### Backend Setup

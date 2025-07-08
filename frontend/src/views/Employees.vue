@@ -10,24 +10,14 @@
       <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>
       
       <!-- Employee Search Section -->
-      <div v-if="selectType === 'specific'" class="mb-6 relative">
-        <input 
-          type="text" 
-          class="text-center text-lg h-12 w-full rounded border border-white/20 bg-white/10 text-white placeholder-white/50 focus:outline-none focus:border-primary transition"
-          v-model="searchQuery"
-          placeholder="enter employee id"
-          @input="debouncedSearch"
-        >
-        <div class="absolute top-full left-0 right-0 bg-primary/10 border border-primary/20 rounded-lg mt-1 max-h-[200px] overflow-y-auto z-50 backdrop-blur-md shadow-lg" v-if="filteredEmployees.length > 0">
-          <div 
-            v-for="employee in filteredEmployees" 
-            :key="employee"
-            class="p-3 cursor-pointer transition-all duration-200 text-white border-b border-primary/20 text-left text-lg hover:bg-primary/20 hover:translate-x-1 last:border-b-0"
-            @click="selectEmployee(employee)"
-          >
-            {{ employee }}
-          </div>
-        </div>
+      <div v-if="selectType === 'specific'" class="mb-6">
+        <EmployeeSearch
+          :company-id="companyId"
+          context="payslip"
+          placeholder="first or last name"
+          @employee-selected="selectEmployee"
+          @error="handleSearchError"
+        />
       </div>
 
       <!-- Payroll Group Selection Section -->
@@ -168,21 +158,21 @@
 
 <script>
 import axios from 'axios';
+import EmployeeSearch from '../components/EmployeeSearch.vue'
 
 export default {
   name: 'Employees',
+  components: {
+    EmployeeSearch
+  },
   data() {
     return {
       companyId: '',
       selectType: '',
-      searchQuery: '',
-      searchResults: [],
       selectedEmployee: null,
-      filteredEmployees: [],
       payrollGroups: [],
       selectedPayrollGroup: '',
       error: null,
-      searchTimeout: null,
       selectedCategory: '',
       selectedFields: [],
       selectedFieldLabels: [],
@@ -268,8 +258,6 @@ export default {
     },
     selectSpecificEmployee() {
       this.selectType = 'specific';
-      this.searchQuery = '';
-      this.filteredEmployees = [];
     },
     selectPayrollGroup() {
       this.selectType = 'payroll_group';
@@ -284,37 +272,17 @@ export default {
       // Navigate to dates with payroll group parameter
       this.$router.push(`/dates/${this.companyId}/all?payroll_group_id=${this.selectedPayrollGroup}`);
     },
-    debouncedSearch() {
-      // Clear any existing timeout
-      if (this.searchTimeout) {
-        clearTimeout(this.searchTimeout);
-      }
-      
-      // Set a new timeout
-      this.searchTimeout = setTimeout(() => {
-        this.searchEmployees();
-      }, 300); // 300ms delay
+    handleSearchError(errorMessage) {
+      this.error = errorMessage;
     },
-    async searchEmployees() {
-      if (!this.searchQuery) {
-        this.filteredEmployees = [];
-        return;
-      }
+    selectEmployee(employee) {
+      if (!employee) return;
       
-      try {
-        const response = await axios.get(`/api/search-employees/${this.companyId}/${this.searchQuery}`);
-        this.filteredEmployees = response.data.employees;
-      } catch (err) {
-        this.error = 'Failed to search employees';
-      }
-    },
-    selectEmployee(empId) {
-      if (!empId) return;
+      // Store the selected employee object for consistency
+      this.selectedEmployee = employee;
       
-      this.selectedEmployee = empId;
-      this.searchQuery = empId;
-      this.filteredEmployees = [];
-      this.$router.push(`/dates/${this.companyId}/${empId}`);
+      // Navigate to dates using the employee ID
+      this.$router.push(`/dates/${this.companyId}/${employee.emp_id}`);
     },
     async loadFilterOptions() {
       this.loadingFilterOptions = true;

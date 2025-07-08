@@ -42,6 +42,95 @@ def get_display_name(cursor, table, id_field, name_field, id_value, company_id):
     row = cursor.fetchone()
     return row[0] if row else None
 
+# Reusable function for employee search with AES decryption and joins
+def search_employees_by_name(cursor, company_id, name_search, context='all', limit=10):
+    """
+    Search employees by first name or last name with AES decryption.
+    
+    Args:
+        cursor: Database cursor
+        company_id: Company ID to filter by
+        name_search: Search term for first/last name
+        context: 'shifts', 'payslip', or 'all' - determines which tables to join
+        limit: Maximum number of results to return
+    
+    Returns:
+        List of employee dictionaries with emp_id, first_name, last_name, and context-specific fields
+    """
+    if not name_search or len(name_search) < 2:
+        return []
+    
+    # Base query with employee name decryption
+    base_query = """
+        SELECT DISTINCT
+            e.emp_id,
+            CAST(AES_DECRYPT(e.last_name, %s) AS CHAR(150) CHARACTER SET utf8) AS last_name,
+            CAST(AES_DECRYPT(e.first_name, %s) AS CHAR(150) CHARACTER SET utf8) AS first_name,
+            COALESCE(lao.name, 'N/A') AS location_office,
+            COALESCE(d.department_name, 'N/A') AS department_name,
+            COALESCE(rk.rank_name, 'N/A') AS rank_name
+        FROM employee e
+        LEFT JOIN employee_payroll_information epi ON e.emp_id = epi.emp_id AND epi.company_id = %s
+        LEFT JOIN location_and_offices lao ON epi.location_and_offices_id = lao.location_and_offices_id
+        LEFT JOIN department d ON epi.department_id = d.dept_id AND d.company_id = %s
+        LEFT JOIN `rank` rk ON epi.rank_id = rk.rank_id AND rk.company_id = %s
+    """
+    
+    # Add context-specific filters
+    if context == 'shifts':
+        base_query += """
+            INNER JOIN employee_shifts_schedule ess ON e.emp_id = ess.emp_id AND ess.company_id = %s
+        """
+    elif context == 'payslip':
+        base_query += """
+            INNER JOIN payroll_payslip pp ON e.emp_id = pp.emp_id AND pp.company_id = %s
+        """
+    
+    # Add name search conditions
+    base_query += """
+        WHERE e.company_id = %s
+        AND (CAST(AES_DECRYPT(e.last_name, %s) AS CHAR(150) CHARACTER SET utf8) LIKE %s
+             OR CAST(AES_DECRYPT(e.first_name, %s) AS CHAR(150) CHARACTER SET utf8) LIKE %s)
+        ORDER BY last_name ASC, first_name ASC
+        LIMIT %s
+    """
+    
+    # Build parameters array
+    search_param = f"%{name_search}%"
+    params = [
+        ENCRYPT_KEY, ENCRYPT_KEY,  # For name decryption
+        company_id, company_id, company_id,  # For joins
+    ]
+    
+    # Add context-specific company_id parameter
+    if context in ['shifts', 'payslip']:
+        params.append(company_id)
+    
+    params.extend([
+        company_id,  # For main WHERE clause
+        ENCRYPT_KEY, search_param,  # For last_name search
+        ENCRYPT_KEY, search_param,  # For first_name search
+        limit
+    ])
+    
+    cursor.execute(base_query, tuple(params))
+    results = cursor.fetchall()
+    
+    # Format results into employee objects
+    employees = []
+    for row in results:
+        employee = {
+            'emp_id': row[0],
+            'last_name': row[1] if row[1] else 'N/A',
+            'first_name': row[2] if row[2] else 'N/A',
+            'location_office': row[3] if row[3] else 'N/A',
+            'department_name': row[4] if row[4] else 'N/A',
+            'rank_name': row[5] if row[5] else 'N/A'
+        }
+        employees.append(employee)
+    
+    return employees
+
 @app.route('/api/analytics/<int:company_id>/<emp_id>/<string:period_from>/<string:period_to>/<string:aggregation_type>', methods=['GET'])
 def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='single'):
     try:
@@ -388,6 +477,10 @@ def validate_company(company_id):
 
 @app.route('/api/search-employees/<int:company_id>/<string:query>', methods=['GET'])
 def search_employees(company_id, query):
+    """
+    Legacy endpoint for emp_id search - kept for backwards compatibility
+    TODO: Remove after confirming all modules use new name-based search
+    """
     cursor = mysql.connection.cursor()
     
     # Search for first 5 matching employee IDs
@@ -406,6 +499,43 @@ def search_employees(company_id, query):
     
     cursor.close()
     return jsonify({'employees': employees})
+
+@app.route('/api/search-employees-by-name/<int:company_id>/<string:name_search>', methods=['GET'])
+def search_employees_by_name_endpoint(company_id, name_search):
+    """
+    Unified endpoint for searching employees by first name or last name.
+    Used by both shifts and payslip modules for consistent employee search.
+    """
+    try:
+        # Validate parameters
+        if not all([company_id, name_search]):
+            return jsonify({'error': 'Missing required parameters'}), 400
+            
+        if len(name_search) < 2:
+            return jsonify({'employees': []})
+            
+        # Get context from query parameter (shifts, payslip, or all)
+        context = request.args.get('context', 'all')
+        limit = int(request.args.get('limit', 10))
+        
+        cursor = mysql.connection.cursor()
+        
+        # Use our reusable function
+        employees = search_employees_by_name(cursor, company_id, name_search, context, limit)
+        
+        cursor.close()
+        
+        return jsonify({
+            'employees': employees,
+            'search_term': name_search,
+            'company_id': company_id,
+            'context': context,
+            'total_results': len(employees)
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error in search-employees-by-name: {str(e)}")
+        return jsonify({'error': f'Failed to search employees: {str(e)}'}), 500
 
 @app.route('/api/payroll-groups/<int:company_id>', methods=['GET'])
 def get_payroll_groups(company_id):
