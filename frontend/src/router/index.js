@@ -8,7 +8,10 @@ import Analytics from '../views/Analytics.vue'
 import AggregationChoice from '../views/AggregationChoice.vue'
 import DrillDown from '../views/DrillDown.vue'
 import ShiftsSelection from '../views/ShiftsSelection.vue'
+import ShiftsScheduleTypeSelection from '../views/ShiftsScheduleTypeSelection.vue'
 import ShiftsScheduleTypeAnalytics from '../views/ShiftsScheduleTypeAnalytics.vue'
+import ShiftsChangesDatePicker from '../views/ShiftsChangesDatePicker.vue'
+import ShiftsChangesResults from '../views/ShiftsChangesResults.vue'
 import ShiftsAllocationSelection from '../views/ShiftsAllocationSelection.vue'
 import ShiftsAllocationAnalytics from '../views/ShiftsAllocationAnalytics.vue'
 import ShiftsAllocationDrilldown from '../views/ShiftsAllocationDrilldown.vue'
@@ -70,9 +73,24 @@ const routes = [
     component: ShiftsSelection
   },
   {
-    path: '/shifts-schedule-type/:companyId',
+    path: '/shifts-schedule-type-selection/:companyId',
+    name: 'ShiftsScheduleTypeSelection',
+    component: ShiftsScheduleTypeSelection
+  },
+  {
+    path: '/shifts-schedule-type-analytics/:companyId',
     name: 'ShiftsScheduleTypeAnalytics',
     component: ShiftsScheduleTypeAnalytics
+  },
+  {
+    path: '/shifts-changes-date-picker/:companyId',
+    name: 'ShiftsChangesDatePicker',
+    component: ShiftsChangesDatePicker
+  },
+  {
+    path: '/shifts-changes-results/:companyId/:fromDate/:toDate',
+    name: 'ShiftsChangesResults',
+    component: ShiftsChangesResults
   },
   {
     path: '/shifts-allocation-selection/:companyId',
