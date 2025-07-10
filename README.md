@@ -74,6 +74,146 @@ yarn serve
 ### Unified Chart System
 All charts in the application use a unified system for consistent behavior and visual appearance.
 
+## Code Reusability & DRY Principles
+
+The application implements extensive code reuse patterns to eliminate duplication and ensure consistency across modules.
+
+### 1. Backend Employee Search Abstraction
+
+#### Unified Search Function
+```python
+# Location: backend/app.py (lines 46-133)
+def search_employees_by_name(cursor, company_id, name_search, context='all', limit=10):
+```
+
+**Features:**
+- **AES Decryption:** Handles encrypted employee names consistently
+- **Database Joins:** Includes department, rank, and location data
+- **Context Filtering:** Supports different search contexts
+- **Reusable Parameters:** Configurable search terms and limits
+
+**Context Options:**
+- `context='shifts'` - employees with shift assignments
+- `context='payslip'` - employees with payroll data  
+- `context='all'` - no additional filtering
+
+#### Unified API Endpoint
+```python
+# Replaces multiple endpoint patterns
+/api/search-employees-by-name/<company_id>/<name_search>?context=<context>&limit=<limit>
+```
+
+**Usage:**
+- Payslip module: `context=payslip`
+- Shifts module: `context=shifts`
+- General search: `context=all`
+
+### 2. Frontend Component Reusability
+
+#### Employee Search Component
+```vue
+<!-- Location: frontend/src/components/EmployeeSearch.vue -->
+<EmployeeSearch 
+  :company-id="companyId"
+  context="shifts"
+  placeholder="search by name..."
+  @employee-selected="handleSelection"
+/>
+```
+
+**Features:**
+- **Debounced Search:** 300ms delay for optimal UX
+- **Consistent Display:** "FirstName LastName (emp_id)" format
+- **Dropdown Interface:** Clean selection experience
+- **Error Handling:** Unified error states and messaging
+
+**Reused In:**
+- `EmployeeShifts.vue` (shifts context)
+- `Employees.vue` (payslip context)
+
+#### Paginated Table Component
+```vue
+<!-- Location: frontend/src/components/PaginatedTable.vue -->
+<PaginatedTable 
+  :data="tableData"
+  :items-per-page="20"
+  record-type="shift changes"
+  :subtitle-text="descriptiveText"
+>
+  <template #table="{ paginatedData }">
+    <!-- Custom table content -->
+  </template>
+  <template #actions>
+    <!-- Custom action buttons -->
+  </template>
+</PaginatedTable>
+```
+
+**Features:**
+- **Flexible Slots:** Custom table content and action buttons
+- **Pagination Logic:** Previous/next controls with page information
+- **Responsive Design:** Consistent styling across screen sizes
+- **Data Management:** Auto-resets pagination when data changes
+
+**Reused In:**
+- `EmployeeShiftHistory.vue` (individual employee shifts)
+- `ShiftsChangesResults.vue` (period-based change analysis)
+
+### 3. Period-Based Change Detection
+
+#### Backend Algorithm
+```python
+# Location: backend/app.py (lines 540-683)
+@app.route('/api/shifts-changes-by-period/<int:company_id>/<string:date_from>/<string:date_to>')
+```
+
+**Features:**
+- **Efficient O(n) Processing:** Single query with in-memory analysis
+- **Date Range Validation:** Enforces 2-7 day periods
+- **Change Detection:** Compares consecutive shift assignments
+- **Deduplication:** Removes duplicate change records
+
+**Algorithm Steps:**
+1. Single query for all shifts in period with AES decryption
+2. Sort by employee ID and date for optimal processing
+3. Track last shift per employee in HashMap
+4. Detect changes when shift type or name differs
+5. Deduplicate and sort results by employee name
+
+### 4. Standardized Data Formatting
+
+#### Consistent Patterns
+- **Employee Display:** `"${firstName} ${lastName} (${empId})"`
+- **Date Formatting:** Short month format with consistent locale
+- **Error Handling:** Unified try-catch patterns with user-friendly messages
+- **Loading States:** Consistent spinner and messaging across components
+
+#### Eliminated Duplication
+- **Old Search Endpoint:** Removed `/api/search-employees` (emp_id only)
+- **Duplicate UI Logic:** Consolidated search interfaces
+- **Custom Pagination:** Extracted into reusable component
+- **Inconsistent Formatting:** Unified date, name, and error displays
+
+### 5. Component Communication Standards
+
+#### Props Interface
+```javascript
+// Consistent prop patterns across reusable components
+props: {
+  companyId: { type: String, required: true },
+  context: { type: String, default: 'all' },
+  itemsPerPage: { type: Number, default: 20 },
+  placeholder: { type: String, default: 'search...' }
+}
+```
+
+#### Event Patterns
+```javascript
+// Standardized event naming and payload structure
+this.$emit('employee-selected', { emp_id, first_name, last_name, ... });
+this.$emit('data-updated', { total: count, filtered: filteredCount });
+```
+
 ## Charting Standards
 
 ### 1. Unified Chart Architecture

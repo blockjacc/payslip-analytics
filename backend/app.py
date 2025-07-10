@@ -1139,6 +1139,177 @@ def get_shifts_allocation_drilldown(company_id, schedule_type, shift_id):
         app.logger.error(f"Error in shifts allocation drilldown: {str(e)}")
         return jsonify({'error': f'Failed to retrieve shifts allocation drilldown data: {str(e)}'}), 500
 
+@app.route('/api/shifts/by-start-time/<int:company_id>/<string:start_time>', methods=['GET'])
+def get_shifts_by_start_time(company_id, start_time):
+    """
+    Get all active shifts that start at a specific time with configuration flags and employee counts.
+    Follows unified endpoint pattern with single fetch and in-memory processing.
+    """
+    try:
+        # Validate parameters
+        if not all([company_id, start_time]):
+            return jsonify({'error': 'Missing required parameters'}), 400
+            
+        # Normalize start_time format (accept "0800", "08:00", "8:00" etc.)
+        try:
+            # Remove any non-digit characters except colons
+            clean_time = ''.join(c for c in start_time if c.isdigit() or c == ':')
+            
+            if ':' in clean_time:
+                # Format like "08:00" or "8:00"
+                time_parts = clean_time.split(':')
+                if len(time_parts) >= 2:
+                    hour = int(time_parts[0])
+                    minute = int(time_parts[1])
+                else:
+                    return jsonify({'error': 'Invalid time format'}), 400
+            else:
+                # Format like "0800" or "800"
+                if len(clean_time) == 3:
+                    # "800" -> 8:00
+                    hour = int(clean_time[0])
+                    minute = int(clean_time[1:3])
+                elif len(clean_time) == 4:
+                    # "0800" -> 08:00
+                    hour = int(clean_time[0:2])
+                    minute = int(clean_time[2:4])
+                else:
+                    return jsonify({'error': 'Invalid time format'}), 400
+            
+            # Validate time range
+            if hour < 0 or hour > 23 or minute < 0 or minute > 59:
+                return jsonify({'error': 'Time must be between 00:00 and 23:59'}), 400
+                
+            # Format as MySQL TIME
+            formatted_time = f"{hour:02d}:{minute:02d}:00"
+            
+        except (ValueError, IndexError) as e:
+            return jsonify({'error': f'Invalid time format: {str(e)}'}), 400
+            
+        cursor = mysql.connection.cursor()
+        
+        # Single query to get all shifts starting at the specified time
+        # Include configuration flags, values, and employee counts following in-memory compute principle
+        query = '''
+            SELECT DISTINCT
+                ws.work_schedule_id,
+                ws.name AS shift_name,
+                ws.work_type_name AS shift_type,
+                rs.work_start_time,
+                rs.work_end_time,
+                rs.total_work_hours,
+                
+                -- Configuration flags for filtering (break time management only)
+                ws.enable_lunch_break,
+                ws.enable_additional_breaks,
+                ws.enable_shift_threshold,
+                ws.enable_grace_period,
+                ws.enable_advance_break_rules,
+                
+                COUNT(DISTINCT ess.emp_id) as employee_count
+                
+            FROM work_schedule ws
+            JOIN regular_schedule rs ON ws.work_schedule_id = rs.work_schedule_id
+            LEFT JOIN employee_shifts_schedule ess ON ws.work_schedule_id = ess.work_schedule_id 
+                AND ess.status = 'Active' 
+                AND ess.company_id = %s
+                
+            WHERE ws.comp_id = %s 
+                AND ws.status = 'Active'
+                AND rs.company_id = %s
+                AND rs.work_start_time = %s
+                
+            GROUP BY ws.work_schedule_id, ws.name, ws.work_type_name, 
+                     rs.work_start_time, rs.work_end_time, rs.total_work_hours,
+                     ws.enable_lunch_break, ws.enable_additional_breaks, ws.enable_shift_threshold,
+                     ws.enable_grace_period, ws.enable_advance_break_rules
+                     
+            ORDER BY employee_count DESC, ws.name ASC
+        '''
+        
+        cursor.execute(query, (company_id, company_id, company_id, formatted_time))
+        results = cursor.fetchall()
+        cursor.close()
+        
+        if not results:
+            return jsonify({
+                'shifts': [],
+                'start_time': formatted_time,
+                'start_time_input': start_time,
+                'company_id': company_id,
+                'total_shifts': 0,
+                'total_employees': 0
+            })
+        
+        # Get configuration filters from query parameters
+        config_filters = {}
+        supported_configs = [
+            'enable_lunch_break', 'enable_additional_breaks', 'enable_shift_threshold',
+            'enable_grace_period', 'enable_advance_break_rules'
+        ]
+        
+        for config in supported_configs:
+            if request.args.get(config) == 'true':
+                config_filters[config] = True
+        
+        # Process results following in-memory compute principle
+        shifts = []
+        total_employees = 0
+        
+        for row in results:
+            # Extract configuration flags (break time management only)
+            config_flags = {
+                'enable_lunch_break': row[6] == 'yes' if row[6] else False,
+                'enable_additional_breaks': row[7] == 'yes' if row[7] else False,
+                'enable_shift_threshold': row[8] == 'yes' if row[8] else False,
+                'enable_grace_period': row[9] == 'yes' if row[9] else False,
+                'enable_advance_break_rules': row[10] == 'yes' if row[10] else False
+            }
+            
+            # Apply configuration filters if any are specified
+            if config_filters:
+                # Check if this shift matches ANY of the specified config filters (OR logic)
+                matches_filters = False
+                for filter_key, filter_value in config_filters.items():
+                    if config_flags.get(filter_key) == filter_value:
+                        matches_filters = True
+                        break
+                
+                # Skip this shift if it doesn't match any of the filters
+                if not matches_filters:
+                    continue
+            
+            shift_data = {
+                'work_schedule_id': row[0],
+                'shift_name': row[1] if row[1] else 'Unknown Shift',
+                'shift_type': row[2] if row[2] else 'N/A',
+                'work_start_time': str(row[3]) if row[3] else None,
+                'work_end_time': str(row[4]) if row[4] else None,
+                'total_work_hours': float(row[5]) if row[5] else 0.0,
+                'employee_count': row[11] if row[11] else 0,  # Updated index for employee count
+                'config_flags': config_flags
+            }
+            
+            shifts.append(shift_data)
+            total_employees += shift_data['employee_count']
+        
+        # Add applied filters information to response
+        response_data = {
+            'shifts': shifts,
+            'start_time': formatted_time,
+            'start_time_input': start_time,
+            'company_id': company_id,
+            'total_shifts': len(shifts),
+            'total_employees': total_employees,
+            'applied_filters': config_filters if config_filters else None
+        }
+        
+        return jsonify(response_data)
+        
+    except Exception as e:
+        app.logger.error(f"Error in shifts by start time: {str(e)}")
+        return jsonify({'error': f'Failed to retrieve shifts by start time: {str(e)}'}), 500
+
 @app.route('/api/employee-shifts/<int:company_id>/<string:name_search>', methods=['GET'])
 def get_employee_shifts(company_id, name_search):
     """

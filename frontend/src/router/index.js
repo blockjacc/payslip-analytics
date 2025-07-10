@@ -17,6 +17,9 @@ import ShiftsAllocationAnalytics from '../views/ShiftsAllocationAnalytics.vue'
 import ShiftsAllocationDrilldown from '../views/ShiftsAllocationDrilldown.vue'
 import ShiftsAllocationDrilldownPicker from '../views/ShiftsAllocationDrilldownPicker.vue'
 import ShiftsAllocationDrilldownTable from '../views/ShiftsAllocationDrilldownTable.vue'
+import ShiftsStartTimeInput from '../views/ShiftsStartTimeInput.vue'
+import ShiftsStartTimeConfigSelection from '../views/ShiftsStartTimeConfigSelection.vue'
+import ShiftsStartTimeAnalytics from '../views/ShiftsStartTimeAnalytics.vue'
 import EmployeeShifts from '../views/EmployeeShifts.vue'
 import EmployeeShiftHistory from '../views/EmployeeShiftHistory.vue'
 import EmployeeScheduleChanges from '../views/EmployeeScheduleChanges.vue'
@@ -111,6 +114,26 @@ const routes = [
     path: '/shifts-allocation-drilldown/:companyId/:scheduleType/:shiftIds/:shiftId',
     name: 'ShiftsAllocationDrilldownTable',
     component: ShiftsAllocationDrilldownTable
+  },
+  {
+    path: '/shifts-start-time-input/:companyId',
+    name: 'ShiftsStartTimeInput',
+    component: ShiftsStartTimeInput
+  },
+  {
+    path: '/shifts-start-time-config-selection/:companyId',
+    name: 'ShiftsStartTimeConfigSelection',
+    component: ShiftsStartTimeConfigSelection
+  },
+  {
+    path: '/shifts-start-time-analytics/:companyId/:startTime',
+    name: 'ShiftsStartTimeAnalytics',
+    component: ShiftsStartTimeAnalytics
+  },
+  {
+    path: '/shifts-start-time-drilldown/:companyId/:shiftId',
+    name: 'ShiftsStartTimeDrilldown',
+    component: () => import('../views/ShiftsStartTimeDrilldown.vue')
   },
   {
     path: '/employee-shifts/:companyId',
