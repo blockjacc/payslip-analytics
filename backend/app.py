@@ -1206,6 +1206,12 @@ def get_shifts_by_start_time(company_id, start_time):
                 ws.enable_grace_period,
                 ws.enable_advance_break_rules,
                 
+                -- Configuration values for display
+                ws.assumed_breaks,
+                ws.additional_break_started_after_1,
+                rs.latest_time_in_allowed,
+                ws.break_started_after,
+                
                 COUNT(DISTINCT ess.emp_id) as employee_count
                 
             FROM work_schedule ws
@@ -1222,7 +1228,9 @@ def get_shifts_by_start_time(company_id, start_time):
             GROUP BY ws.work_schedule_id, ws.name, ws.work_type_name, 
                      rs.work_start_time, rs.work_end_time, rs.total_work_hours,
                      ws.enable_lunch_break, ws.enable_additional_breaks, ws.enable_shift_threshold,
-                     ws.enable_grace_period, ws.enable_advance_break_rules
+                     ws.enable_grace_period, ws.enable_advance_break_rules,
+                     ws.assumed_breaks, ws.additional_break_started_after_1, rs.latest_time_in_allowed,
+                     ws.break_started_after
                      
             ORDER BY employee_count DESC, ws.name ASC
         '''
@@ -1266,6 +1274,15 @@ def get_shifts_by_start_time(company_id, start_time):
                 'enable_advance_break_rules': row[10] == 'yes' if row[10] else False
             }
             
+            # Extract configuration values for display
+            config_values = {
+                'lunch_break_duration': row[11] if row[11] else None,  # assumed_breaks
+                'additional_break_duration': row[12] if row[12] else None,  # additional_break_started_after_1
+                'shift_threshold_mins': row[13] if row[13] else None,  # latest_time_in_allowed from regular_schedule
+                'grace_period_mins': row[14] if row[14] else None,  # break_started_after
+                'advance_break_rules': None  # No specific value, just enabled/disabled
+            }
+            
             # Apply configuration filters if any are specified
             if config_filters:
                 # Check if this shift matches ANY of the specified config filters (OR logic)
@@ -1286,8 +1303,9 @@ def get_shifts_by_start_time(company_id, start_time):
                 'work_start_time': str(row[3]) if row[3] else None,
                 'work_end_time': str(row[4]) if row[4] else None,
                 'total_work_hours': float(row[5]) if row[5] else 0.0,
-                'employee_count': row[11] if row[11] else 0,  # Updated index for employee count
-                'config_flags': config_flags
+                'employee_count': row[15] if row[15] else 0,  # Updated index for employee count
+                'config_flags': config_flags,
+                'config_values': config_values
             }
             
             shifts.append(shift_data)
@@ -1482,6 +1500,300 @@ def get_employee_shifts(company_id, name_search):
     except Exception as e:
         app.logger.error(f"Error in employee-shifts: {str(e)}")
         return jsonify({'error': f'Failed to retrieve employee shifts data: {str(e)}'}), 500
+
+@app.route('/api/shift-details/<int:company_id>/<int:shift_id>', methods=['GET'])
+def get_shift_details(company_id, shift_id):
+    """
+    Get comprehensive configuration details for a specific shift.
+    Returns ALL fields from ALL shift-related tables exactly as shown in the comprehensive UI.
+    """
+    try:
+        # Validate parameters
+        if not all([company_id, shift_id]):
+            return jsonify({'error': 'Missing required parameters'}), 400
+            
+        cursor = mysql.connection.cursor()
+        
+        # Comprehensive query to get ALL existing work_schedule fields
+        work_schedule_query = '''
+            SELECT 
+                work_schedule_id, name, work_type_name, comp_id, flag_custom, status, `default`,
+                category_id, employees_required, notes, bg_color, break_rules, assumed_breaks,
+                advanced_settings, account_id, enable_lunch_break, break_type_1, track_break_1,
+                break_schedule_1, break_started_after, enable_additional_breaks,
+                num_of_additional_breaks, break_type_2, track_break_2, break_schedule_2,
+                additional_break_started_after_1, additional_break_started_after_2,
+                enable_shift_threshold, enable_grace_period, tardiness_rule, disable_premium_payments,
+                enable_premium_payments_starts_on_holiday_restday, flag_migrate, enable_breaks_on_holiday,
+                enable_working_on_restday, total_hrs_per_pay_period, total_hrs_per_day, period_type,
+                advanced_rules_premium_pay, pay_holiday_premium_on_regular_workday,
+                pay_holiday_premium_on_regular_workday_nsd, pay_holiday_premium_on_holiday,
+                pay_holiday_premium_on_holiday_nsd, pay_restday_premium_on_regular_workday,
+                pay_restday_premium_on_regular_workday_nsd, pay_holiday_premium_on_restday,
+                pay_holiday_premium_on_restday_nsd, total_hrs_per_week, created_date, updated_date,
+                created_by_account_id, updated_by_account_id, flag_default_restday,
+                pay_ot_holiday_rates_workday_holiday, pay_ot_holiday_rates_holiday_workday,
+                pay_ot_rest_day_rates_workday_restday, pay_ot_rest_day_rates_restday_workday,
+                paycheck_total_hrs_per_pay_period, enable_advance_break_rules, archive, archived_date
+            FROM work_schedule 
+            WHERE work_schedule_id = %s AND comp_id = %s AND status = 'Active'
+            LIMIT 1
+        '''
+        
+        cursor.execute(work_schedule_query, (shift_id, company_id))
+        ws_result = cursor.fetchone()
+        
+        if not ws_result:
+            cursor.close()
+            return jsonify({'error': 'Shift not found or inactive'}), 404
+        
+        # Map ALL work_schedule fields
+        work_schedule_data = {
+            'WORK_SCHEDULE_ID': ws_result[0],
+            'NAME': ws_result[1] if ws_result[1] else 'N/A',
+            'WORK_TYPE_NAME': ws_result[2] if ws_result[2] else 'N/A',
+            'COMP_ID': ws_result[3] if ws_result[3] else 'N/A',
+            'FLAG_CUSTOM': ws_result[4] if ws_result[4] else 'N/A',
+            'STATUS': ws_result[5] if ws_result[5] else 'N/A',
+            'DEFAULT': ws_result[6] if ws_result[6] else 'N/A',
+            'CATEGORY_ID': ws_result[7] if ws_result[7] else 'N/A',
+            'EMPLOYEES_REQUIRED': ws_result[8] if ws_result[8] else 'N/A',
+            'NOTES': ws_result[9] if ws_result[9] else 'N/A',
+            'BG_COLOR': ws_result[10] if ws_result[10] else 'N/A',
+            'BREAK_RULES': ws_result[11] if ws_result[11] else 'N/A',
+            'ASSUMED_BREAKS': ws_result[12] if ws_result[12] else 'N/A',
+            'ADVANCED_SETTINGS': ws_result[13] if ws_result[13] else 'N/A',
+            'ACCOUNT_ID': ws_result[14] if ws_result[14] else 'N/A',
+            'ENABLE_LUNCH_BREAK': ws_result[15] if ws_result[15] else 'N/A',
+            'BREAK_TYPE_1': ws_result[16] if ws_result[16] else 'N/A',
+            'TRACK_BREAK_1': ws_result[17] if ws_result[17] else 'N/A',
+            'BREAK_SCHEDULE_1': ws_result[18] if ws_result[18] else 'N/A',
+            'BREAK_STARTED_AFTER': ws_result[19] if ws_result[19] else 'N/A',
+            'ENABLE_ADDITIONAL_BREAKS': ws_result[20] if ws_result[20] else 'N/A',
+            'NUM_OF_ADDITIONAL_BREAKS': ws_result[21] if ws_result[21] else 'N/A',
+            'BREAK_TYPE_2': ws_result[22] if ws_result[22] else 'N/A',
+            'TRACK_BREAK_2': ws_result[23] if ws_result[23] else 'N/A',
+            'BREAK_SCHEDULE_2': ws_result[24] if ws_result[24] else 'N/A',
+            'ADDITIONAL_BREAK_STARTED_AFTER_1': ws_result[25] if ws_result[25] else 'N/A',
+            'ADDITIONAL_BREAK_STARTED_AFTER_2': ws_result[26] if ws_result[26] else 'N/A',
+            'ENABLE_SHIFT_THRESHOLD': ws_result[27] if ws_result[27] else 'N/A',
+            'ENABLE_GRACE_PERIOD': ws_result[28] if ws_result[28] else 'N/A',
+            'TARDINESS_RULE': ws_result[29] if ws_result[29] else 'N/A',
+            'DISABLE_PREMIUM_PAYMENTS': ws_result[30] if ws_result[30] else 'N/A',
+            'ENABLE_PREMIUM_PAYMENTS_STARTS_ON_HOLIDAY_RESTDAY': ws_result[31] if ws_result[31] else 'N/A',
+            'FLAG_MIGRATE': ws_result[32] if ws_result[32] else 'N/A',
+            'ENABLE_BREAKS_ON_HOLIDAY': ws_result[33] if ws_result[33] else 'N/A',
+            'ENABLE_WORKING_ON_RESTDAY': ws_result[34] if ws_result[34] else 'N/A',
+            'TOTAL_HRS_PER_PAY_PERIOD': ws_result[35] if ws_result[35] else 'N/A',
+            'TOTAL_HRS_PER_DAY': ws_result[36] if ws_result[36] else 'N/A',
+            'PERIOD_TYPE': ws_result[37] if ws_result[37] else 'N/A',
+            'ADVANCED_RULES_PREMIUM_PAY': ws_result[38] if ws_result[38] else 'N/A',
+            'PAY_HOLIDAY_PREMIUM_ON_REGULAR_WORKDAY': ws_result[39] if ws_result[39] else 'N/A',
+            'PAY_HOLIDAY_PREMIUM_ON_REGULAR_WORKDAY_NSD': ws_result[40] if ws_result[40] else 'N/A',
+            'PAY_HOLIDAY_PREMIUM_ON_HOLIDAY': ws_result[41] if ws_result[41] else 'N/A',
+            'PAY_HOLIDAY_PREMIUM_ON_HOLIDAY_NSD': ws_result[42] if ws_result[42] else 'N/A',
+            'PAY_RESTDAY_PREMIUM_ON_REGULAR_WORKDAY': ws_result[43] if ws_result[43] else 'N/A',
+            'PAY_RESTDAY_PREMIUM_ON_REGULAR_WORKDAY_NSD': ws_result[44] if ws_result[44] else 'N/A',
+            'PAY_HOLIDAY_PREMIUM_ON_RESTDAY': ws_result[45] if ws_result[45] else 'N/A',
+            'PAY_HOLIDAY_PREMIUM_ON_RESTDAY_NSD': ws_result[46] if ws_result[46] else 'N/A',
+            'TOTAL_HRS_PER_WEEK': ws_result[47] if ws_result[47] else 'N/A',
+            'CREATED_DATE': ws_result[48].strftime('%Y-%m-%d %H:%M:%S') if ws_result[48] else 'N/A',
+            'UPDATED_DATE': ws_result[49].strftime('%Y-%m-%d %H:%M:%S') if ws_result[49] else 'N/A',
+            'CREATED_BY_ACCOUNT_ID': ws_result[50] if ws_result[50] else 'N/A',
+            'UPDATED_BY_ACCOUNT_ID': ws_result[51] if ws_result[51] else 'N/A',
+            'FLAG_DEFAULT_RESTDAY': ws_result[52] if ws_result[52] else 'N/A',
+            'PAY_OT_HOLIDAY_RATES_WORKDAY_HOLIDAY': ws_result[53] if ws_result[53] else 'N/A',
+            'PAY_OT_HOLIDAY_RATES_HOLIDAY_WORKDAY': ws_result[54] if ws_result[54] else 'N/A',
+            'PAY_OT_REST_DAY_RATES_WORKDAY_RESTDAY': ws_result[55] if ws_result[55] else 'N/A',
+            'PAY_OT_REST_DAY_RATES_RESTDAY_WORKDAY': ws_result[56] if ws_result[56] else 'N/A',
+            'PAYCHECK_TOTAL_HRS_PER_PAY_PERIOD': ws_result[57] if ws_result[57] else 'N/A',
+            'ENABLE_ADVANCE_BREAK_RULES': ws_result[58] if ws_result[58] else 'N/A',
+            'ARCHIVE': ws_result[59] if ws_result[59] else 'N/A',
+            'ARCHIVED_DATE': ws_result[60].strftime('%Y-%m-%d %H:%M:%S') if ws_result[60] else 'N/A'
+        }
+        
+        # Get ALL regular_schedule fields
+        regular_schedule_query = '''
+            SELECT 
+                reg_work_sched_id, work_schedule_id, work_schedule_name, days_of_work,
+                work_start_time, work_end_time, total_work_hours, company_id, break_in_min,
+                latest_time_in_allowed, status, break_1, break_2, flag_half_day
+            FROM regular_schedule 
+            WHERE work_schedule_id = %s AND company_id = %s
+            LIMIT 1
+        '''
+        
+        cursor.execute(regular_schedule_query, (shift_id, company_id))
+        rs_result = cursor.fetchone()
+        
+        regular_schedule_data = {}
+        if rs_result:
+            regular_schedule_data = {
+                'REG_WORK_SCHED_ID': rs_result[0] if rs_result[0] else 'N/A',
+                'WORK_SCHEDULE_ID': rs_result[1] if rs_result[1] else 'N/A',
+                'WORK_SCHEDULE_NAME': rs_result[2] if rs_result[2] else 'N/A',
+                'DAYS_OF_WORK': rs_result[3] if rs_result[3] else 'N/A',
+                'WORK_START_TIME': str(rs_result[4]) if rs_result[4] else 'N/A',
+                'WORK_END_TIME': str(rs_result[5]) if rs_result[5] else 'N/A',
+                'TOTAL_WORK_HOURS': float(rs_result[6]) if rs_result[6] else 'N/A',
+                'COMPANY_ID': rs_result[7] if rs_result[7] else 'N/A',
+                'BREAK_IN_MIN': rs_result[8] if rs_result[8] else 'N/A',
+                'LATEST_TIME_IN_ALLOWED': rs_result[9] if rs_result[9] else 'N/A',
+                'STATUS': rs_result[10] if rs_result[10] else 'N/A',
+                'BREAK_1': float(rs_result[11]) if rs_result[11] else 'N/A',
+                'BREAK_2': float(rs_result[12]) if rs_result[12] else 'N/A',
+                'FLAG_HALF_DAY': rs_result[13] if rs_result[13] else 'N/A'
+            }
+        
+        # Get ALL flexible_hours fields if they exist
+        flexible_hours_query = '''
+            SELECT 
+                workday_settings_id, not_required_login, total_hours_for_the_day, 
+                total_hours_for_the_week, total_days_per_year, latest_time_in_allowed,
+                number_of_breaks_per_day, duration_of_lunch_break_per_day, 
+                duration_of_short_break_per_day, work_schedule_id, company_id
+            FROM flexible_hours 
+            WHERE work_schedule_id = %s AND company_id = %s
+            LIMIT 1
+        '''
+        
+        cursor.execute(flexible_hours_query, (shift_id, company_id))
+        fh_result = cursor.fetchone()
+        
+        flexible_hours_data = {}
+        if fh_result:
+            flexible_hours_data = {
+                'WORKDAY_SETTINGS_ID': fh_result[0] if fh_result[0] else 'N/A',
+                'NOT_REQUIRED_LOGIN': fh_result[1] if fh_result[1] else 'N/A',
+                'TOTAL_HOURS_FOR_THE_DAY': fh_result[2] if fh_result[2] else 'N/A',
+                'TOTAL_HOURS_FOR_THE_WEEK': fh_result[3] if fh_result[3] else 'N/A',
+                'TOTAL_DAYS_PER_YEAR': fh_result[4] if fh_result[4] else 'N/A',
+                'LATEST_TIME_IN_ALLOWED': str(fh_result[5]) if fh_result[5] else 'N/A',
+                'NUMBER_OF_BREAKS_PER_DAY': fh_result[6] if fh_result[6] else 'N/A',
+                'DURATION_OF_LUNCH_BREAK_PER_DAY': fh_result[7] if fh_result[7] else 'N/A',
+                'DURATION_OF_SHORT_BREAK_PER_DAY': fh_result[8] if fh_result[8] else 'N/A',
+                'WORK_SCHEDULE_ID': fh_result[9] if fh_result[9] else 'N/A',
+                'COMPANY_ID': fh_result[10] if fh_result[10] else 'N/A'
+            }
+        
+        # Get ALL rest_day entries
+        rest_day_query = '''
+            SELECT 
+                rest_day_id, rest_day, company_id, work_schedule_id, status, deleted
+            FROM rest_day 
+            WHERE work_schedule_id = %s AND company_id = %s AND status = 'Active' AND deleted = '0'
+        '''
+        
+        cursor.execute(rest_day_query, (shift_id, company_id))
+        rd_results = cursor.fetchall()
+        
+        rest_days_data = []
+        for rd_result in rd_results:
+            rest_days_data.append({
+                'REST_DAY_ID': rd_result[0] if rd_result[0] else 'N/A',
+                'REST_DAY': rd_result[1] if rd_result[1] else 'N/A',
+                'COMPANY_ID': rd_result[2] if rd_result[2] else 'N/A',
+                'WORK_SCHEDULE_ID': rd_result[3] if rd_result[3] else 'N/A',
+                'STATUS': rd_result[4] if rd_result[4] else 'N/A',
+                'DELETED': rd_result[5] if rd_result[5] else 'N/A'
+            })
+        
+        # Get employee count for summary
+        count_query = '''
+            SELECT COUNT(DISTINCT ess.emp_id) as employee_count
+            FROM employee_shifts_schedule ess
+            WHERE ess.work_schedule_id = %s 
+                AND ess.status = 'Active' 
+                AND ess.company_id = %s
+        '''
+        cursor.execute(count_query, (shift_id, company_id))
+        count_result = cursor.fetchone()
+        employee_count = count_result[0] if count_result else 0
+        
+        cursor.close()
+        
+        # Return comprehensive data exactly as shown in the UI
+        response = {
+            'shift_summary': {
+                'shift_name': work_schedule_data['NAME'],
+                'employee_count': employee_count
+            },
+            'work_schedule': work_schedule_data,
+            'regular_schedule': regular_schedule_data,
+            'flexible_hours': flexible_hours_data if flexible_hours_data else None,
+            'rest_days': rest_days_data,
+            'company_id': company_id,
+            'shift_id': shift_id
+        }
+        
+        return jsonify(response)
+        
+    except Exception as e:
+        app.logger.error(f"Error in shift details: {str(e)}")
+        return jsonify({'error': f'Failed to retrieve shift details: {str(e)}'}), 500
+
+@app.route('/api/shift-employees/<int:company_id>/<int:shift_id>', methods=['GET'])
+def get_shift_employees(company_id, shift_id):
+    """
+    Get all employees assigned to a specific shift with download capability.
+    """
+    try:
+        cursor = mysql.connection.cursor()
+        
+        # Query to get all employees assigned to the shift
+        query = '''
+            SELECT DISTINCT
+                ess.emp_id,
+                CAST(AES_DECRYPT(e.last_name, %s) AS CHAR(150) CHARACTER SET utf8) AS last_name,
+                CAST(AES_DECRYPT(e.first_name, %s) AS CHAR(150) CHARACTER SET utf8) AS first_name,
+                COALESCE(lao.name, 'N/A') AS location_office,
+                COALESCE(d.department_name, 'N/A') AS department_name,
+                COALESCE(rk.rank_name, 'N/A') AS rank_name,
+                ess.valid_from,
+                ess.until,
+                ess.status
+            FROM employee_shifts_schedule ess
+            JOIN employee e ON ess.emp_id = e.emp_id
+            LEFT JOIN employee_payroll_information epi ON ess.emp_id = epi.emp_id AND epi.company_id = %s
+            LEFT JOIN location_and_offices lao ON epi.location_and_offices_id = lao.location_and_offices_id
+            LEFT JOIN department d ON epi.department_id = d.dept_id AND d.company_id = %s
+            LEFT JOIN `rank` rk ON epi.rank_id = rk.rank_id AND rk.company_id = %s
+            WHERE ess.company_id = %s 
+                AND ess.work_schedule_id = %s 
+                AND ess.status = 'Active'
+            ORDER BY last_name ASC, first_name ASC
+        '''
+        
+        cursor.execute(query, (ENCRYPT_KEY, ENCRYPT_KEY, company_id, company_id, company_id, company_id, shift_id))
+        results = cursor.fetchall()
+        cursor.close()
+        
+        # Format employee data
+        employees = []
+        for row in results:
+            employees.append({
+                'emp_id': row[0],
+                'last_name': row[1] if row[1] else 'N/A',
+                'first_name': row[2] if row[2] else 'N/A',
+                'full_name': f"{row[1]}, {row[2]}" if row[1] and row[2] else 'N/A',
+                'location_office': row[3] if row[3] else 'N/A',
+                'department_name': row[4] if row[4] else 'N/A',
+                'rank_name': row[5] if row[5] else 'N/A',
+                'valid_from': row[6].strftime('%Y-%m-%d') if row[6] else 'N/A',
+                'until': row[7].strftime('%Y-%m-%d') if row[7] else 'N/A',
+                'status': row[8] if row[8] else 'N/A'
+            })
+        
+        return jsonify({
+            'employees': employees,
+            'employee_count': len(employees),
+            'company_id': company_id,
+            'shift_id': shift_id
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error in shift employees: {str(e)}")
+        return jsonify({'error': f'Failed to retrieve shift employees: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 

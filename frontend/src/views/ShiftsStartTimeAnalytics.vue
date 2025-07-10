@@ -73,7 +73,7 @@
         </div>
 
         <!-- No Results -->
-        <div v-else-if="!loading && shiftsData" class="text-center text-white/70">
+        <div v-else class="text-center text-white/70">
           <p class="text-lg">no shifts found matching your criteria</p>
           <p class="text-sm mt-2">try adjusting your filters or selecting a different start time</p>
         </div>
@@ -222,7 +222,29 @@ export default {
         return 'multiple';
       } else if (this.selectedConfigs.length === 1) {
         const config = this.selectedConfigs[0];
-        return shift.config_flags[config] ? '✓' : '✗';
+        const isEnabled = shift.config_flags[config];
+        
+        if (!isEnabled) return '✗';
+        
+        // Show actual values if available
+        if (shift.config_values) {
+          switch(config) {
+            case 'enable_lunch_break':
+              return shift.config_values.lunch_break_duration ? `${shift.config_values.lunch_break_duration}` : 'enabled';
+            case 'enable_additional_breaks':
+              return shift.config_values.additional_break_duration ? `${shift.config_values.additional_break_duration}` : 'enabled';
+            case 'enable_shift_threshold':
+              return shift.config_values.shift_threshold_mins ? `${shift.config_values.shift_threshold_mins}` : 'enabled';
+            case 'enable_grace_period':
+              return shift.config_values.grace_period_mins ? `${shift.config_values.grace_period_mins}` : 'enabled';
+            case 'enable_advance_break_rules':
+              return 'enabled';
+            default:
+              return 'enabled';
+          }
+        }
+        
+        return 'enabled';
       } else {
         // Multiple configs - show count of enabled ones
         let enabledCount = 0;
