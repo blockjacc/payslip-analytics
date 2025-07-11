@@ -40,34 +40,25 @@
           <div class="overflow-x-auto">
             <table class="w-full text-white border-collapse">
               <thead>
-                                 <tr class="border-b border-white/20">
-                   <th class="text-left p-3 text-primary font-semibold">shift name</th>
-                   <th class="text-center p-3 text-primary font-semibold">employees</th>
-                   <th class="text-center p-3 text-primary font-semibold">{{ dynamicColumnHeader }}</th>
-                   <th class="text-center p-3 text-primary font-semibold">end time</th>
-                   <th class="text-center p-3 text-primary font-semibold">total hours</th>
-                   <th class="text-center p-3 text-primary font-semibold">actions</th>
-                 </tr>
+                <tr class="border-b border-white/20">
+                  <th class="text-left p-3 text-primary font-semibold">shift name</th>
+                  <th class="text-center p-3 text-primary font-semibold">employees</th>
+                  <th v-for="config in sortedSelectedConfigs" :key="config" class="text-center p-3 text-primary font-semibold">
+                    {{ getConfigDisplayName(config) }}
+                  </th>
+                </tr>
               </thead>
-                             <tbody>
-                 <tr v-for="shift in shiftsData.shifts" :key="shift.work_schedule_id" 
-                     class="border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
-                     @click="viewShiftDetails(shift)">
-                   <td class="p-3 font-medium text-primary">{{ shift.shift_name }}</td>
-                   <td class="p-3 text-center">{{ formatNumber(shift.employee_count) }}</td>
-                   <td class="p-3 text-center text-primary font-bold">{{ getDynamicColumnValue(shift) }}</td>
-                   <td class="p-3 text-center">{{ formatTime(shift.work_end_time) }}</td>
-                   <td class="p-3 text-center">{{ shift.total_work_hours || 'N/A' }}</td>
-                   <td class="p-3 text-center">
-                     <button 
-                       class="bg-primary/20 hover:bg-primary/40 text-white rounded px-3 py-1 text-sm transition-colors"
-                       @click.stop="viewShiftDetails(shift)"
-                     >
-                       view details
-                     </button>
-                   </td>
-                 </tr>
-               </tbody>
+              <tbody>
+                <tr v-for="shift in shiftsData.shifts" :key="shift.work_schedule_id" 
+                    class="border-b border-white/10 hover:bg-white/5 transition-colors cursor-pointer"
+                    @click="viewShiftDetails(shift)">
+                  <td class="p-3 font-medium text-primary">{{ shift.shift_name }}</td>
+                  <td class="p-3 text-center">{{ formatNumber(shift.employee_count) }}</td>
+                  <td v-for="config in sortedSelectedConfigs" :key="config" class="p-3 text-center text-primary font-bold">
+                    {{ getConfigValue(shift, config) }}
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -129,16 +120,9 @@ export default {
     }
   },
   computed: {
-    // Dynamic column header based on selected filters
-    dynamicColumnHeader() {
-      if (this.selectedConfigs.length === 0) {
-        return 'configuration';
-      } else if (this.selectedConfigs.length === 1) {
-        const config = this.selectedConfigs[0];
-        return this.configDisplayNames[config] || 'configuration';
-      } else {
-        return 'selected configs';
-      }
+    // Sorted selected configs for consistent column order
+    sortedSelectedConfigs() {
+      return [...this.selectedConfigs].sort();
     }
   },
   async created() {
@@ -215,44 +199,32 @@ export default {
       return this.configDisplayNames[configName] || configName;
     },
     
-    getDynamicColumnValue(shift) {
+    getConfigValue(shift, configName) {
       if (!shift.config_flags) return 'N/A';
       
-      if (this.selectedConfigs.length === 0) {
-        return 'multiple';
-      } else if (this.selectedConfigs.length === 1) {
-        const config = this.selectedConfigs[0];
-        const isEnabled = shift.config_flags[config];
-        
-        if (!isEnabled) return '✗';
-        
-        // Show actual values if available
-        if (shift.config_values) {
-          switch(config) {
-            case 'enable_lunch_break':
-              return shift.config_values.lunch_break_duration ? `${shift.config_values.lunch_break_duration}` : 'enabled';
-            case 'enable_additional_breaks':
-              return shift.config_values.additional_break_duration ? `${shift.config_values.additional_break_duration}` : 'enabled';
-            case 'enable_shift_threshold':
-              return shift.config_values.shift_threshold_mins ? `${shift.config_values.shift_threshold_mins}` : 'enabled';
-            case 'enable_grace_period':
-              return shift.config_values.grace_period_mins ? `${shift.config_values.grace_period_mins}` : 'enabled';
-            case 'enable_advance_break_rules':
-              return 'enabled';
-            default:
-              return 'enabled';
-          }
+      const isEnabled = shift.config_flags[configName];
+      
+      if (!isEnabled) return '✗';
+      
+      // Show actual values if available
+      if (shift.config_values) {
+        switch(configName) {
+          case 'enable_lunch_break':
+            return shift.config_values.lunch_break_duration ? `${shift.config_values.lunch_break_duration}` : 'enabled';
+          case 'enable_additional_breaks':
+            return shift.config_values.additional_break_duration ? `${shift.config_values.additional_break_duration}` : 'enabled';
+          case 'enable_shift_threshold':
+            return shift.config_values.shift_threshold_mins ? `${shift.config_values.shift_threshold_mins}` : 'enabled';
+          case 'enable_grace_period':
+            return shift.config_values.grace_period_mins ? `${shift.config_values.grace_period_mins}` : 'enabled';
+          case 'enable_advance_break_rules':
+            return 'enabled';
+          default:
+            return 'enabled';
         }
-        
-        return 'enabled';
-      } else {
-        // Multiple configs - show count of enabled ones
-        let enabledCount = 0;
-        this.selectedConfigs.forEach(config => {
-          if (shift.config_flags[config]) enabledCount++;
-        });
-        return `${enabledCount}/${this.selectedConfigs.length}`;
       }
+      
+      return 'enabled';
     },
     viewShiftDetails(shift) {
       // Store shift details for drilldown
