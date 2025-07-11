@@ -21,8 +21,7 @@
       <div v-else-if="shiftData">
         <!-- Header -->
         <div class="text-center mb-8">
-          <h1 class="text-4xl font-bold mb-3">comprehensive shift details</h1>
-          <h2 class="text-2xl text-white/80 mb-4">{{ shiftData.shift_name }}</h2>
+          <h1 class="text-4xl font-bold mb-3">{{ shiftData.shift_summary.shift_name }} - comprehensive shift details</h1>
           <div class="flex items-center justify-center gap-6 mb-6">
             <span class="text-lg text-white/70">{{ shiftData.shift_summary?.employee_count || 0 }} employees assigned</span>
             <button 
@@ -232,7 +231,7 @@ export default {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `${this.shiftData.shift_name.replace(/[^a-zA-Z0-9]/g, '_')}_employees.csv`;
+        link.download = `${this.shiftData.shift_summary.shift_name.replace(/[^a-zA-Z0-9]/g, '_')}_employees.csv`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
