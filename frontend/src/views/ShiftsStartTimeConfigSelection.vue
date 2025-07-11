@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8">
+  <div class="min-h-screen p-8">
     <h1 class="font-serif text-white mb-8 text-4xl text-center">select shift characteristics</h1>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-4xl text-center mx-auto">
       <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>

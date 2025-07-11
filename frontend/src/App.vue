@@ -1,12 +1,19 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <BaseLayout>
+      <router-view></router-view>
+    </BaseLayout>
   </div>
 </template>
 
 <script>
+import BaseLayout from './components/layouts/BaseLayout.vue'
+
 export default {
-  name: 'App'
+  name: 'App',
+  components: {
+    BaseLayout
+  }
 }
 </script>
 
@@ -100,14 +107,12 @@ a:hover {
 
 html, body {
   height: 100%;
-  background: linear-gradient(to right, rgba(0, 128, 0, 0.1) 0%, rgba(128, 0, 128, 0.1) 100%);
 }
 
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   height: 100vh;
-  background: linear-gradient(to right, rgba(0, 128, 0, 0.1) 0%, rgba(128, 0, 128, 0.1) 100%);
   margin: 0;
   padding: 0;
   color: rgba(0, 128, 0, 0.8);

@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
+  <div class="min-h-screen text-white">
     <div class="container mx-auto px-6 py-8">
       
       <!-- Error State -->

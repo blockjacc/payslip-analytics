@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen w-full bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#232526] p-8">
+  <div class="min-h-screen w-full p-8">
     <h1 class="font-serif text-white mb-8 text-4xl text-center">
       shifts starting at {{ formatStartTime(startTime) }}
     </h1>
