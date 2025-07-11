@@ -74,6 +74,54 @@ yarn serve
 ### Unified Chart System
 All charts in the application use a unified system for consistent behavior and visual appearance.
 
+## UX/UI Design System
+
+### Universal Background System
+The application implements a unified background system to ensure visual consistency across all pages and components.
+
+#### Architecture
+- **BaseLayout Component**: Single source of truth for page background styling
+- **Location**: `frontend/src/components/layouts/BaseLayout.vue`
+- **Usage**: Wraps all page content through `App.vue`
+
+#### Background Gradient
+- **Colors**: Green to purple gradient
+- **CSS**: `background: linear-gradient(to right, rgba(0, 128, 0, 0.1) 0%, rgba(128, 0, 128, 0.1) 100%);`
+- **Opacity**: Very subtle (0.1) for optimal text readability
+
+#### Implementation Pattern
+```vue
+<!-- App.vue -->
+<template>
+  <div id="app">
+    <BaseLayout>
+      <router-view></router-view>
+    </BaseLayout>
+  </div>
+</template>
+```
+
+```vue
+<!-- BaseLayout.vue -->
+<template>
+  <div class="min-h-screen" style="background: linear-gradient(to right, rgba(0, 128, 0, 0.1) 0%, rgba(128, 0, 128, 0.1) 100%);">
+    <slot />
+  </div>
+</template>
+```
+
+#### Component Standards
+- **No Individual Backgrounds**: Vue components should NOT define their own background styles
+- **Gradient Inheritance**: All pages inherit the universal gradient from BaseLayout
+- **Button Styling**: UI element gradients (like blue-to-cyan buttons) are preserved
+- **Consistency**: Eliminates background inconsistencies and copy-paste drift
+
+#### Migration Benefits
+- **Single Source**: Background changes made in one place apply universally
+- **Maintainability**: No more scattered background styles across components
+- **Consistency**: Uniform visual experience across all pages
+- **Design System Foundation**: Establishes pattern for other global styles
+
 ## Code Reusability & DRY Principles
 
 The application implements extensive code reuse patterns to eliminate duplication and ensure consistency across modules.
