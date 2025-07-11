@@ -241,16 +241,22 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
             
             # Process each period
             for period_start, period_end in periods:
-                # Dynamically build the query based on selected fields
-                query_fields = ", ".join(selected_fields)
+                # Build SQL for selected fields with AES decryption
+                field_sql = ', '.join([
+                    f"CAST(AES_DECRYPT({field}, %s) AS DECIMAL(10,2)) AS {field}" for field in selected_fields
+                ])
+                
                 query = f"""
-                    SELECT {query_fields}
+                    SELECT {field_sql}
                     FROM payroll_payslip 
                     WHERE company_id = %s
                     AND period_from = %s AND period_to = %s
                 """
                 
-                params = [company_id, period_start, period_end]
+                # Build parameters array - include ENCRYPT_KEY for each field
+                params = [ENCRYPT_KEY] * len(selected_fields)  # One ENCRYPT_KEY per field
+                params.extend([company_id, period_start, period_end])
+                
                 if emp_id != 'all':
                     query += " AND emp_id = %s"
                     params.append(emp_id)
@@ -297,15 +303,11 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
                 # Initialize sums for this period with selected fields
                 period_sums = {field: 0.0 for field in selected_fields}
                 
-                # Process each row for this period
+                # Process each row for this period - data is already decrypted
                 for row in rows:
                     for i, field in enumerate(selected_fields):
-                        if row[i] and row[i] != 'NO_AUTO_VALUE_ON_ZERO':
-                            decrypt_query = "SELECT CAST(AES_DECRYPT(%s, %s) AS DECIMAL(10,2)) as value"
-                            cursor.execute(decrypt_query, (row[i], ENCRYPT_KEY))
-                            decrypted_result = cursor.fetchone()
-                            if decrypted_result and decrypted_result[0] is not None:
-                                period_sums[field] += float(decrypted_result[0])
+                        if row[i] is not None:
+                            period_sums[field] += float(row[i])
                 
                 # Add period data to result
                 period_analytics = {}
@@ -348,10 +350,13 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
             return jsonify(result)
             
         # For single/aggregate view
-        # Dynamically build the query based on selected fields
-        query_fields = ", ".join(selected_fields)
+        # Build SQL for selected fields with AES decryption
+        field_sql = ', '.join([
+            f"CAST(AES_DECRYPT({field}, %s) AS DECIMAL(10,2)) AS {field}" for field in selected_fields
+        ])
+        
         query = f"""
-            SELECT {query_fields}, period_from, period_to
+            SELECT {field_sql}, period_from, period_to
             FROM payroll_payslip 
             WHERE company_id = %s
         """
@@ -363,8 +368,9 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
             date_filter = " AND period_from >= %s AND period_to <= %s"
         query += date_filter
         
-        # Build parameters array
-        params = [company_id, period_from, period_to]
+        # Build parameters array - include ENCRYPT_KEY for each field
+        params = [ENCRYPT_KEY] * len(selected_fields)  # One ENCRYPT_KEY per field
+        params.extend([company_id, period_from, period_to])
         
         # Add employee filter if not 'all'
         if emp_id != 'all':
@@ -415,15 +421,12 @@ def get_analytics(company_id, emp_id, period_from, period_to, aggregation_type='
         # Initialize sums with selected fields
         sums = {field: 0.0 for field in selected_fields}
             
-        # Process each row
+        # Process each row - data is already decrypted
         for row in rows:
+            # Skip the last 2 columns (period_from, period_to) when processing fields
             for i, field in enumerate(selected_fields):
-                if row[i] and row[i] != 'NO_AUTO_VALUE_ON_ZERO':
-                    decrypt_query = "SELECT CAST(AES_DECRYPT(%s, %s) AS DECIMAL(10,2)) as value"
-                    cursor.execute(decrypt_query, (row[i], ENCRYPT_KEY))
-                    decrypted_result = cursor.fetchone()
-                    if decrypted_result and decrypted_result[0] is not None:
-                        sums[field] += float(decrypted_result[0])
+                if row[i] is not None:
+                    sums[field] += float(row[i])
         
         # Create result object with field sums
         result = {}
