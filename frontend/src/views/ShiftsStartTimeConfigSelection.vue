@@ -117,6 +117,14 @@ export default {
         'grace_period_settings': 'Grace Period Settings',
         'advanced_break_rules': 'Advanced Break Rules'
       },
+      // Field to config mapping for backend API
+      fieldToConfigMap: {
+        'lunch_break_duration': 'enable_lunch_break',
+        'additional_breaks_schedule': 'enable_additional_breaks',
+        'shift_threshold_minutes': 'enable_shift_threshold',
+        'grace_period_settings': 'enable_grace_period',
+        'advanced_break_rules': 'enable_advance_break_rules'
+      },
       error: null
     }
   },
@@ -193,9 +201,12 @@ export default {
         return;
       }
       
-      // Store selected fields and category in sessionStorage
-      sessionStorage.setItem('selectedShiftCharacteristics', JSON.stringify(this.selectedFields));
-      sessionStorage.setItem('selectedShiftCategory', this.selectedCategory);
+      // Map selected fields to config flags for backend API
+      const selectedConfigs = this.selectedFields.map(field => this.fieldToConfigMap[field]);
+      
+      // Store selected configs and category in sessionStorage with correct keys
+      sessionStorage.setItem('selectedShiftConfigs', JSON.stringify(selectedConfigs));
+      sessionStorage.setItem('selectedShiftConfigCategory', this.selectedCategory);
       
       // Navigate to analytics - convert time format for URL
       const startTimeForUrl = this.startTime.replace(':', '').substring(0, 4);

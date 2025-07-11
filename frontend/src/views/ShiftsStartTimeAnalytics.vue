@@ -120,11 +120,11 @@ export default {
       
       // Display names for break time management only (no caps)
       configDisplayNames: {
-        'enable_lunch_break': 'lunch break',
-        'enable_additional_breaks': 'additional breaks',
-        'enable_shift_threshold': 'shift threshold',
-        'enable_grace_period': 'grace period',
-        'enable_advance_break_rules': 'advance break rules'
+        'enable_lunch_break': 'lunch break duration',
+        'enable_additional_breaks': 'additional breaks schedule',
+        'enable_shift_threshold': 'shift threshold minutes',
+        'enable_grace_period': 'grace period settings',
+        'enable_advance_break_rules': 'advanced break rules'
       }
     }
   },
