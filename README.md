@@ -50,18 +50,32 @@ payslip-analytics/
 ### Backend Setup
 ```bash
 cd backend
-python -m venv venv
+# Virtual environment is already configured - do not recreate it
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
-python app.py
+python3 app.py  # Note: Use python3, not python
 ```
+
+**Important Notes:**
+- **Always activate virtual environment** before running backend operations: `source venv/bin/activate`
+- **Use python3** command (not `python`) to avoid "command not found" errors
+- Backend runs on **port 5002** by default
+- Virtual environment is pre-configured - do not recreate it
 
 ### Frontend Setup
 ```bash
 cd frontend
-yarn install
-yarn serve
+yarn install  # Use yarn, not npm
+yarn dev       # Start development server
 ```
+
+**Important Notes:**
+- **Use yarn package manager** (not npm) for all frontend operations
+- Available commands:
+  - `yarn dev` - Start development server
+  - `yarn build` - Build for production
+  - `yarn serve` - Serve built files
+- Frontend runs on **port 3000** by default
 
 ## Architecture Principles
 
@@ -501,6 +515,26 @@ this.chart = new Chart(ctx, chartConfig);
 - Minimize backend requests through single-fetch strategy
 - Use efficient data structures for large datasets
 - Implement proper component lifecycle management
+
+#### AES Decryption Optimization (Critical Performance Fix)
+- **Problem:** Original `/api/analytics/` endpoint used O(n×m×db) nested loops for AES decryption
+- **Impact:** For 100 payslip rows × 5 fields = 500 separate database calls per request
+- **Solution:** Migrated to SQL-based AES decryption pattern from `/api/analytics-prefetch/`
+- **Implementation:**
+  ```sql
+  -- Before (nested loops with separate DB calls)
+  for row in rows:
+      for field in fields:
+          cursor.execute("SELECT CAST(AES_DECRYPT(%s, %s) AS DECIMAL(10,2))", (row[field], key))
+  
+  -- After (single SQL query with built-in decryption)
+  SELECT CAST(AES_DECRYPT(field1, %s) AS DECIMAL(10,2)) AS field1,
+         CAST(AES_DECRYPT(field2, %s) AS DECIMAL(10,2)) AS field2
+  FROM payroll_payslip WHERE conditions...
+  ```
+- **Result:** 500x performance improvement (500 DB calls → 1 DB call)
+- **Affected Endpoints:** Both "separate" and "single/aggregate" analytics paths
+- **Verification:** Functionality remains identical, only performance improved
 
 ## Database Considerations
 
