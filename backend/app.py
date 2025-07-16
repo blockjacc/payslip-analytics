@@ -1798,5 +1798,25 @@ def get_shift_employees(company_id, shift_id):
         app.logger.error(f"Error in shift employees: {str(e)}")
         return jsonify({'error': f'Failed to retrieve shift employees: {str(e)}'}), 500
 
+@app.route('/api/companies', methods=['GET'])
+def get_companies():
+    try:
+        cursor = mysql.connection.cursor()
+        query = """
+            SELECT company_id, company_name
+            FROM company
+            WHERE status = 'Active'
+            ORDER BY company_name
+        """
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        cursor.close()
+        companies = [
+            {"company_id": row[0], "company_name": row[1]} for row in rows
+        ]
+        return jsonify({"companies": companies})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 
