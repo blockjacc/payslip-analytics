@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response
 from flask_cors import CORS
 from flask_mysqldb import MySQL
 from dotenv import load_dotenv
@@ -1817,6 +1817,77 @@ def get_companies():
         return jsonify({"companies": companies})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+# --- Deep Dive Endpoints ---
+@app.route('/api/deepdive/payroll-cronjob/<int:company_id>/<int:emp_id>/<string:date>', methods=['GET'])
+def deepdive_payroll_cronjob(company_id, emp_id, date):
+    """
+    Return all payroll_cronjob rows for the given company, emp_id, and date (date between period_from and period_to).
+    """
+    try:
+        cursor = mysql.connection.cursor()
+        query = '''
+            SELECT * FROM payroll_cronjob
+            WHERE company_id = %s AND emp_id = %s
+              AND %s BETWEEN period_from AND period_to
+        '''
+        cursor.execute(query, (company_id, emp_id, date))
+        rows = cursor.fetchall()
+        colnames = [desc[0] for desc in cursor.description]
+        data = [dict(zip(colnames, row)) for row in rows]
+        cursor.close()
+        if not data:
+            return jsonify({"data": [], "message": "No data found"})
+        return jsonify({"data": data})
+    except Exception as e:
+        return make_response(jsonify({"error": str(e)}), 500)
+
+@app.route('/api/deepdive/timekeeping/<int:company_id>/<int:emp_id>/<string:date>', methods=['GET'])
+def deepdive_timekeeping(company_id, emp_id, date):
+    """
+    Return all employee_time_in rows for the given company, emp_id, and date.
+    """
+    try:
+        cursor = mysql.connection.cursor()
+        query = '''
+            SELECT * FROM employee_time_in
+            WHERE comp_id = %s AND emp_id = %s AND date = %s
+        '''
+        cursor.execute(query, (company_id, emp_id, date))
+        rows = cursor.fetchall()
+        colnames = [desc[0] for desc in cursor.description]
+        data = [dict(zip(colnames, row)) for row in rows]
+        cursor.close()
+        if not data:
+            return jsonify({"data": [], "message": "No data found"})
+        return jsonify({"data": data})
+    except Exception as e:
+        return make_response(jsonify({"error": str(e)}), 500)
+
+@app.route('/api/deepdive/shifts/<int:company_id>/<int:emp_id>/<string:date>', methods=['GET'])
+def deepdive_shifts(company_id, emp_id, date):
+    """
+    Return all shift assignments for the given company, emp_id, and date (date between valid_from and until).
+    """
+    try:
+        cursor = mysql.connection.cursor()
+        query = '''
+            SELECT ess.*, ws.name AS shift_name, ws.work_type_name, ws.status AS shift_status
+            FROM employee_shifts_schedule ess
+            JOIN work_schedule ws ON ess.work_schedule_id = ws.work_schedule_id
+            WHERE ess.company_id = %s AND ess.emp_id = %s
+              AND %s BETWEEN ess.valid_from AND ess.until
+        '''
+        cursor.execute(query, (company_id, emp_id, date))
+        rows = cursor.fetchall()
+        colnames = [desc[0] for desc in cursor.description]
+        data = [dict(zip(colnames, row)) for row in rows]
+        cursor.close()
+        if not data:
+            return jsonify({"data": [], "message": "No data found"})
+        return jsonify({"data": data})
+    except Exception as e:
+        return make_response(jsonify({"error": str(e)}), 500)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 

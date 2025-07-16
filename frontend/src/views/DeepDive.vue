@@ -94,7 +94,7 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import BaseLayout from '../components/layouts/BaseLayout.vue';
 import EmployeeSearch from '../components/EmployeeSearch.vue';
 import DatePicker from 'vue-datepicker-next';
@@ -102,6 +102,7 @@ import 'vue-datepicker-next/index.css';
 
 const tab = ref('pay');
 const route = useRoute();
+const router = useRouter();
 const companyId = route.params.company_id;
 const empId = route.params.emp_id;
 const date = route.params.date;

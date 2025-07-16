@@ -149,6 +149,11 @@ const routes = [
     path: '/employee-schedule-changes/:companyId/:empId',
     name: 'EmployeeScheduleChanges',
     component: EmployeeScheduleChanges
+  },
+  {
+    path: '/deepdive/:company_id/:emp_id/:date',
+    name: 'DeepDive',
+    component: () => import('../views/DeepDive.vue')
   }
 ]
 

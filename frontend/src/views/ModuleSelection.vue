@@ -78,17 +78,12 @@
         <!-- Deep Dive Module -->
         <div class="relative">
           <button 
-            class="w-full p-8 text-lg bg-white/5 text-white border border-white/20 transition-all duration-300 hover:bg-white/10 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            disabled
-            @mouseenter="showTooltip = 'deepdive'"
-            @mouseleave="showTooltip = null"
+            class="w-full p-8 text-lg bg-white/5 text-white border border-white/20 transition-all duration-300 hover:bg-white/10 hover:-translate-y-1 rounded-xl"
+            @click="selectModule('deepdive')"
           >
             <div class="text-3xl mb-3">🔍</div>
             <div class="font-semibold">deep dive</div>
           </button>
-          <div v-if="showTooltip === 'deepdive'" class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1 bg-black/80 text-white text-sm rounded whitespace-nowrap z-10">
-            coming soon
-          </div>
         </div>
       </div>
 
@@ -131,6 +126,9 @@ export default {
         this.$router.push(`/field-selection/${this.companyId}`);
       } else if (module === 'shifts') {
         this.$router.push(`/shifts-selection/${this.companyId}`);
+      } else if (module === 'deepdive') {
+        // For now, use placeholder emp_id and date for testing
+        this.$router.push(`/deepdive/${this.companyId}/55554/2025-05-01`);
       }
       // Other modules will be handled when they're implemented
     },
