@@ -8,7 +8,7 @@
     <div v-if="!loading && !error && drilldownData" class="flex justify-center">
       <div class="bg-white/10 rounded-xl p-8 w-full max-w-6xl">
         <div class="text-center mb-8">
-          <h3 class="text-primary mb-2 text-2xl">company id: {{ companyId }}</h3>
+          <h3 class="text-primary mb-2 text-2xl">company: {{ companyName || companyId }}</h3>
           <h3 class="text-primary mb-2 text-xl">schedule type: {{ scheduleType }}</h3>
           <h3 class="text-primary mb-2 text-xl">shift: {{ drilldownData.shift_name }}</h3>
           <h4 class="text-secondary text-lg">employee count: {{ drilldownData.employee_count }}</h4>
@@ -78,25 +78,23 @@ export default {
     return {
       loading: true,
       error: '',
+      companyId: '',
+      companyName: '',
+      scheduleType: '',
+      shiftId: '',
       drilldownData: null,
       allShiftIds: [],
       currentShiftId: null,
       shiftsMeta: []
     }
   },
+  created() {
+    this.companyId = this.$route.params.companyId;
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
+    this.scheduleType = this.$route.params.scheduleType;
+    this.shiftId = this.$route.params.shiftId;
+  },
   computed: {
-    companyId() {
-      return this.$route.params.companyId;
-    },
-    scheduleType() {
-      return this.$route.params.scheduleType;
-    },
-    shiftIds() {
-      return this.$route.params.shiftIds;
-    },
-    shiftId() {
-      return this.$route.params.shiftId;
-    },
     sortedEmployees() {
       if (!this.drilldownData || !this.drilldownData.employees) return [];
       return [...this.drilldownData.employees].sort((a, b) => {

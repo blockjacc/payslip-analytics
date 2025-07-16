@@ -14,7 +14,7 @@
         
         <!-- Filter Summary -->
         <div class="mb-8 text-center">
-          <h3 class="text-primary mb-2 text-2xl">company id: {{ companyId }}</h3>
+          <h3 class="text-primary mb-2 text-2xl">company: {{ companyName || companyId }}</h3>
           <div class="text-primary text-lg mb-4">
             <p><span class="font-bold">start time:</span> {{ formatStartTime(startTime) }}</p>
             <p><span class="font-bold">total shifts found:</span> {{ shiftsData.total_shifts }}</p>
@@ -102,6 +102,7 @@ export default {
   data() {
     return {
       companyId: '',
+      companyName: '',
       startTime: '',
       shiftsData: null,
       loading: false,
@@ -127,6 +128,7 @@ export default {
   },
   async created() {
     this.companyId = this.$route.params.companyId;
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     this.startTime = this.$route.params.startTime;
     
     if (!this.companyId || !this.startTime) {

@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center justify-center min-h-[80vh] p-8">
     <h1 class="font-serif text-white mb-8 text-4xl text-center">schedule type analysis</h1>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-4xl text-center mx-auto">
-      <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>
+      <h3 class="text-primary mb-6 text-2xl">company: {{ companyName || companyId }}</h3>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
         <!-- Type Distribution Option -->
         <button 
@@ -40,11 +40,17 @@ export default {
   name: 'ShiftsScheduleTypeSelection',
   data() {
     return {
-      companyId: ''
+      companyId: '',
+      companyName: '',
+      currentStep: 1,
+      selectedScheduleType: '',
+      scheduleTypes: [],
+      error: null
     }
   },
   created() {
     this.companyId = this.$route.params.companyId;
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     if (!this.companyId) {
       this.$router.push('/');
       return;

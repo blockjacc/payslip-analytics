@@ -4,7 +4,7 @@
     <div class="flex justify-center">
       <div class="bg-white/10 rounded-xl p-8 w-full max-w-6xl">
         <div class="text-center mb-8">
-          <h3 class="text-primary mb-2 text-2xl">company id: {{ companyId }}</h3>
+          <h3 class="text-primary mb-2 text-2xl">company: {{ companyName || companyId }}</h3>
         </div>
         <div class="flex justify-end mb-4">
           <button
@@ -40,9 +40,14 @@ export default {
   data() {
     return {
       companyId: '',
+      companyName: '',
+      scheduleType: '',
+      chartData: null,
+      chartOptions: null,
       loading: false,
-      error: null,
-      scheduleTypes: []
+      error: '',
+      periods: [],
+      analyticsPrefetchData: null
     }
   },
   computed: {
@@ -95,6 +100,7 @@ export default {
   },
   created() {
     this.companyId = this.$route.params.companyId;
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     if (!this.companyId) {
       this.$router.push('/');
       return;

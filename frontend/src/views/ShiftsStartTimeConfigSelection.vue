@@ -2,7 +2,7 @@
   <div class="min-h-screen p-8">
     <h1 class="font-serif text-white mb-8 text-4xl text-center">select shift characteristics</h1>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-4xl text-center mx-auto">
-      <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>
+      <h3 class="text-primary mb-6 text-2xl">company: {{ companyName || companyId }}</h3>
       <h4 class="text-primary mb-6 text-lg">shifts starting at: {{ startTime }}</h4>
       
       <!-- Step 1: Category Selection -->
@@ -106,6 +106,7 @@ export default {
   data() {
     return {
       companyId: '',
+      companyName: '',
       startTime: '',
       currentStep: 1,
       selectedCategory: null,
@@ -131,14 +132,14 @@ export default {
   created() {
     // Get company ID from route params
     this.companyId = this.$route.params.companyId;
-    
+    // Retrieve company name from sessionStorage
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     // Validate company ID exists
     if (!this.companyId) {
       this.error = 'Invalid company ID';
       this.$router.push('/');
       return;
     }
-    
     // Get selected start time from sessionStorage
     this.startTime = sessionStorage.getItem('selectedStartTime');
     if (!this.startTime) {

@@ -1,4 +1,4 @@
-l<template>
+<template>
   <div class="flex flex-col items-center justify-center min-h-[80vh] p-8">
     <h1 class="font-serif text-white mb-8 text-4xl text-center">select employee(s)</h1>
     <div v-if="selectedCategory && selectedFields.length > 0" class="mb-6 bg-primary/8 rounded-lg p-2 px-4 text-primary text-lg flex flex-wrap items-center gap-2 max-w-2xl text-left">
@@ -7,7 +7,7 @@ l<template>
       <span class="text-primary">{{ selectedFieldLabels.join(', ') }}</span>
     </div>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-lg text-center">
-      <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>
+      <h3 class="text-primary mb-6 text-2xl">company: {{ companyName || companyId }}</h3>
       
       <!-- Employee Search Section -->
       <div v-if="selectType === 'specific'" class="mb-6">
@@ -168,6 +168,7 @@ export default {
   data() {
     return {
       companyId: '',
+      companyName: '',
       selectType: '',
       selectedEmployee: null,
       payrollGroups: [],
@@ -186,16 +187,15 @@ export default {
   created() {
     // Get company ID from route params and store it
     this.companyId = this.$route.params.companyId;
-    
+    // Retrieve company name from sessionStorage
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     // Validate company ID exists
     if (!this.companyId) {
       this.error = 'Invalid company ID';
       this.$router.push('/');
     }
-    
     // Load selected fields and category from sessionStorage
     this.loadSelectedSummary();
-    
     // Load payroll groups
     this.loadPayrollGroups();
   },

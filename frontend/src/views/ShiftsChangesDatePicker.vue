@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center justify-center min-h-[80vh] p-8">
     <h1 class="font-serif text-white mb-8 text-4xl text-center">shift changes period</h1>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-4xl text-center mx-auto">
-      <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>
+      <h3 class="text-primary mb-6 text-2xl">company: {{ companyName || companyId }}</h3>
       
       <!-- Info Text -->
       <div class="bg-blue-500/20 border border-blue-500/30 rounded-lg p-4 mb-6 text-sm text-blue-100">
@@ -84,6 +84,7 @@ export default {
   data() {
     return {
       companyId: '',
+      companyName: '',
       fromDate: '',
       toDate: '',
       validationMessage: null,
@@ -93,6 +94,7 @@ export default {
   },
   created() {
     this.companyId = this.$route.params.companyId;
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     if (!this.companyId) {
       this.$router.push('/');
       return;

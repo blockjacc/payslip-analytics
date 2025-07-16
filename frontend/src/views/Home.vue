@@ -39,6 +39,11 @@ export default {
     onCompanySelected(company) {
       this.selectedCompany = company;
       this.error = '';
+      // Persist company_id and company_name for downstream pages
+      if (company && company.company_id && company.company_name) {
+        sessionStorage.setItem('selectedCompanyId', company.company_id);
+        sessionStorage.setItem('selectedCompanyName', company.company_name);
+      }
     },
     async validateCompany() {
       if (!this.selectedCompany) return;

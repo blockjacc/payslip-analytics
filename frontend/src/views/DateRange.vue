@@ -3,7 +3,7 @@
     <h1 class="font-serif text-white mb-8 text-4xl text-center">select date range</h1>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-lg text-center">
       <div class="mb-8 pb-6 border-b border-white/10">
-        <h3 class="text-primary mb-3 text-xl">company id: {{ companyId }}</h3>
+        <h3 class="text-primary mb-3 text-xl">company: {{ companyName || companyId }}</h3>
         <h3 class="text-primary text-xl">employee id: {{ employeeId === 'all' ? 'all employees' : employeeId }}</h3>
         <h3 v-if="payrollGroupId" class="text-primary text-xl">payroll group: {{ payrollGroupId }}</h3>
         <h3 v-if="filterDisplay" class="text-primary text-xl">{{ filterDisplay }}</h3>
@@ -68,6 +68,7 @@ export default {
   data() {
     return {
       companyId: '',
+      companyName: '',
       employeeId: '',
       payrollGroupId: '',
       selectedFromDate: '',
@@ -90,6 +91,7 @@ export default {
   },
   created() {
     this.companyId = this.$route.params.companyId;
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     this.employeeId = this.$route.params.employeeId;
     
     // Get payroll group ID from query parameters or sessionStorage

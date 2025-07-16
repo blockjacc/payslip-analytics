@@ -2,7 +2,7 @@
   <div class="p-8">
     <h1 class="font-serif text-white mb-8 text-4xl text-center">select fields to analyze</h1>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-4xl text-center mx-auto">
-      <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>
+      <h3 class="text-primary mb-6 text-2xl">company: {{ companyName || companyId }}</h3>
       
       <!-- Step 1: Category Selection -->
       <div v-if="currentStep === 1" class="category-selection">
@@ -109,6 +109,7 @@ export default {
   data() {
     return {
       companyId: '',
+      companyName: '',
       currentStep: 1,
       selectedCategory: null,
       selectedFields: [],
@@ -122,14 +123,14 @@ export default {
   created() {
     // Get company ID from route params
     this.companyId = this.$route.params.companyId;
-    
+    // Retrieve company name from sessionStorage
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     // Validate company ID exists
     if (!this.companyId) {
       this.error = 'Invalid company ID';
       this.$router.push('/');
       return;
     }
-    
     // Load field definitions
     this.loadFieldDefinitions();
   },

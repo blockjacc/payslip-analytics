@@ -7,7 +7,7 @@
       <span class="text-primary">({{ selectedEmployee.emp_id }})</span>
     </div>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-lg text-center">
-      <h3 class="text-primary mb-6 text-2xl">company id: {{ companyId }}</h3>
+      <h3 class="text-primary mb-6 text-2xl">company: {{ companyName || companyId }}</h3>
       
       <!-- Employee Name Search Section -->
       <div v-if="!selectedEmployee">
@@ -143,6 +143,7 @@ export default {
   data() {
     return {
       companyId: '',
+      companyName: '',
       selectedEmployee: null,
       viewType: '', // 'daily' or 'changes'
       dateFrom: '',
@@ -176,7 +177,8 @@ export default {
   created() {
     // Get company ID from route params
     this.companyId = this.$route.params.companyId;
-    
+    // Retrieve company name from sessionStorage
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     // Validate company ID exists
     if (!this.companyId) {
       this.error = 'Invalid company ID';

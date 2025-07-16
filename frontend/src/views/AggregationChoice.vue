@@ -3,7 +3,7 @@
     <h1 class="font-serif text-white mb-8 text-4xl text-center">multiple pay periods detected</h1>
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-2xl text-center">
       <div class="mb-8 pb-6 border-b border-white/10">
-        <h3 class="text-primary mb-3 text-xl">company id: {{ companyId }}</h3>
+        <h3 class="text-primary mb-3 text-xl">company: {{ companyName || companyId }}</h3>
         <h3 class="text-primary mb-3 text-xl">employee id: {{ employeeId === 'all' ? 'all employees' : employeeId }}</h3>
         <h3 v-if="payrollGroupId" class="text-primary mb-3 text-xl">payroll group: {{ payrollGroupId }}</h3>
         <h3 v-if="filterDisplay" class="text-primary mb-3 text-xl">{{ filterDisplay }}</h3>
@@ -41,6 +41,7 @@ export default {
   data() {
     return {
       locationName: '',
+      companyName: ''
     }
   },
   computed: {
@@ -154,6 +155,7 @@ export default {
     }
   },
   created() {
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     if (this.$route.query.location_id) {
       this.fetchLocationName();
     }

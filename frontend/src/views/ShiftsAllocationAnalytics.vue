@@ -4,7 +4,7 @@
     <div class="flex justify-center">
       <div class="bg-white/10 rounded-xl p-8 w-full max-w-6xl">
         <div class="text-center mb-8">
-          <h3 class="text-primary mb-2 text-2xl">company id: {{ companyId }}</h3>
+          <h3 class="text-primary mb-2 text-2xl">company: {{ companyName || companyId }}</h3>
           <h3 class="text-primary mb-2 text-xl">schedule type: {{ scheduleType }}</h3>
           <h4 class="text-secondary text-lg">selected shifts: {{ selectedShiftNames.join(', ') }}</h4>
         </div>
@@ -57,6 +57,7 @@ export default defineComponent({
   data() {
     return {
       companyId: '',
+      companyName: '',
       scheduleType: '',
       shiftIds: '',
       loading: true,
@@ -65,6 +66,7 @@ export default defineComponent({
   },
   async created() {
     this.companyId = this.$route.params.companyId;
+    this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     this.scheduleType = this.$route.params.scheduleType;
     this.shiftIds = this.$route.params.shiftIds;
     await this.fetchShiftData();
@@ -169,11 +171,4 @@ export default defineComponent({
     goToDrilldownPicker() {
       if (!this.schedules.length) return;
       const shiftIds = this.schedules.map(s => s.work_schedule_id).join(',');
-      this.$router.push(`/shifts-allocation-drilldown/${this.companyId}/${this.scheduleType}/${shiftIds}`);
-    },
-    goToDrilldown(shiftId) {
-      this.$router.push(`/shifts-allocation-drilldown/${this.companyId}/${this.scheduleType}/${shiftId}`);
-    }
-  }
-});
-</script> 
+      this.$router.push(`

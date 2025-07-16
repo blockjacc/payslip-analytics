@@ -8,7 +8,7 @@
     <div v-if="!loading && !error && shifts.length" class="flex justify-center">
       <div class="bg-white/10 rounded-xl p-8 w-full max-w-3xl">
         <div class="mb-8 text-center">
-          <h3 class="text-primary mb-2 text-2xl">company id: {{ companyId }}</h3>
+          <h3 class="text-primary mb-2 text-2xl">company: {{ companyName || companyId }}</h3>
           <h3 class="text-primary mb-2 text-xl">schedule type: {{ scheduleType }}</h3>
           <h4 class="text-secondary text-lg">selected shifts: {{ shifts.length }}</h4>
         </div>
