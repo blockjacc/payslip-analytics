@@ -179,3 +179,19 @@ scales: {
 ---
 
 **This principle applies to all analytics and drilldown features in this app. Any new visualization or export should be implemented using in-memory compute, not new backend endpoints.**
+
+## UI / UX Guidelines
+
+- **Date Picker:**
+  - The project uses [`vue-datepicker-next`](https://github.com/mengxiong10/vue-datepicker-next) as the standard date picker component.
+  - All date selection in the app should use this component for consistency, accessibility, and cross-browser reliability.
+  - Usage example:
+    ```vue
+    <DatePicker v-model:value="selectedDate" type="date" format="YYYY-MM-DD" value-type="format" :editable="false" />
+    ```
+  - Import in your component:
+    ```js
+    import DatePicker from 'vue-datepicker-next';
+    import 'vue-datepicker-next/index.css';
+    ```
+  - See `DeepDive.vue` for a reference implementation.
