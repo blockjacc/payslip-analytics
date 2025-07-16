@@ -1,0 +1,23 @@
+table name	company			
+company_id	int(11)	n	Unique identifier for each company	company_id
+company_name	varchar(80)	n	Registered legal name of the company	company_name
+trade_name	varchar(100)	n	Trading name or brand name of the company	
+business_address	varchar(180)	n	Company full business address	
+city	varchar(80)	n	City where the company is located	
+zipcode	varchar(80)	n	Zip or postal code	
+organization_type	varchar(80)	n	Type of organization (e.g. Corporation, Partnership)	
+industry	varchar(80)	n	Industry sector the company belongs to	
+business_phone	varchar(80)	n	Business landline number	
+mobile_number	varchar(80)	n	Mobile phone number	
+fax	varchar(80)	n	Fax number	
+company_logo	varchar(150)	n	Path or URL to the company main logo	
+company_logo_thumb	varchar(150)	n	Thumbnail version of the company logo	
+company_email_logo	varchar(150)	n	Logo used in emails sent by the company	
+company_banner	varchar(150)	n	Header/banner image for the company	
+banner_white_bg	enum('no','yes')	n	Flag for whether the banner uses a white background	
+region	varchar(10)	n	Region or province	
+sub_domain	varchar(150)	n	unique url on subdomain name	
+login_key	varchar(10)	n	Optional login key for quick access or verification	
+created_date	datetime	n	Date when the company record was created	
+updated_date	datetime	n	Date when the record was last updated	
+status	enum('Active','Inactive')	n	Indicates if the company is currently active	

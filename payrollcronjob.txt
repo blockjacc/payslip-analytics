@@ -1,0 +1,166 @@
+table name	payroll_cronjob			
+payroll_cronjob_id	INT(11)	n	Primary key, auto-incremented ID of the cronjob entry.	company_id
+company_id	INT(11)	n	ID of the company.	emp_id
+emp_id	INT(11)	n	Foreign key to the employee.	
+payroll_period	DATE	n	Date representing the payroll period.	
+period_from	DATE	n	Start date of the payroll period.	
+period_to	DATE	n	End date of the payroll period.	
+datetimestamp	DATETIME	n	Timestamp when the record was created.	
+flag_run_parent	ENUM('0', '1')	n	Indicates if there are updates in any of the related child flag fields.	
+flag_night_differential	ENUM('0', '1')	n	Indicates night differential if there is a recent update in the employee's log related to night shift differential	
+flag_rest_day	ENUM('0', '1')	n	Indicates rest day if there is a recent update in the employee's log related to rest day premium	
+flag_holiday_premium	ENUM('0', '1')	n	Indicates holiday if there is a recent update in the employee's log related to holiday premium	
+flag_overtime	ENUM('0', '1')	n	Indicates overtime if there is a recent update in the employee's log related to overtime premium	
+flag_paid_leave	ENUM('0', '1')	n	Indicates paid leave is included.	
+flag_absences	ENUM('0', '1')	n	Indicates absences if there is a recent update in the employee's log	
+flag_tardiness	ENUM('0', '1')	n	Indicates tardiness if there is a recent update in the employee's log	
+flag_undertime	ENUM('0', '1')	n	Indicates undertime if there is a recent update in the employee's log	
+flag_hoursworked	ENUM('0', '1')	n	Indicates hours worked if there is a recent update in the employee's log	
+flag_allowances	ENUM('0', '1')	n	Indicates allowances if there is a recent update in the employee's earnings records.	
+flag_commissions	ENUM('0', '1')	n	Indicates commissions if there is a recent update in the employee's earnings records.	
+flag_de_minimis	ENUM('0', '1')	n	Indicates de minimis if there is a recent update in the employee's earnings records.	
+flag_other_earnings	ENUM('0', '1')	n	Indicates other earnings if there is a recent update in the employee's earnings records.	
+flag_third_party_loans	ENUM('0', '1')	n	Indicates third party loans if there is a recent update in the employee's deductions records.	
+flag_government_loans	ENUM('0', '1')	n	Indicates government loans if there is a recent update in the employee's deductions records.	
+flag_other_deductions	ENUM('0', '1')	n	Indicates other deductions if there is a recent update in the employee's deductions records.	
+flag_retroactive_pay	ENUM('0', '1')	n	Indicates retroactive pay if there is a recent update in the employee's basic pay records.	
+night_differential_details	TEXT	n	Details of night differential	"night_differential_details Array Structure
+
+[0]	(unused or index)	Optional entry index
+[1]	2.50	Number of night differential (NSD) hours
+[2]	375.00	NSD compensation amount (formatted to 2 decimal places)
+[3]	2025-07-01	Raw date string (used for date filtering and display)"
+rest_day_details	TEXT	n	Details of rest day pay.	"rest_day_details Array Structure
+
+[0]	(unused or index)	Optional entry index
+[1]	5	Number of rest day hours worked
+[2]	750.00	Compensation amount for rest day work (2 decimals)
+[3]	2025-07-01	Raw date string (used for filtering and display)"
+holiday_premium_details	TEXT	n	Details of holiday premium.	"holiday_premium_details Array Structure
+
+[0]	(unused or index)	Optional entry index
+[1]	8	Number of hours worked during a holiday
+[2]	1200.00	Holiday pay compensation (formatted to 2 decimal places)
+[3]	2025-07-01	Raw date string (used for date matching and display)"
+overtime_details	TEXT	n	Details of overtime.	"overtime_details Array Structure
+
+[0]	(unused or index)	Optional entry index
+[1]	3	Number of overtime hours
+[2]	450.00	Overtime pay amount (formatted to 2 decimal places)
+[3]	2025/07/01	Raw date string (slash-separated; normalized to hyphen)"
+paid_leave_details	TEXT	n	Details of paid leave.	"paid_leave_details Array Structure
+
+[0]	(unused or index)	Optional entry index
+[1]	8	Number of paid leave hours
+[2]	1000.00	Paid leave amount (formatted to 2 decimals)
+[3]	2025-07-01	Raw date string (used for date comparison & display)"
+absences_details	TEXT	n	Details of absences.	"absences_details Array Structure
+
+[0]	(unused or index)	Optional entry index
+[1]	2025-07-01	Raw date string (to be parsed)
+[2]	4	Number of absent hours
+[3]	500.00	Deduction amount (formatted to 2 decimals)"
+tardiness_details	TEXT	n	Details of tardiness.	"tardiness_details Array Structure
+
+[0]	(unused or index)	Optional entry index
+[1]	2025-07-01	Raw date string (to be parsed)
+[2]	1.5	Number of tardiness hours
+[3]	150.00	Deduction amount due to tardiness (2 decimals)"
+undertime_details	TEXT	n	Details of undertime.	"undertime_details Array Structure
+
+[0]	(unused or index)	Optional entry index
+[1]	2025-07-01	Raw date string (to be parsed)
+[2]	2	Number of undertime hours
+[3]	200.00	Deduction amount due to undertime (2 decimals)"
+hoursworked_details	TEXT	n	Details of hours worked.	"hoursworked_details Array Structure
+
+[0]	(unused or index counter)	Optional entry index
+[1]	Raw date string	Parsed into formatted date
+[2]	Hours worked (e.g., 8)	Number of hours worked"
+allowances_details	TEXT	n	Details of allowances.	"allowances_details Array Structure
+
+description	Phone Allowance	Description or name of the allowance
+amount	5000	Total allowance amount
+emp_id	1	Employee ID
+company_id	1	Company ID
+payroll_period	2023-01-05	Payroll period date
+period_from	2022-12-16	Start date of the payroll period
+period_to	2022-12-31	End date of the payroll period"
+commissions_details	TEXT	n	Details of commissions.	"commission_details Array Structure
+
+commission_settings_id	120	Reference ID from commission settings
+amount	22.00	Commission amount
+emp_id	1963	Employee ID
+company_id	28	Company ID
+payroll_period	2023-01-15	Payroll period in which the commission was applied
+period_from	2022-12-26	Start date of the commission earning period
+period_to	2023-01-10	End date of the commission earning period"
+de_minimis_details	TEXT	n	Details of de minimis benefits.	"payroll_de_minimis_array Inner Structure
+
+description	Medical Cash Allowance	Description of the de minimis item
+amount	125.00	Amount of the benefit
+excess	0.00	Excess over the non-taxable limit
+emp_id	1	Employee ID
+company_id	1	Company ID
+payroll_period	2023-01-05	Payroll period for which this benefit is applied
+period_from	2022-12-16	Period start
+period_to	2022-12-31	Period end"
+other_earnings_details	TEXT	n	Details of other earnings.	"other_earnings_details Array Structure
+
+emp_id	43828	Employee ID
+payroll_period	2023-01-05	Payroll period date
+period_from	2022-12-16	Start date of the payroll period
+period_to	2022-12-31	End date of the payroll period
+company_id	325	Company ID
+employee_earning_id	96026	Unique ID for the employee earning record"
+third_party_loan_details	TEXT	n	Details of third-party loans.	"third_party_loan_details Array Structure
+
+emp_id	34605	Employee ID
+company_id	325	Company ID
+payroll_date	2023-01-05	Payroll date when the loan installment was deducted
+period_from	2022-12-16	Start of the payroll period
+period_to	2022-12-31	End of the payroll period
+installment	2083.33	Loan installment amount deducted
+loan_type_id	86	ID representing the type of loan"
+government_loan_details	TEXT	n	Details of government loans.	"payroll_run_government_loans_array Inner Structure
+
+emp_id	34605	Employee ID
+payroll_period	2023-01-05	Payroll period the loan is associated with
+period_from	2022-12-16	Start of the payroll period
+period_to	2022-12-31	End of the payroll period
+company_id	325	Company ID
+loan_deduction_id	9627	Unique ID for the specific loan deduction
+amount	922.90	Deduction amount for this particular government loan"
+other_deduction_details	TEXT	n	Details of other deductions.	"other_deduction_details Array Structure
+
+deduction_name	May 2022 Philhealth Differential	Name/description of the deduction
+amount	112.50	Deduction amount
+emp_id	34605	Employee ID
+company_id	325	Company ID
+payroll_period	2023-01-05	Payroll period when the deduction was applied
+period_from	2022-12-16	Start date of the payroll period
+period_to	2022-12-31	End date of the payroll period"
+retroactive_pay_details	TEXT	n	Details of retroactive pay.	"retroactive_pay_details Array Structure
+
+emp_id	43771	Employee ID
+company_id	325	Company ID
+period_from	2022-12-01	Start of the affected payroll period
+period_to	2022-12-15	End of the affected payroll period
+pay_period	2022-12-20	The date when the retroactive amount is to be paid
+retro_hours	96.00	Number of hours involved in the retroactive computation
+retro_pay	5137.95	Total retroactive pay adjustment"
+nonattendance_details	TEXT	n	Details of non-attendance.	"nonattendance_details Array Structure
+
+[0]	Regular Work Day	Work type or category
+[1]	March 12, 2023	Date of the non-attended work day
+[2]	7.83	Expected working hours
+[3]	404	Amount"
+status	ENUM('Active', 'Inactive')	n	Current status of the cronjob.	
+ingestionDetails	MEDIUMTEXT	n	Raw ingestion data.	
+ingestionDetailsOptimized	MEDIUMTEXT	n	Optimized ingestion data.	"ingestionDetailsOptimized Array Structure
+
+emp_id	1	Employee ID
+company_id	1	Company ID
+source	paycheck	Indicates the data source (e.g., paycheck)
+amount	1500.00	Amount involved in the ingestion record"
+action_time_audit_trail	TIMESTAMP	n	Last modified timestamp.	

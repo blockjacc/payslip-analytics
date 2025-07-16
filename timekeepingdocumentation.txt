@@ -1,0 +1,65 @@
+employee_time_in table																										
+table name	employee_time_in																									
+Field Name	Data Type	flagging	Description	Link identifier																						
+employee_time_in_id	INT(55) AUTO_INCREMENT	n	"Primary key, unique time-in entry"	employee_time_in																						
+work_schedule_id	INT(11)	n	Reference to work schedule	work_schedule_id																						
+emp_id	INT(55)	n	Employee ID	emp_id																						
+comp_id	INT(55)	n	Company ID	comp_id																						
+date	DATE	n	Date of attendance																							
+time_in	DATETIME	n	Employee time in																							
+lunch_out	DATETIME	n	Lunch break start																							
+lunch_in	DATETIME	n	Lunch break end																							
+break1_out	DATETIME	n	1st Short Break time IN logs																							
+break1_in	DATETIME	n	1st Short Break time OUT logs																							
+break2_out	DATETIME	n	2st Short Break time IN logs																							
+break2_in	DATETIME	n	2st Short Break time OUT logs																							
+time_out	DATETIME	n	Employee time out																							
+total_hours	"DECIMAL(11,2)"	n	Required work hours	note: nabali ang kani 2 fields but gisunod nalang nko																						
+total_hours_required	"DECIMAL(10,2)"	n	Total hours rendered																							
+corrected	"ENUM('No','Yes')"	n	Indicates if the log was corrected manually																							
+reason	TEXT	n	Reason for correction																							
+time_in_status	"ENUM('pending','approved','reject')"	n	Approval status of time in																							
+overbreak_min	INT(4)	n	Minutes over break																							
+late_min	INT(4)	n	Minutes late																							
+tardiness_min	"DECIMAL(6,2)"	n	Total tardiness minutes																							
+undertime_min	"DECIMAL(11,2)"	n	Total undertime minutes																							
+absent_min	"DECIMAL(11,2)"	n	Total absent minutes																							
+notes	TEXT	n	Additional notes																							
+source	VARCHAR(250) DEFAULT 'kiosk'	n	"Source of the log (e.g., kiosk, system)"																							
+last_source	VARCHAR(22)	n	Last known source																							
+shift_name	VARCHAR(100)	n	Name of the shift																							
+status	"ENUM('Active','Inactive')"	n	Record status																							
+change_log_date_filed	DATETIME	n	Date when change was filed																							
+approval_time_in_id	INT(11)	n	Reference ID for approval application																							
+flag_regular_or_excess	"ENUM('regular','excess') DEFAULT 'regular'"	n	Regular vs excess flag																							
+flag_delete_on_hours	"ENUM('0','1') DEFAULT '0'"	n	Flag if hours should be deleted																							
+mobile_clockin_status	"ENUM('pending','approved','reject')"	n	Status of clock-in via mobile																							
+mobile_lunchout_status	"ENUM('pending','approved','reject')"	n	Status of lunch out via mobile																							
+mobile_lunchin_status	"ENUM('pending','approved','reject')"	n	Status of lunch in via mobile																							
+mobile_clockout_status	"ENUM('pending','approved','reject')"	n	Status of clock-out via mobile																							
+mobile_break1_out_status	"ENUM('pending','approved','reject')"	n	Status of break 1 out via mobile																							
+mobile_break1_in_status	"ENUM('pending','approved','reject')"	n	Status of break 1 in via mobile																							
+mobile_break2_out_status	"ENUM('pending','approved','reject')"	n	Status of break 2 out via mobile																							
+mobile_break2_in_status	"ENUM('pending','approved','reject')"	n	Status of break 2 in via mobile																							
+flag_payroll_correction	"ENUM('yes','no') DEFAULT 'no'"	n	Payroll correction flag																							
+ip_address	VARCHAR(255)	n	IP address of device																							
+rest_day_r_a	"ENUM('yes','no')"	n	Rest day with a shift 																							
+flag_rd_include	"ENUM('yes','no') DEFAULT 'yes'"	n	restday approval settings flag																							
+holiday_approve	"ENUM('yes','no') DEFAULT 'no'"	n	holiday approval settings flag																							
+flag_holiday_include	"ENUM('yes','no') DEFAULT 'yes'"	n	"if enable approval and gets approved flag yes, default yes"																							
+kiosk_location	VARCHAR(255)	n	Kiosk location info																							
+missing_lunch	"ENUM('0','1','2') DEFAULT '0'"	n	Lunch log status if missed punch																							
+approval_date	DATETIME	n	Approval datetime																							
+flag_open_shift	"ENUM('0','1') DEFAULT '0'"	n	Open shift flag																							
+os_approval_time_in_id	INT(11)	n	Open shift approval ID / OS application id																							
+action_time	TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP	n	Last system action timestamp																							
+current_date_nsd	"DECIMAL(11,2)"	n	NSD break deduction is computed if the break occurs within the same shift date.																							
+next_date_nsd	"DECIMAL(11,2)"	n	NSD break deduction is computed if the break occurs on the next date.																							
+for_resend_auto_rejected_id	INT(11)	n	Reference ID PPA application 																							
+current_date_holiday	VARCHAR(10)	n	Holiday break deduction is computed if the break occurs within the same shift date.																							
+next_date_holiday	VARCHAR(10)	n	Holiday break deduction is computed if the break occurs on the next date.																							
+source_rule	TEXT	n	determine source for every punches																							
+miss_required_break	"ENUM('0','1') DEFAULT '0'"	n	flag for missing break if break is required																							
+hours_application_id	INT(11)	n	Reference ID for approval application																							
+created_at	DATETIME	n	Record creation/																							
+updated_at	DATETIME	n	update timestamps								

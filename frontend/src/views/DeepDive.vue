@@ -140,10 +140,16 @@ const shiftName = computed(() => {
 });
 
 function filteredFields(obj) {
-  // Only show fields with non-null, non-empty, non-'N/A' values
+  // Exclude technical fields from display (handle inconsistent naming)
+  const exclude = ['emp_id', 'company_id', 'comp_id'];
   return Object.fromEntries(
     Object.entries(obj).filter(
-      ([, value]) => value !== null && value !== '' && value !== 'N/A' && value !== undefined
+      ([key, value]) =>
+        value !== null &&
+        value !== '' &&
+        value !== 'N/A' &&
+        value !== undefined &&
+        !exclude.includes(key)
     )
   );
 }
