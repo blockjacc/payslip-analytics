@@ -171,4 +171,11 @@ export default defineComponent({
     goToDrilldownPicker() {
       if (!this.schedules.length) return;
       const shiftIds = this.schedules.map(s => s.work_schedule_id).join(',');
-      this.$router.push(`
+      this.$router.push(`/shifts-allocation-drilldown-picker/${this.companyId}/${this.scheduleType}/${shiftIds}`);
+    },
+    goToDrilldown(shiftId) {
+      this.$router.push(`/shifts-allocation-drilldown/${this.companyId}/${this.scheduleType}/${shiftId}`);
+    }
+  }
+});
+</script>
