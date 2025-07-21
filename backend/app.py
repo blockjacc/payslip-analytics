@@ -1822,20 +1822,63 @@ def get_companies():
 @app.route('/api/deepdive/payroll-cronjob/<int:company_id>/<int:emp_id>/<string:date>', methods=['GET'])
 def deepdive_payroll_cronjob(company_id, emp_id, date):
     """
-    Return all payroll_cronjob rows for the given company, emp_id, and date (date between period_from and period_to).
+    Return payroll data combining payroll_cronjob and payroll_payslip tables for the given company, emp_id, and date.
     """
     try:
         cursor = mysql.connection.cursor()
         query = '''
-            SELECT * FROM payroll_cronjob
-            WHERE company_id = %s AND emp_id = %s
-              AND %s BETWEEN period_from AND period_to
+            SELECT 
+                pc.hoursworked_details,
+                CAST(AES_DECRYPT(pp.basic_pay, %s) AS DECIMAL(10,2)) AS basic_pay,
+                CAST(AES_DECRYPT(pp.rate, %s) AS DECIMAL(10,2)) AS rate
+            FROM payroll_cronjob pc
+            LEFT JOIN payroll_payslip pp ON pc.emp_id = pp.emp_id 
+                AND pc.company_id = pp.company_id 
+                AND pc.period_from = pp.period_from 
+                AND pc.period_to = pp.period_to
+            WHERE pc.company_id = %s AND pc.emp_id = %s
+              AND %s BETWEEN pc.period_from AND pc.period_to
         '''
-        cursor.execute(query, (company_id, emp_id, date))
+        cursor.execute(query, (ENCRYPT_KEY, ENCRYPT_KEY, company_id, emp_id, date))
         rows = cursor.fetchall()
         colnames = [desc[0] for desc in cursor.description]
         data = [dict(zip(colnames, row)) for row in rows]
         cursor.close()
+        
+        # Process hoursworked_details to extract hours for the specific date
+        import json
+        from datetime import datetime
+        
+        for record in data:
+            if record['hoursworked_details']:
+                try:
+                    # Parse the JSON array
+                    hours_data = json.loads(record['hoursworked_details'])
+                    
+                    # Find the entry matching the selected date
+                    target_date = datetime.strptime(date, '%Y-%m-%d')
+                    formatted_target_date = target_date.strftime('%B %d, %Y')
+                    
+                    hours_worked = None
+                    for entry in hours_data:
+                        parts = entry.split('-')
+                        if len(parts) >= 3:
+                            entry_date = parts[1].strip()
+                            if entry_date == formatted_target_date:
+                                hours_worked = parts[2].strip()
+                                break
+                    
+                    if hours_worked:
+                        # Format as "DD-MMM-YY | X hrs"
+                        formatted_date = target_date.strftime('%d-%b-%y')
+                        record['hours_worked'] = f"{formatted_date} | {hours_worked} hrs"
+                    else:
+                        record['hours_worked'] = "No hours data for this date"
+                except (json.JSONDecodeError, ValueError) as e:
+                    record['hours_worked'] = "Error parsing hours data"
+            else:
+                record['hours_worked'] = "No hours data available"
+        
         if not data:
             return jsonify({"data": [], "message": "No data found"})
         return jsonify({"data": data})

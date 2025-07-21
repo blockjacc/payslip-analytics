@@ -37,7 +37,27 @@
           <button :class="{active: tab==='settings'}" @click="tab='settings'">Settings</button>
         </div>
         <div v-if="tab==='pay'" class="tab-content">
-          <div class="text-center text-gray-400 py-8">Pay details coming soon.</div>
+          <div v-if="payLoading">Loading pay data...</div>
+          <div v-else-if="payError">{{ payError }}</div>
+          <div v-else-if="payData && payData.length">
+            <div v-for="(record, idx) in payData" :key="idx" class="bg-slate-800/50 rounded-lg p-6 mb-6">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="space-y-1">
+                  <div class="text-xs uppercase tracking-wide text-white/50">basic pay</div>
+                  <div class="text-white font-medium">{{ formatFieldValue(record.basic_pay) }}</div>
+                </div>
+                <div class="space-y-1">
+                  <div class="text-xs uppercase tracking-wide text-white/50">hourly rate</div>
+                  <div class="text-white font-medium">{{ formatFieldValue(record.rate) }}</div>
+                </div>
+                <div class="space-y-1">
+                  <div class="text-xs uppercase tracking-wide text-white/50">hours worked</div>
+                  <div class="text-white font-medium">{{ formatFieldValue(record.hours_worked) }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div v-else>No pay data found.</div>
         </div>
         <div v-if="tab==='attendance'" class="tab-content">
           <div v-if="attendanceLoading">Loading attendance...</div>
@@ -111,6 +131,11 @@ const date = route.params.date;
 const attendanceData = ref([]);
 const attendanceLoading = ref(false);
 const attendanceError = ref('');
+
+// Pay
+const payData = ref([]);
+const payLoading = ref(false);
+const payError = ref('');
 
 // Settings
 const settingsData = ref(null);
@@ -191,6 +216,21 @@ async function fetchAttendance() {
   }
 }
 
+async function fetchPay() {
+  if (!selectedEmployee.value || !selectedDate.value) return;
+  payLoading.value = true;
+  payError.value = '';
+  try {
+    const res = await fetch(`/api/deepdive/payroll-cronjob/${companyId}/${selectedEmployee.value.emp_id}/${selectedDate.value}`);
+    const json = await res.json();
+    payData.value = json.data || [];
+  } catch (e) {
+    payError.value = 'Failed to load pay data.';
+  } finally {
+    payLoading.value = false;
+  }
+}
+
 async function fetchSettings() {
   if (!selectedEmployee.value || !selectedDate.value) return;
   settingsLoading.value = true;
@@ -231,6 +271,7 @@ function resetEmployee() {
 watch([selectedEmployee, selectedDate], ([emp, date]) => {
   if (emp && date) {
     fetchAttendance();
+    fetchPay(); // Added fetchPay to watch
     fetchSettings();
   }
 });

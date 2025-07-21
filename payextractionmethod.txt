@@ -1,0 +1,17 @@
+- Selected Shift Date: 2025-07-07
+ 
+- query to pull data
+	- 'SELECT *
+	    FROM payroll_cronjob
+	    WHERE emp_id = ?
+	      AND company_id = ?
+	      AND status = 'Active'
+	      AND DATE(period_from) <= Shift Date
+	      AND DATE(period_to) >= Shift Date
+	    LIMIT 1'
+ 
+- How to Extract Data from hoursworked_details field
+	- Selected Shift Date: 2025-07-07
+	- Load the hoursworked_details JSON using json.loads(getPaycheckDetails['hoursworked_details']).
+	- Loop through each entry, then split the string using .split('-') to extract parts.
+	- Use [1] as the raw date and [2] as hours worked, then if [1] matches the shift date, format the output as: 07-Jul-25 | 8 hrs.
