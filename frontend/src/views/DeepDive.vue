@@ -40,19 +40,61 @@
           <div v-if="payLoading">Loading pay data...</div>
           <div v-else-if="payError">{{ payError }}</div>
           <div v-else-if="payData && payData.length">
-            <div v-for="(record, idx) in payData" :key="idx" class="bg-slate-800/50 rounded-lg p-6 mb-6">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="space-y-1">
-                  <div class="text-xs uppercase tracking-wide text-white/50">basic pay</div>
-                  <div class="text-white font-medium">{{ formatFieldValue(record.basic_pay) }}</div>
+            <div v-for="(record, idx) in payData" :key="idx">
+              <!-- Main pay fields in horizontal grid -->
+              <div class="bg-slate-800/50 rounded-lg p-6 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="space-y-1">
+                    <div class="text-xs uppercase tracking-wide text-white/50">basic pay</div>
+                    <div class="text-white font-medium">{{ formatFieldValue(record.basic_pay) }}</div>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="text-xs uppercase tracking-wide text-white/50">hourly rate</div>
+                    <div class="text-white font-medium">{{ formatFieldValue(record.rate) }}</div>
+                  </div>
+                  <div class="space-y-1">
+                    <div class="text-xs uppercase tracking-wide text-white/50">hours worked</div>
+                    <div class="text-white font-medium">{{ formatFieldValue(record.hours_worked) }}</div>
+                  </div>
                 </div>
-                <div class="space-y-1">
-                  <div class="text-xs uppercase tracking-wide text-white/50">hourly rate</div>
-                  <div class="text-white font-medium">{{ formatFieldValue(record.rate) }}</div>
-                </div>
-                <div class="space-y-1">
-                  <div class="text-xs uppercase tracking-wide text-white/50">hours worked</div>
-                  <div class="text-white font-medium">{{ formatFieldValue(record.hours_worked) }}</div>
+              </div>
+              
+              <!-- Paycheck details in tabular format -->
+              <div class="bg-slate-800/50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-emerald-400 mb-4">paycheck details</h3>
+                <div class="space-y-3">
+                  <div class="flex justify-between items-center py-2 border-b border-white/10">
+                    <span class="text-white/70">absences</span>
+                    <span class="text-white font-medium">{{ formatFieldValue(record.absences) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-white/10">
+                    <span class="text-white/70">tardiness</span>
+                    <span class="text-white font-medium">{{ formatFieldValue(record.tardiness) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-white/10">
+                    <span class="text-white/70">undertime</span>
+                    <span class="text-white font-medium">{{ formatFieldValue(record.undertime) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-white/10">
+                    <span class="text-white/70">paid/unpaid leave</span>
+                    <span class="text-white font-medium">{{ formatFieldValue(record.paid_leave) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-white/10">
+                    <span class="text-white/70">overtime</span>
+                    <span class="text-white font-medium">{{ formatFieldValue(record.overtime) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-white/10">
+                    <span class="text-white/70">restday</span>
+                    <span class="text-white font-medium">{{ formatFieldValue(record.rest_day) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-white/10">
+                    <span class="text-white/70">holiday</span>
+                    <span class="text-white font-medium">{{ formatFieldValue(record.holiday_premium) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-white/10">
+                    <span class="text-white/70">night shift differential</span>
+                    <span class="text-white font-medium">{{ formatFieldValue(record.night_differential) }}</span>
+                  </div>
                 </div>
               </div>
             </div>
