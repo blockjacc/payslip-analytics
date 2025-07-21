@@ -1829,6 +1829,14 @@ def deepdive_payroll_cronjob(company_id, emp_id, date):
         query = '''
             SELECT 
                 pc.hoursworked_details,
+                pc.absences_details,
+                pc.tardiness_details,
+                pc.undertime_details,
+                pc.paid_leave_details,
+                pc.overtime_details,
+                pc.rest_day_details,
+                pc.holiday_premium_details,
+                pc.night_differential_details,
                 CAST(AES_DECRYPT(pp.basic_pay, %s) AS DECIMAL(10,2)) AS basic_pay,
                 CAST(AES_DECRYPT(pp.rate, %s) AS DECIMAL(10,2)) AS rate
             FROM payroll_cronjob pc
@@ -1845,20 +1853,19 @@ def deepdive_payroll_cronjob(company_id, emp_id, date):
         data = [dict(zip(colnames, row)) for row in rows]
         cursor.close()
         
-        # Process hoursworked_details to extract hours for the specific date
+        # Process detail fields to extract hours and amounts for the specific date
         import json
         from datetime import datetime
         
+        target_date = datetime.strptime(date, '%Y-%m-%d')
+        formatted_target_date = target_date.strftime('%B %d, %Y')
+        formatted_date = target_date.strftime('%d-%b-%y')
+        
         for record in data:
+            # Process hoursworked_details
             if record['hoursworked_details']:
                 try:
-                    # Parse the JSON array
                     hours_data = json.loads(record['hoursworked_details'])
-                    
-                    # Find the entry matching the selected date
-                    target_date = datetime.strptime(date, '%Y-%m-%d')
-                    formatted_target_date = target_date.strftime('%B %d, %Y')
-                    
                     hours_worked = None
                     for entry in hours_data:
                         parts = entry.split('-')
@@ -1869,8 +1876,6 @@ def deepdive_payroll_cronjob(company_id, emp_id, date):
                                 break
                     
                     if hours_worked:
-                        # Format as "DD-MMM-YY | X hrs"
-                        formatted_date = target_date.strftime('%d-%b-%y')
                         record['hours_worked'] = f"{formatted_date} | {hours_worked} hrs"
                     else:
                         record['hours_worked'] = "No hours data for this date"
@@ -1878,6 +1883,50 @@ def deepdive_payroll_cronjob(company_id, emp_id, date):
                     record['hours_worked'] = "Error parsing hours data"
             else:
                 record['hours_worked'] = "No hours data available"
+            
+            # Process other detail fields (with hours and amounts)
+            detail_fields = [
+                'absences_details', 'tardiness_details', 'undertime_details', 
+                'paid_leave_details', 'overtime_details', 'rest_day_details', 
+                'holiday_premium_details', 'night_differential_details'
+            ]
+            
+            for field in detail_fields:
+                processed_field = field.replace('_details', '')
+                if record[field]:
+                    try:
+                        field_data = json.loads(record[field])
+                        hours = None
+                        amount = None
+                        
+                        for entry in field_data:
+                            parts = entry.split('-')
+                            if len(parts) >= 4:
+                                # Check if date matches (position 3 for most fields)
+                                entry_date_part = parts[3].strip()
+                                # Convert date format from "2025/05/01" to "May 01, 2025"
+                                try:
+                                    if '/' in entry_date_part:
+                                        entry_date_obj = datetime.strptime(entry_date_part, '%Y/%m/%d')
+                                        entry_date_formatted = entry_date_obj.strftime('%B %d, %Y')
+                                    else:
+                                        entry_date_formatted = entry_date_part
+                                    
+                                    if entry_date_formatted == formatted_target_date:
+                                        hours = parts[1].strip()
+                                        amount = parts[2].strip()
+                                        break
+                                except ValueError:
+                                    continue
+                        
+                        if hours and amount:
+                            record[processed_field] = f"{formatted_date} | {hours} hrs | {amount}"
+                        else:
+                            record[processed_field] = "~"
+                    except (json.JSONDecodeError, ValueError) as e:
+                        record[processed_field] = "~"
+                else:
+                    record[processed_field] = "~"
         
         if not data:
             return jsonify({"data": [], "message": "No data found"})
