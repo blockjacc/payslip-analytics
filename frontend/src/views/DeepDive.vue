@@ -107,7 +107,7 @@
           <div v-else-if="attendanceData && attendanceData.length">
             <div v-for="(record, idx) in attendanceData" :key="idx" class="bg-slate-800/50 rounded-lg p-6 mb-6">
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div v-for="(value, key) in filteredFields(record)" :key="key" class="space-y-1">
+                <div v-for="(value, key) in filteredFieldsForDisplay(record)" :key="key" class="space-y-1">
                   <div class="text-xs uppercase tracking-wide text-white/50">{{ formatFieldName(key) }}</div>
                   <div class="text-white font-medium">{{ formatFieldValue(value) }}</div>
                 </div>
@@ -126,7 +126,7 @@
                 <div v-if="Array.isArray(settingsData[section.key])">
                   <div v-for="(item, idx) in settingsData[section.key]" :key="idx" class="bg-slate-800/50 rounded-lg p-6 mb-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div v-for="(value, key) in filteredFields(item)" :key="key" class="space-y-1">
+                      <div v-for="(value, key) in filteredFieldsForDisplay(item)" :key="key" class="space-y-1">
                         <div class="text-xs uppercase tracking-wide text-white/50">{{ formatFieldName(key) }}</div>
                         <div class="text-white font-medium">{{ formatFieldValue(value) }}</div>
                       </div>
@@ -136,7 +136,7 @@
                 <div v-else-if="settingsData[section.key] && typeof settingsData[section.key] === 'object'">
                   <div class="bg-slate-800/50 rounded-lg p-6 mb-6">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div v-for="(value, key) in filteredFields(settingsData[section.key])" :key="key" class="space-y-1">
+                      <div v-for="(value, key) in filteredFieldsForDisplay(settingsData[section.key])" :key="key" class="space-y-1">
                         <div class="text-xs uppercase tracking-wide text-white/50">{{ formatFieldName(key) }}</div>
                         <div class="text-white font-medium">{{ formatFieldValue(value) }}</div>
                       </div>
@@ -206,18 +206,55 @@ const shiftName = computed(() => {
   return '';
 });
 
-function filteredFields(obj) {
-  // Exclude technical fields from display (handle inconsistent naming)
-  const exclude = ['emp_id', 'company_id', 'comp_id'];
+// Efficient recursive filtering function for display fields
+function filteredFieldsForDisplay(obj) {
+  const technicalFields = [
+    'emp_id', 'employee_id', 'company_id', 'comp_id', 'reg_work_sched_id', 'work_schedule_id', 'created_by_account_id', 'updated_by_account_id', 'category_id', 'account_id', 'shift_id', 'id', 'status', 'deleted', 'flag_migrate', 'flag_custom', 'archive', 'archived_date', 'created_date', 'updated_date', 'period_type', 'cost_center', 'notes', 'bg_color', 'advanced_settings', 'default', 'flag_default_restday', 'flag_half_day', 'flag_open_shift', 'flag_trapp_source', 'flag_api_import', 'flag_payroll_correction', 'flag_tardiness_undertime', 'flag_delete_on_hours', 'flag_new_time_keeping', 'flag_on_leave', 'flag_holiday_include', 'flag_rd_include', 'flag_regular_or_excess', 'flag_time_in', 'flag_time_out', 'flag_lunch_break', 'flag_additional_breaks', 'flag_grace_period', 'flag_shift_threshold', 'flag_advance_break_rules', 'flag_working_on_restday', 'flag_breaks_on_holiday', 'flag_premium_payments', 'flag_premium_payments_starts_on_holiday_restday', 'flag_holiday_premium_on_regular_workday', 'flag_holiday_premium_on_regular_workday_nsd', 'flag_holiday_premium_on_holiday', 'flag_holiday_premium_on_holiday_nsd', 'flag_restday_premium_on_regular_workday', 'flag_restday_premium_on_regular_workday_nsd', 'flag_holiday_premium_on_restday', 'flag_holiday_premium_on_restday_nsd', 'flag_ot_holiday_rates_workday_holiday', 'flag_ot_holiday_rates_holiday_workday', 'flag_ot_rest_day_rates_workday_restday', 'flag_ot_rest_day_rates_restday_workday'];
+
+  if (Array.isArray(obj)) {
+    // Filter each item in the array
+    return obj.map(filteredFieldsForDisplay);
+  }
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
   return Object.fromEntries(
-    Object.entries(obj).filter(
-      ([key, value]) =>
-        value !== null &&
-        value !== '' &&
-        value !== 'N/A' &&
-        value !== undefined &&
-        !exclude.includes(key)
-    )
+    Object.entries(obj).filter(([key, value]) => {
+      // Exclude technical fields
+      if (technicalFields.includes(key)) return false;
+      // Exclude null, empty, undefined, 'N/A'
+      if (
+        value === null ||
+        value === '' ||
+        value === undefined ||
+        value === 'N/A'
+      ) {
+        return false;
+      }
+      // Exclude zero values (0, 0.0, '0', '0.00')
+      if (
+        value === 0 ||
+        value === 0.0 ||
+        value === '0' ||
+        value === '0.00'
+      ) {
+        return false;
+      }
+      // Exclude 'Disabled' values (boolean false, or string 'Disabled')
+      if (
+        value === false ||
+        (typeof value === 'string' && value.trim().toLowerCase() === 'disabled')
+      ) {
+        return false;
+      }
+      return true;
+    }).map(([key, value]) => {
+      // Recursively filter nested objects/arrays
+      if (typeof value === 'object' && value !== null) {
+        return [key, filteredFieldsForDisplay(value)];
+      }
+      return [key, value];
+    })
   );
 }
 
