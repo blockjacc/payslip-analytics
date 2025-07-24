@@ -212,7 +212,6 @@ function filteredFieldsForDisplay(obj) {
     'emp_id', 'employee_id', 'company_id', 'comp_id', 'reg_work_sched_id', 'work_schedule_id', 'created_by_account_id', 'updated_by_account_id', 'category_id', 'account_id', 'shift_id', 'id', 'status', 'deleted', 'flag_migrate', 'flag_custom', 'archive', 'archived_date', 'created_date', 'updated_date', 'period_type', 'cost_center', 'notes', 'bg_color', 'advanced_settings', 'default', 'flag_default_restday', 'flag_half_day', 'flag_open_shift', 'flag_trapp_source', 'flag_api_import', 'flag_payroll_correction', 'flag_tardiness_undertime', 'flag_delete_on_hours', 'flag_new_time_keeping', 'flag_on_leave', 'flag_holiday_include', 'flag_rd_include', 'flag_regular_or_excess', 'flag_time_in', 'flag_time_out', 'flag_lunch_break', 'flag_additional_breaks', 'flag_grace_period', 'flag_shift_threshold', 'flag_advance_break_rules', 'flag_working_on_restday', 'flag_breaks_on_holiday', 'flag_premium_payments', 'flag_premium_payments_starts_on_holiday_restday', 'flag_holiday_premium_on_regular_workday', 'flag_holiday_premium_on_regular_workday_nsd', 'flag_holiday_premium_on_holiday', 'flag_holiday_premium_on_holiday_nsd', 'flag_restday_premium_on_regular_workday', 'flag_restday_premium_on_regular_workday_nsd', 'flag_holiday_premium_on_restday', 'flag_holiday_premium_on_restday_nsd', 'flag_ot_holiday_rates_workday_holiday', 'flag_ot_holiday_rates_holiday_workday', 'flag_ot_rest_day_rates_workday_restday', 'flag_ot_rest_day_rates_restday_workday'];
 
   if (Array.isArray(obj)) {
-    // Filter each item in the array
     return obj.map(filteredFieldsForDisplay);
   }
   if (typeof obj !== 'object' || obj === null) {
@@ -220,9 +219,7 @@ function filteredFieldsForDisplay(obj) {
   }
   return Object.fromEntries(
     Object.entries(obj).filter(([key, value]) => {
-      // Exclude technical fields
       if (technicalFields.includes(key)) return false;
-      // Exclude null, empty, undefined, 'N/A'
       if (
         value === null ||
         value === '' ||
@@ -231,7 +228,6 @@ function filteredFieldsForDisplay(obj) {
       ) {
         return false;
       }
-      // Exclude zero values (0, 0.0, '0', '0.00')
       if (
         value === 0 ||
         value === 0.0 ||
@@ -240,16 +236,18 @@ function filteredFieldsForDisplay(obj) {
       ) {
         return false;
       }
-      // Exclude 'Disabled' values (boolean false, or string 'Disabled')
+      // Exclude 'Disabled' and 'no' values (boolean false, string 'Disabled', string 'no')
       if (
         value === false ||
-        (typeof value === 'string' && value.trim().toLowerCase() === 'disabled')
+        (typeof value === 'string' && (
+          value.trim().toLowerCase() === 'disabled' ||
+          value.trim().toLowerCase() === 'no'
+        ))
       ) {
         return false;
       }
       return true;
     }).map(([key, value]) => {
-      // Recursively filter nested objects/arrays
       if (typeof value === 'object' && value !== null) {
         return [key, filteredFieldsForDisplay(value)];
       }
@@ -280,6 +278,24 @@ function formatDate(dateStr) {
   return d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
+// Utility to log data to a file (for debugging)
+function logDataToFile(filename, heading, data, source) {
+  // Only works in Node.js or Electron, not in browser, so this is a placeholder for real-world debugging
+  // In a real Vue app, you would use a backend API or devtool for this
+  if (typeof window === 'undefined' && typeof require === 'function') {
+    const fs = require('fs');
+    const logContent = `==== ${heading} ====
+Source: ${source}
+Data:
+${JSON.stringify(data, null, 2)}\n\n`;
+    fs.appendFileSync(filename, logContent);
+  } else {
+    // For browser: print to console for now
+    console.log(`==== ${heading} (${source}) ====`);
+    console.log(data);
+  }
+}
+
 async function fetchAttendance() {
   if (!selectedEmployee.value || !selectedDate.value) return;
   attendanceLoading.value = true;
@@ -288,6 +304,7 @@ async function fetchAttendance() {
     const res = await fetch(`/api/deepdive/timekeeping/${companyId}/${selectedEmployee.value.emp_id}/${selectedDate.value}`);
     const json = await res.json();
     attendanceData.value = json.data || [];
+    logDataToFile('attendance_log.txt', 'Attendance Data', json.data, `/api/deepdive/timekeeping/${companyId}/${selectedEmployee.value.emp_id}/${selectedDate.value}`);
   } catch (e) {
     attendanceError.value = 'Failed to load attendance data.';
   } finally {
@@ -321,6 +338,7 @@ async function fetchSettings() {
       const shiftId = json.data[0].work_schedule_id;
       const settingsRes = await fetch(`/api/shift-details/${companyId}/${shiftId}`);
       settingsData.value = await settingsRes.json();
+      logDataToFile('settings_log.txt', 'Settings Data', json.data, `/api/deepdive/shifts/${companyId}/${selectedEmployee.value.emp_id}/${selectedDate.value}`);
     } else {
       settingsData.value = null;
     }
