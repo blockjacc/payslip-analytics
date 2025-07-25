@@ -3,6 +3,7 @@
     <h1 class="font-serif text-white mb-8 text-4xl text-center">
       drill down<span v-if="filterDisplay"> – {{ filterDisplay }}</span>
     </h1>
+    <div class="text-primary text-xl mb-4 text-center">employee: {{ employeeName }}</div>
     <div v-if="loading" class="text-white">loading...</div>
     <div v-if="error" class="text-red-400">error: {{ error }}</div>
     <div v-if="!loading && !error">
@@ -66,7 +67,8 @@ export default {
       result: null,
       selectedPeriodIdx: null,
       selectedFields: [],
-      fieldDisplayNames: {}
+      fieldDisplayNames: {},
+      employeeName: ''
     }
   },
   computed: {
@@ -245,6 +247,18 @@ export default {
       const fields = sessionStorage.getItem('selectedPayslipFields') || '["basic_pay","regular_pay","gross_pay","net_amount"]';
       this.selectedFields = JSON.parse(fields);
       await this.fetchFieldDisplayNames();
+      // Get employee name from sessionStorage if available
+      if (this.$route.params.employeeId && this.$route.params.employeeId !== 'all') {
+        const storedEmployee = sessionStorage.getItem('selectedEmployee');
+        if (storedEmployee) {
+          const emp = JSON.parse(storedEmployee);
+          this.employeeName = `${emp.first_name} ${emp.last_name} (${emp.emp_id})`;
+        } else {
+          this.employeeName = `employee id: ${this.$route.params.employeeId}`;
+        }
+      } else {
+        this.employeeName = 'all employees';
+      }
       const fieldsParam = encodeURIComponent(fields);
       let url;
       // Use single employee endpoint if employeeId is set and not 'all'

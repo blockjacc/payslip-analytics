@@ -4,7 +4,7 @@
     <div class="flex justify-center">
       <div class="bg-white/10 rounded-xl p-8 w-full max-w-6xl">
         <div class="text-center mb-8">
-          <h3 class="text-primary mb-2 text-2xl">employee id: {{ employeeId }}</h3>
+          <h3 class="text-primary mb-2 text-2xl">employee: {{ employeeName }}</h3>
           <h3 v-if="payrollGroupId" class="text-primary mb-2 text-xl">payroll group: {{ payrollGroupId }}</h3>
           <h3 v-if="filterDisplay" class="text-primary mb-2 text-xl">{{ filterDisplay }}</h3>
           <h4 class="text-secondary text-lg">period: {{ formatDate(periodFrom) }} - {{ formatDate(periodTo) }}</h4>
@@ -101,6 +101,7 @@ export default defineComponent({
       drilldownPeriodIndex: null,
       drilldownEmployees: [],
       baseYAxisMax: 40000,
+      employeeName: '',
       // Color mapping from payslip_field_colors.txt
       fieldColors: {
         // Amounts
@@ -548,6 +549,18 @@ export default defineComponent({
       this.selectedFields = JSON.parse(storedFields);
     } else {
       this.selectedFields = ['basic_pay', 'regular_pay', 'gross_pay', 'net_amount'];
+    }
+    // Get employee name from sessionStorage if available
+    if (this.employeeId && this.employeeId !== 'all') {
+      const storedEmployee = sessionStorage.getItem('selectedEmployee');
+      if (storedEmployee) {
+        const emp = JSON.parse(storedEmployee);
+        this.employeeName = `${emp.first_name} ${emp.last_name} (${emp.emp_id})`;
+      } else {
+        this.employeeName = `employee id: ${this.employeeId}`;
+      }
+    } else {
+      this.employeeName = 'all employees';
     }
     this.fetchFieldDisplayNames();
     this.fetchAnalyticsPrefetch();

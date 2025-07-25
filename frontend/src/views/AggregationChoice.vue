@@ -4,7 +4,7 @@
     <div class="bg-white/10 rounded-xl p-8 w-full max-w-2xl text-center">
       <div class="mb-8 pb-6 border-b border-white/10">
         <h3 class="text-primary mb-3 text-xl">company: {{ companyName || companyId }}</h3>
-        <h3 class="text-primary mb-3 text-xl">employee id: {{ employeeId === 'all' ? 'all employees' : employeeId }}</h3>
+        <h3 class="text-primary mb-3 text-xl">employee: {{ employeeName }}</h3>
         <h3 v-if="payrollGroupId" class="text-primary mb-3 text-xl">payroll group: {{ payrollGroupId }}</h3>
         <h3 v-if="filterDisplay" class="text-primary mb-3 text-xl">{{ filterDisplay }}</h3>
         <h3 class="text-primary text-xl">period: {{ formatDate(periodFrom) }} - {{ formatDate(periodTo) }}</h3>
@@ -41,7 +41,8 @@ export default {
   data() {
     return {
       locationName: '',
-      companyName: ''
+      companyName: '',
+      employeeName: ''
     }
   },
   computed: {
@@ -158,6 +159,18 @@ export default {
     this.companyName = sessionStorage.getItem('selectedCompanyName') || '';
     if (this.$route.query.location_id) {
       this.fetchLocationName();
+    }
+    // Get employee name from sessionStorage if available
+    if (this.$route.params.employeeId && this.$route.params.employeeId !== 'all') {
+      const storedEmployee = sessionStorage.getItem('selectedEmployee');
+      if (storedEmployee) {
+        const emp = JSON.parse(storedEmployee);
+        this.employeeName = `${emp.first_name} ${emp.last_name} (${emp.emp_id})`;
+      } else {
+        this.employeeName = `employee id: ${this.$route.params.employeeId}`;
+      }
+    } else {
+      this.employeeName = 'all employees';
     }
   },
 }

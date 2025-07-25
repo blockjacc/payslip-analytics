@@ -281,6 +281,9 @@ export default {
       // Store the selected employee object for consistency
       this.selectedEmployee = employee;
       
+      // Store in sessionStorage for access in other views
+      sessionStorage.setItem('selectedEmployee', JSON.stringify(employee));
+      
       // Navigate to dates using the employee ID
       this.$router.push(`/dates/${this.companyId}/${employee.emp_id}`);
     },
