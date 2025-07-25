@@ -246,11 +246,16 @@ export default {
       this.selectedFields = JSON.parse(fields);
       await this.fetchFieldDisplayNames();
       const fieldsParam = encodeURIComponent(fields);
-      let url = `/api/analytics-prefetch/${this.$route.params.companyId}/${this.$route.params.periodFrom}/${this.$route.params.periodTo}/${this.$route.params.aggregationType}?fields=${fieldsParam}`;
+      let url;
+      // Use single employee endpoint if employeeId is set and not 'all'
+      if (this.$route.params.employeeId && this.$route.params.employeeId !== 'all') {
+        url = `/api/analytics-single-employee/${this.$route.params.companyId}/${this.$route.params.employeeId}/${this.$route.params.periodFrom}/${this.$route.params.periodTo}/${this.$route.params.aggregationType}?fields=${fieldsParam}&drilldown=true`;
+      } else {
+        url = `/api/analytics-prefetch/${this.$route.params.companyId}/${this.$route.params.periodFrom}/${this.$route.params.periodTo}/${this.$route.params.aggregationType}?fields=${fieldsParam}&drilldown=true`;
+      }
       Object.entries(this.$route.query).forEach(([key, value]) => {
         url += `&${key}=${value}`;
       });
-      url += '&drilldown=true';
       const response = await fetch(url);
       if (!response.ok) throw new Error(await response.text());
       this.result = await response.json();

@@ -357,7 +357,13 @@ export default defineComponent({
           ? this.selectedFields 
           : ['basic_pay', 'regular_pay', 'gross_pay', 'net_amount'];
         const fieldsParam = encodeURIComponent(JSON.stringify(selectedFields));
-        let url = `/api/analytics-prefetch/${this.companyId}/${this.periodFrom}/${this.periodTo}/${this.$route.params.aggregationType || 'single'}?fields=${fieldsParam}`;
+        let url;
+        // If a single employee is selected, use the new endpoint
+        if (this.employeeId && this.employeeId !== 'all') {
+          url = `/api/analytics-single-employee/${this.companyId}/${this.employeeId}/${this.periodFrom}/${this.periodTo}/${this.$route.params.aggregationType || 'single'}?fields=${fieldsParam}`;
+        } else {
+          url = `/api/analytics-prefetch/${this.companyId}/${this.periodFrom}/${this.periodTo}/${this.$route.params.aggregationType || 'single'}?fields=${fieldsParam}`;
+        }
         if (this.payrollGroupId) {
           url += `&payroll_group_id=${this.payrollGroupId}`;
         }

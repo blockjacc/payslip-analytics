@@ -88,6 +88,11 @@ yarn dev       # Start development server
 ### Unified Chart System
 All charts in the application use a unified system for consistent behavior and visual appearance.
 
+**New in 2024:**
+- Stacking order for stacked bar charts is now determined per period (not globally). For each period, fields/items are stacked in ascending order of value for that period. This ensures correct visual representation even when the order of values changes between periods.
+- This per-period stacking is supported for all analytics modules (payslip, shifts, deep dive, etc.) via a shared utility.
+- Legacy global stacking order is still available for backward compatibility.
+
 ## UX/UI Design System
 
 ### Universal Background System
@@ -281,8 +286,9 @@ this.$emit('data-updated', { total: count, filtered: filteredCount });
 ### 1. Unified Chart Architecture
 
 #### Core Utilities (`src/utils/chartAxis.js`)
-- **`getUnifiedStackedBarChart()`**: For simple single-value charts (shifts analytics)
-- **`getUnifiedPayslipChart()`**: For multi-period, multi-field charts (payslip analytics)
+- **`getUnifiedStackedBarChart()`**: For simple single-value charts (shifts analytics), now supports per-period stacking order.
+- **`getUnifiedPayslipChart()`**: For multi-period, multi-field charts (payslip analytics), now supports per-period stacking order.
+- **`getStackingOrderForPeriods()`**: Utility to compute correct stacking order for each period, used by all chart utilities.
 - **`mapValueToLogPosition()`**: Transforms data values to logarithmic positions on linear scale
 
 #### Key Technical Innovation: Logarithmic Position Mapping
@@ -332,7 +338,7 @@ export function getSimpleYAxis(values) {
 #### Visual Standards
 - **Font:** 'Open Sans' for all chart text
 - **Legend:** Always displayed on the right
-- **Stacking Order:** Always lowest to highest values (bottom to top)
+- **Stacking Order:** By default, each period’s bar stacks fields/items in ascending order of value for that period (per-period stacking). Legacy global stacking is available for backward compatibility.
 - **Colors:** Consistent across all charts using predefined color schemes
 
 ### 3. Chart Types and Usage
@@ -425,6 +431,7 @@ this.chart = new Chart(ctx, chartConfig);
 - **Problem:** Individual value mapping for stacked charts was mathematically incorrect
 - **Issue:** Mapping each value individually (91→X, 100→Y, 114→Z) then stacking X+Y+Z ≠ correct total
 - **Solution:** Cumulative position mapping with incremental heights
+- **2024 Update:** Stacking order is now determined per period, not globally. The new utility `getStackingOrderForPeriods` ensures each bar is stacked in the correct order for its period. All chart utilities support this for maximum flexibility and accuracy. Legacy global stacking is still supported for backward compatibility.
 - **Implementation:**
   1. Calculate cumulative values: [91, 191, 305]
   2. Map cumulative values to log positions: [logPos(91), logPos(191), logPos(305)]
@@ -454,7 +461,7 @@ this.chart = new Chart(ctx, chartConfig);
 #### For New Charts
 - [ ] Use unified chart utilities (`getUnifiedStackedBarChart` or `getUnifiedPayslipChart`)
 - [ ] Implement 11-tick logarithmic Y-axis with custom tick generation
-- [ ] Ensure proper stacking order (lowest to highest values)
+- [ ] Ensure proper stacking order (per-period stacking, unless global stacking is required)
 - [ ] Include legend on the right
 - [ ] Use 'Open Sans' font throughout
 - [ ] Implement proper tooltip handling with original values

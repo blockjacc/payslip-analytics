@@ -1981,5 +1981,184 @@ def deepdive_shifts(company_id, emp_id, date):
     except Exception as e:
         return make_response(jsonify({"error": str(e)}), 500)
 
+@app.route('/api/analytics-single-employee/<int:company_id>/<emp_id>/<string:period_from>/<string:period_to>/<string:aggregation_type>', methods=['GET'])
+def analytics_single_employee(company_id, emp_id, period_from, period_to, aggregation_type='single'):
+    try:
+        import json
+        ENCRYPT_KEY = os.getenv('MYSQL_ENCRYPT_KEY')
+        # Parse fields from query param
+        selected_fields = request.args.get('fields', None)
+        if selected_fields:
+            try:
+                selected_fields = json.loads(selected_fields)
+                if not isinstance(selected_fields, list):
+                    selected_fields = None
+            except:
+                selected_fields = None
+        if not selected_fields:
+            return jsonify({'error': 'No fields specified'}), 400
+        # Optional filters
+        payroll_group_id = request.args.get('payroll_group_id', None)
+        location_id = request.args.get('location_id', None)
+        department_id = request.args.get('department_id', None)
+        rank_id = request.args.get('rank_id', None)
+        employment_type_id = request.args.get('employment_type_id', None)
+        position_id = request.args.get('position_id', None)
+        cost_center_id = request.args.get('cost_center_id', None)
+        project_id = request.args.get('project_id', None)
+        drilldown = request.args.get('drilldown', 'false').lower() == 'true'
+        # Build SQL for selected fields
+        field_sql = ', '.join([
+            f"CAST(AES_DECRYPT(p.{field}, '{ENCRYPT_KEY}') AS DECIMAL(10,2)) AS {field}" for field in selected_fields
+        ])
+        # Employee name fields (decrypted)
+        name_fields = [
+            f"CAST(AES_DECRYPT(e.last_name, '{ENCRYPT_KEY}') AS CHAR(150) CHARACTER SET utf8) AS last_name",
+            f"CAST(AES_DECRYPT(e.first_name, '{ENCRYPT_KEY}') AS CHAR(150) CHARACTER SET utf8) AS first_name"
+        ]
+        # Build the query
+        query = f'''
+            SELECT p.emp_id, {', '.join(name_fields)}, p.period_from, p.period_to, {field_sql}
+            FROM payroll_payslip p
+            JOIN employee e ON p.emp_id = e.emp_id
+            WHERE p.company_id = %s
+              AND p.emp_id = %s
+              AND p.period_from >= %s AND p.period_to <= %s
+        '''
+        params = [company_id, emp_id, period_from, period_to]
+        if payroll_group_id:
+            query += ' AND p.payroll_group_id = %s'
+            params.append(payroll_group_id)
+        if location_id:
+            query += ''' AND p.emp_id IN (
+                SELECT emp_id FROM employee_payroll_information epi
+                WHERE epi.location_and_offices_id = %s
+            )'''
+            params.append(location_id)
+        if department_id:
+            query += ''' AND p.emp_id IN (
+                SELECT emp_id FROM employee_payroll_information epi
+                WHERE epi.department_id = %s
+            )'''
+            params.append(department_id)
+        if rank_id:
+            query += ''' AND p.emp_id IN (
+                SELECT emp_id FROM employee_payroll_information epi
+                WHERE epi.rank_id = %s
+            )'''
+            params.append(rank_id)
+        if employment_type_id:
+            query += ''' AND p.emp_id IN (
+                SELECT emp_id FROM employee_payroll_information epi
+                WHERE epi.employment_type = %s
+            )'''
+            params.append(employment_type_id)
+        if position_id:
+            query += ''' AND p.emp_id IN (
+                SELECT emp_id FROM employee_payroll_information epi
+                WHERE epi.position = %s
+            )'''
+            params.append(position_id)
+        if cost_center_id:
+            query += ''' AND p.emp_id IN (
+                SELECT emp_id FROM employee_payroll_information epi
+                WHERE epi.cost_center = %s
+            )'''
+            params.append(cost_center_id)
+        if project_id:
+            query += ''' AND p.emp_id IN (
+                SELECT emp_id FROM employee_payroll_information epi
+                WHERE epi.project_id = %s
+            )'''
+            params.append(project_id)
+        query += ' ORDER BY p.period_from, p.period_to'
+        cursor = mysql.connection.cursor()
+        cursor.execute(query, tuple(params))
+        rows = cursor.fetchall()
+        colnames = [desc[0] for desc in cursor.description]
+        data = [dict(zip(colnames, row)) for row in rows]
+        # Group by period if 'separate', else aggregate
+        if aggregation_type == 'separate':
+            periods = {}
+            for row in data:
+                period_key = (row['period_from'], row['period_to'])
+                if period_key not in periods:
+                    periods[period_key] = []
+                periods[period_key].append(row)
+            result = {'periods': [], 'filters': {}}
+            for (from_date, to_date), employees in sorted(periods.items()):
+                if drilldown:
+                    # Drill-down: return all employee rows for this period
+                    result['periods'].append({
+                        'period': {'from': str(from_date), 'to': str(to_date)},
+                        'employees': employees
+                    })
+                else:
+                    # Summary: aggregate by field
+                    summary = {field: 0.0 for field in selected_fields}
+                    for emp in employees:
+                        for field in selected_fields:
+                            summary[field] += float(emp[field] or 0)
+                    result['periods'].append({
+                        'period': {'from': str(from_date), 'to': str(to_date)},
+                        'summary': {k: round(v, 2) for k, v in summary.items()}
+                    })
+            if not drilldown:
+                # Add total across all periods
+                total = {field: 0.0 for field in selected_fields}
+                for period in result['periods']:
+                    for field in selected_fields:
+                        total[field] += period['summary'][field]
+                result['total'] = {k: round(v, 2) for k, v in total.items()}
+            # Get display names for all filters
+            filter_display = {}
+            filter_map = [
+                (location_id, 'location_and_offices', 'location_and_offices_id', 'name', 'location_name'),
+                (department_id, 'department', 'dept_id', 'department_name', 'department_name'),
+                (rank_id, 'rank', 'rank_id', 'rank_name', 'rank_name'),
+                (employment_type_id, 'employment_type', 'emp_type_id', 'name', 'employment_type_name'),
+                (position_id, 'position', 'position_id', 'position_name', 'position_name'),
+                (cost_center_id, 'cost_center', 'cost_center_id', 'cost_center_code', 'cost_center_code'),
+                (project_id, 'project', 'project_id', 'project_name', 'project_name'),
+            ]
+            for id_value, table, id_field, name_field, resp_field in filter_map:
+                if id_value:
+                    display = get_display_name(cursor, table, id_field, name_field, id_value, company_id)
+                    filter_display[resp_field] = display
+            result['filters'] = filter_display
+            return jsonify(result)
+        else:
+            # Aggregate or single: all data in one group
+            if drilldown:
+                # Drill-down: return all employee rows
+                return jsonify({'employees': data})
+            else:
+                # Summary: aggregate by field
+                summary = {field: 0.0 for field in selected_fields}
+                for row in data:
+                    for field in selected_fields:
+                        summary[field] += float(row[field] or 0)
+                # Get display names for all filters
+                filter_display = {}
+                filter_map = [
+                    (location_id, 'location_and_offices', 'location_and_offices_id', 'name', 'location_name'),
+                    (department_id, 'department', 'dept_id', 'department_name', 'department_name'),
+                    (rank_id, 'rank', 'rank_id', 'rank_name', 'rank_name'),
+                    (employment_type_id, 'employment_type', 'emp_type_id', 'name', 'employment_type_name'),
+                    (position_id, 'position', 'position_id', 'position_name', 'position_name'),
+                    (cost_center_id, 'cost_center', 'cost_center_id', 'cost_center_code', 'cost_center_code'),
+                    (project_id, 'project', 'project_id', 'project_name', 'project_name'),
+                ]
+                for id_value, table, id_field, name_field, resp_field in filter_map:
+                    if id_value:
+                        display = get_display_name(cursor, table, id_field, name_field, id_value, company_id)
+                        filter_display[resp_field] = display
+                result = {k: round(v, 2) for k, v in summary.items()}
+                result['filters'] = filter_display
+                return jsonify(result)
+    except Exception as e:
+        app.logger.error(f"Error in analytics-single-employee: {str(e)}")
+        return jsonify({'error': f'Failed to retrieve analytics-single-employee data: {str(e)}'}), 500
+
 if __name__ == '__main__':
     app.run(debug=True, port=5002) 
