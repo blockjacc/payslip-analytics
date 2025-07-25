@@ -125,6 +125,50 @@ def create_indexes():
             else:
                 print("⏭️  Index idx_company_payroll_group already exists")
             
+            # Index for payroll_cronjob (deep dive)
+            if not index_exists(cursor, 'idx_pc_company_emp_period', 'payroll_cronjob'):
+                print("Creating index idx_pc_company_emp_period on payroll_cronjob(company_id, emp_id, period_from, period_to)...")
+                cursor.execute("""
+                    CREATE INDEX idx_pc_company_emp_period
+                    ON payroll_cronjob(company_id, emp_id, period_from, period_to)
+                """)
+                print("✅ Created idx_pc_company_emp_period")
+            else:
+                print("⏭️  Index idx_pc_company_emp_period already exists")
+
+            # Index for employee_time_in (deep dive)
+            if not index_exists(cursor, 'idx_eti_comp_emp_date', 'employee_time_in'):
+                print("Creating index idx_eti_comp_emp_date on employee_time_in(comp_id, emp_id, date)...")
+                cursor.execute("""
+                    CREATE INDEX idx_eti_comp_emp_date
+                    ON employee_time_in(comp_id, emp_id, date)
+                """)
+                print("✅ Created idx_eti_comp_emp_date")
+            else:
+                print("⏭️  Index idx_eti_comp_emp_date already exists")
+
+            # Index for employee_shifts_schedule (deep dive)
+            if not index_exists(cursor, 'idx_ess_company_emp_valid', 'employee_shifts_schedule'):
+                print("Creating index idx_ess_company_emp_valid on employee_shifts_schedule(company_id, emp_id, valid_from, until)...")
+                cursor.execute("""
+                    CREATE INDEX idx_ess_company_emp_valid
+                    ON employee_shifts_schedule(company_id, emp_id, valid_from, until)
+                """)
+                print("✅ Created idx_ess_company_emp_valid")
+            else:
+                print("⏭️  Index idx_ess_company_emp_valid already exists")
+
+            # Index for work_schedule (deep dive)
+            if not index_exists(cursor, 'idx_ws_id_comp_status', 'work_schedule'):
+                print("Creating index idx_ws_id_comp_status on work_schedule(work_schedule_id, comp_id, status)...")
+                cursor.execute("""
+                    CREATE INDEX idx_ws_id_comp_status
+                    ON work_schedule(work_schedule_id, comp_id, status)
+                """)
+                print("✅ Created idx_ws_id_comp_status")
+            else:
+                print("⏭️  Index idx_ws_id_comp_status already exists")
+            
             mysql.connection.commit()
             cursor.close()
             
