@@ -35,8 +35,13 @@
           <button :class="{active: tab==='pay'}" @click="tab='pay'">Pay</button>
           <button :class="{active: tab==='attendance'}" @click="tab='attendance'">Attendance</button>
           <button :class="{active: tab==='settings'}" @click="tab='settings'">Settings</button>
+          <button :class="{active: tab==='applications'}" @click="tab='applications'">Applications</button>
         </div>
         <div v-if="tab==='pay'" class="tab-content">
+          <div class="flex gap-4 mb-4">
+            <button :class="['px-4 py-2 rounded', payView==='debit' ? 'bg-primary text-white' : 'bg-white/10 text-primary']" @click="payView='debit'">Debit</button>
+            <button :class="['px-4 py-2 rounded', payView==='credit' ? 'bg-primary text-white' : 'bg-white/10 text-primary']" @click="payView='credit'">Credit</button>
+          </div>
           <div v-if="payLoading">Loading pay data...</div>
           <div v-else-if="payError">{{ payError }}</div>
           <div v-else-if="payData && payData.length">
@@ -162,6 +167,14 @@
           </div>
           <div v-else>No settings data found.</div>
         </div>
+        <div v-if="tab==='applications'" class="tab-content">
+          <div class="flex gap-4 mb-4">
+            <button :class="['px-4 py-2 rounded', applicationsView==='pending' ? 'bg-primary text-white' : 'bg-white/10 text-primary']" @click="applicationsView='pending'">Pending</button>
+            <button :class="['px-4 py-2 rounded', applicationsView==='approved' ? 'bg-primary text-white' : 'bg-white/10 text-primary']" @click="applicationsView='approved'">Approved</button>
+            <button :class="['px-4 py-2 rounded', applicationsView==='rejected' ? 'bg-primary text-white' : 'bg-white/10 text-primary']" @click="applicationsView='rejected'">Rejected</button>
+          </div>
+          <div class="text-white/60 text-center py-8">(Applications content goes here)</div>
+        </div>
       </div>
     </div>
   </BaseLayout>
@@ -176,6 +189,8 @@ import DatePicker from 'vue-datepicker-next';
 import 'vue-datepicker-next/index.css';
 
 const tab = ref('pay');
+const payView = ref('debit'); // 'debit' or 'credit'
+const applicationsView = ref('pending'); // 'pending', 'approved', 'rejected'
 const route = useRoute();
 const router = useRouter();
 const companyId = route.params.company_id;
