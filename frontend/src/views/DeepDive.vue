@@ -102,21 +102,32 @@
           <div v-else>No pay data found.</div>
         </div>
         <div v-if="tab==='attendance'" class="tab-content">
+          <div class="flex gap-4 mb-4">
+            <button :class="['px-4 py-2 rounded', attendanceView==='filtered' ? 'bg-primary text-white' : 'bg-white/10 text-primary']" @click="attendanceView='filtered'">Filtered</button>
+            <button :class="['px-4 py-2 rounded', attendanceView==='all' ? 'bg-primary text-white' : 'bg-white/10 text-primary']" @click="attendanceView='all'">All</button>
+          </div>
           <div v-if="attendanceLoading">Loading attendance...</div>
           <div v-else-if="attendanceError">{{ attendanceError }}</div>
           <div v-else-if="attendanceData && attendanceData.length">
             <div v-for="(record, idx) in attendanceData" :key="idx" class="bg-slate-800/50 rounded-lg p-6 mb-6">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div v-for="(value, key) in filteredFieldsForDisplay(record)" :key="key" class="space-y-1">
-                  <div class="text-xs uppercase tracking-wide text-white/50">{{ formatFieldName(key) }}</div>
-                  <div class="text-white font-medium">{{ formatFieldValue(value) }}</div>
+              <template v-for="(group, groupIdx) in getAttendanceFieldsForDisplay(record, attendanceView)" :key="groupIdx">
+                <div v-if="group.length" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
+                  <div v-for="key in group" :key="key" class="space-y-1">
+                    <div class="text-xs uppercase tracking-wide text-white/50">{{ formatFieldName(key) }}</div>
+                    <div class="text-white font-medium">{{ formatFieldValue(record[key]) }}</div>
+                  </div>
                 </div>
-              </div>
+                <hr v-if="group.length && groupIdx < getAttendanceFieldsForDisplay(record, attendanceView).length-1" class="my-2 border-white/30" />
+              </template>
             </div>
           </div>
           <div v-else>No attendance data found.</div>
         </div>
         <div v-if="tab==='settings'" class="tab-content">
+          <div class="flex gap-4 mb-4">
+            <button :class="['px-4 py-2 rounded', settingsView==='filtered' ? 'bg-primary text-white' : 'bg-white/10 text-primary']" @click="settingsView='filtered'">Filtered</button>
+            <button :class="['px-4 py-2 rounded', settingsView==='all' ? 'bg-primary text-white' : 'bg-white/10 text-primary']" @click="settingsView='all'">All</button>
+          </div>
           <div v-if="settingsLoading">Loading settings...</div>
           <div v-else-if="settingsError">{{ settingsError }}</div>
           <div v-else-if="settingsData">
@@ -125,22 +136,24 @@
                 <h2 class="section-title text-xl font-semibold text-emerald-400 mb-4">{{ section.label }}</h2>
                 <div v-if="Array.isArray(settingsData[section.key])">
                   <div v-for="(item, idx) in settingsData[section.key]" :key="idx" class="bg-slate-800/50 rounded-lg p-6 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div v-for="(value, key) in filteredFieldsForDisplay(item)" :key="key" class="space-y-1">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
+                      <div v-for="key in getSettingsFieldsForDisplay(item, settingsView)" :key="key" class="space-y-1">
                         <div class="text-xs uppercase tracking-wide text-white/50">{{ formatFieldName(key) }}</div>
-                        <div class="text-white font-medium">{{ formatFieldValue(value) }}</div>
+                        <div class="text-white font-medium">{{ formatFieldValue(item[key]) }}</div>
                       </div>
                     </div>
+                    <hr class="my-2 border-white/30" />
                   </div>
                 </div>
                 <div v-else-if="settingsData[section.key] && typeof settingsData[section.key] === 'object'">
                   <div class="bg-slate-800/50 rounded-lg p-6 mb-6">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div v-for="(value, key) in filteredFieldsForDisplay(settingsData[section.key])" :key="key" class="space-y-1">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-2">
+                      <div v-for="key in getSettingsFieldsForDisplay(settingsData[section.key], settingsView)" :key="key" class="space-y-1">
                         <div class="text-xs uppercase tracking-wide text-white/50">{{ formatFieldName(key) }}</div>
-                        <div class="text-white font-medium">{{ formatFieldValue(value) }}</div>
+                        <div class="text-white font-medium">{{ formatFieldValue(settingsData[section.key][key]) }}</div>
                       </div>
                     </div>
+                    <hr class="my-2 border-white/30" />
                   </div>
                 </div>
               </template>
@@ -269,6 +282,10 @@ function formatFieldValue(value) {
   if (typeof value === 'string' && (value === 'yes' || value === 'no')) {
     return value === 'yes' ? 'Enabled' : 'Disabled';
   }
+  // Remove 'GMT' from time strings if present
+  if (typeof value === 'string' && value.match(/\d{2}:\d{2}:\d{2}/) && value.includes('GMT')) {
+    return value.replace(/\s*GMT\s*/g, '').trim();
+  }
   return value.toString();
 }
 
@@ -378,6 +395,120 @@ onMounted(() => {
   // or if they are set by the user before the component mounts.
   // The watch will handle the actual fetching when emp and date are available.
 });
+
+const attendanceView = ref('filtered'); // 'filtered' or 'all'
+const settingsView = ref('filtered'); // 'filtered' or 'all'
+
+// Field groups for employee_time_in (from timekeepingdocumentation.txt)
+const attendanceFieldGroups = [
+  [ // Group 1
+    'employee_time_in_id', 'work_schedule_id', 'date', 'time_in', 'lunch_out', 'lunch_in', 'break1_out', 'break1_in', 'break2_out', 'break2_in', 'time_out'
+  ],
+  [ // Group 2
+    'total_hours', 'total_hours_required', 'corrected', 'reason', 'time_in_status', 'overbreak_min', 'late_min', 'tardiness_min', 'undertime_min', 'absent_min', 'notes'
+  ],
+  [ // Group 3
+    'source', 'last_source', 'shift_name', 'status', 'change_log_date_filed', 'approval_time_in_id', 'flag_regular_or_excess', 'flag_delete_on_hours', 'flag_payroll_correction', 'ip_address', 'rest_day_r_a', 'flag_rd_include', 'holiday_approve', 'flag_holiday_include', 'kiosk_location', 'missing_lunch', 'approval_date', 'flag_open_shift', 'os_approval_time_in_id', 'action_time', 'current_date_nsd', 'next_date_nsd', 'for_resend_auto_rejected_id', 'current_date_holiday', 'next_date_holiday', 'source_rule', 'miss_required_break', 'hours_application_id', 'created_at', 'updated_at'
+  ]
+];
+
+// Helper to get all mobile_ fields from a record
+function getMobileFields(record) {
+  return Object.keys(record).filter(key => key.startsWith('mobile_'));
+}
+
+function getAttendanceFieldsForDisplay(record, view) {
+  // Exclude emp_id, comp_id, company_id
+  const exclude = ['emp_id', 'comp_id', 'company_id'];
+  // For each group, get fields present in the record
+  const groups = attendanceFieldGroups.map(group =>
+    group.filter(field => field in record && !exclude.includes(field))
+  );
+  // Mobile fields group
+  const mobileFields = getMobileFields(record).filter(f => !exclude.includes(f));
+  // For 'filtered', apply filtering logic
+  if (view === 'filtered') {
+    const filterFn = (key) => {
+      const value = record[key];
+      if (
+        value === null || value === '' || value === undefined || value === 'N/A' ||
+        value === 0 || value === 0.0 || value === '0' || value === '0.00' ||
+        value === false ||
+        (typeof value === 'string' && (
+          value.trim().toLowerCase() === 'disabled' ||
+          value.trim().toLowerCase() === 'no'
+        ))
+      ) {
+        return false;
+      }
+      // Always show 'active'/'inactive'
+      if (typeof value === 'string' && (value.trim().toLowerCase() === 'active' || value.trim().toLowerCase() === 'inactive')) {
+        return true;
+      }
+      return true;
+    };
+    return [
+      ...groups.map(group => group.filter(filterFn)),
+      mobileFields.filter(filterFn)
+    ];
+  } else {
+    // 'all' view: show all fields in each group
+    return [
+      ...groups,
+      mobileFields
+    ];
+  }
+}
+
+function getSettingsFieldsForDisplay(obj, view) {
+  // Exclude emp_id, comp_id/company_id at every level, recursively
+  const exclude = ['emp_id', 'comp_id', 'company_id'];
+  if (Array.isArray(obj)) {
+    // For arrays, return an array of filtered key arrays for each object
+    return obj.map(item => getSettingsFieldsForDisplay(item, view));
+  }
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+  // For objects, get keys that are not excluded
+  let keys = Object.keys(obj).filter(key => !exclude.includes(key));
+  if (view === 'filtered') {
+    const filterFn = (key) => {
+      const value = obj[key];
+      if (
+        value === null || value === '' || value === undefined || value === 'N/A' ||
+        value === 0 || value === 0.0 || value === '0' || value === '0.00' ||
+        value === false ||
+        (typeof value === 'string' && (
+          value.trim().toLowerCase() === 'disabled' ||
+          value.trim().toLowerCase() === 'no'
+        ))
+      ) {
+        return false;
+      }
+      // Always show 'active'/'inactive'
+      if (typeof value === 'string' && (value.trim().toLowerCase() === 'active' || value.trim().toLowerCase() === 'inactive')) {
+        return true;
+      }
+      return true;
+    };
+    keys = keys.filter(filterFn);
+  }
+  // For each key, if the value is an object or array, recursively filter its keys as well
+  return keys.filter(key => {
+    const value = obj[key];
+    if (typeof value === 'object' && value !== null) {
+      // If the nested object/array has no displayable keys, skip it
+      const nested = getSettingsFieldsForDisplay(value, view);
+      if (Array.isArray(nested)) {
+        return nested.some(arr => Array.isArray(arr) ? arr.length > 0 : Object.keys(arr).length > 0);
+      } else if (typeof nested === 'object') {
+        return Object.keys(nested).length > 0;
+      }
+    }
+    return true;
+  });
+}
 </script>
 
 <style scoped>

@@ -545,34 +545,22 @@ this.chart = new Chart(ctx, chartConfig);
 
 ## Database Considerations
 
+#### Indexes for Analytics Performance
+- The following indexes are created for efficient analytics queries:
+  - `payroll_payslip(company_id, period_from, period_to)`
+  - `payroll_payslip(company_id, emp_id)`
+  - `payroll_payslip(company_id, emp_id, period_from, period_to)`
+  - `payroll_payslip(company_id, payroll_group_id)`
+  - `employee_payroll_information(company_id, department_id)`
+  - `employee_payroll_information(company_id, rank_id)`
+  - `employee_payroll_information(company_id, employment_type)`
+  - `employee_payroll_information(company_id, position)`
+  - `employee_payroll_information(company_id, cost_center)`
+  - `employee_payroll_information(company_id, project_id)`
+  - `employee_payroll_information(company_id, location_and_offices_id)`
+- These indexes ensure that all main WHERE clauses and JOINs in payslip analytics endpoints are covered for optimal performance.
+
 ### MySQL Reserved Keywords
 When working with database queries, be aware of MySQL reserved keywords that require special handling:
 
-#### `rank` Table
-- **Issue:** `rank` is a MySQL reserved keyword that can cause SQL syntax errors
-- **Solution:** Always use backticks when referencing the rank table in queries
-- **Correct Usage:** 
-  ```sql
-  LEFT JOIN `rank` rk ON epi.rank_id = rk.rank_id AND rk.company_id = %s
-  ```
-- **Incorrect Usage:**
-  ```sql
-  LEFT JOIN rank r ON epi.rank_id = r.rank_id AND r.company_id = %s
-  ```
-- **Best Practice:** Use descriptive table aliases (e.g., `rk` for rank) to avoid confusion
-
-#### Other Potential Reserved Keywords
-Be cautious with other table/column names that might conflict with MySQL reserved words:
-- `order`, `group`, `select`, `where`, `having`, `limit`, etc.
-- Always use backticks when in doubt: `` `table_name` ``
-- Reference: [MySQL Reserved Keywords Documentation](https://dev.mysql.com/doc/refman/8.0/en/keywords.html)
-
-### Query Development Guidelines
-1. **Test queries individually** before implementing in endpoints
-2. **Use table aliases** to make queries more readable and avoid conflicts
-3. **Escape table/column names** with backticks when they might be reserved keywords
-4. **Follow existing patterns** from working endpoints for consistency
-
----
-
-**This documentation serves as the definitive guide for all charting and analytics implementation in the Payslip Analytics App. Any new features must follow these standards for consistency, maintainability, and user experience.** 
+#### `rank`

@@ -1,0 +1,42 @@
+comp_id/company_id Display Problem in Deep Dive Settings Tab
+============================================================
+
+1. **Problem Statement:**
+   - comp_id (and sometimes company_id) continues to display in all settings sections in the Deep Dive module, even though it should be excluded from the table display (since it is already in the header).
+   - This occurs even after attempts to exclude these fields in the rendering logic.
+
+2. **Initial Diagnosis:**
+   - Each settings section (e.g., work_schedule, regular_schedule, flexible_hours, rest_days) is rendered as an object or array of objects.
+   - Some sections use comp_id as the company identifier, others use company_id.
+   - The exclusion logic was only applied at the top level, not recursively for nested objects/arrays.
+
+3. **First Attempted Solution:**
+   - Updated the getSettingsFieldsForDisplay function to exclude ['emp_id', 'comp_id', 'company_id'] at the current object level.
+   - The template was updated to use only the filtered keys for rendering.
+   - Result: comp_id/company_id still appeared in some sections, especially when nested.
+
+4. **Second Attempted Solution (Recursive Exclusion):**
+   - Refactored getSettingsFieldsForDisplay to recursively exclude ['emp_id', 'comp_id', 'company_id'] at every level (objects and arrays).
+   - For arrays, mapped over each item and applied the exclusion.
+   - For objects, filtered keys and recursively checked nested objects/arrays.
+   - The template was updated to use only the filtered keys for rendering in all sections.
+   - Result: comp_id/company_id still appeared in some sections, especially when the data structure was more complex or when the template did not use the filtered keys everywhere.
+
+5. **Template Usage:**
+   - The template uses v-for="key in getSettingsFieldsForDisplay(item, settingsView)" and then accesses item[key].
+   - If the exclusion logic is not applied consistently or if the template accesses the raw object, comp_id/company_id may still be rendered.
+
+6. **Root Cause (Suspected):**
+   - The data structure returned by the backend may have comp_id/company_id at multiple levels or in unexpected places.
+   - The template or the filtering function may not be handling all possible nesting scenarios.
+   - There may be a mismatch between the filtered keys and the actual data rendered in the template.
+
+7. **Next Steps (if needed):**
+   - Consider flattening or normalizing the data structure before rendering.
+   - Ensure the template always uses only the filtered keys for rendering, at every level.
+   - Optionally, preprocess the data to remove comp_id/company_id before passing to the template.
+
+8. **Summary:**
+   - Multiple attempts were made to exclude comp_id/company_id from all settings sections, including robust recursive filtering.
+   - The problem persists, likely due to data structure complexity or template usage.
+   - Further investigation or a different approach (e.g., data preprocessing) may be required. 

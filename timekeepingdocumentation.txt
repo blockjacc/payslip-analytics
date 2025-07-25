@@ -5,7 +5,7 @@ employee_time_in_id	INT(55) AUTO_INCREMENT	n	"Primary key, unique time-in entry"
 work_schedule_id	INT(11)	n	Reference to work schedule	work_schedule_id																						
 emp_id	INT(55)	n	Employee ID	emp_id																						
 comp_id	INT(55)	n	Company ID	comp_id																						
-date	DATE	n	Date of attendance																							
+date	DATE	n	Date of attendance																						
 time_in	DATETIME	n	Employee time in																							
 lunch_out	DATETIME	n	Lunch break start																							
 lunch_in	DATETIME	n	Lunch break end																							
@@ -13,7 +13,8 @@ break1_out	DATETIME	n	1st Short Break time IN logs
 break1_in	DATETIME	n	1st Short Break time OUT logs																							
 break2_out	DATETIME	n	2st Short Break time IN logs																							
 break2_in	DATETIME	n	2st Short Break time OUT logs																							
-time_out	DATETIME	n	Employee time out																							
+time_out	DATETIME	n	Employee time out		
+-----------------------------------------------------------------------------------------------------------------------------------																					
 total_hours	"DECIMAL(11,2)"	n	Required work hours	note: nabali ang kani 2 fields but gisunod nalang nko																						
 total_hours_required	"DECIMAL(10,2)"	n	Total hours rendered																							
 corrected	"ENUM('No','Yes')"	n	Indicates if the log was corrected manually																							
@@ -24,7 +25,8 @@ late_min	INT(4)	n	Minutes late
 tardiness_min	"DECIMAL(6,2)"	n	Total tardiness minutes																							
 undertime_min	"DECIMAL(11,2)"	n	Total undertime minutes																							
 absent_min	"DECIMAL(11,2)"	n	Total absent minutes																							
-notes	TEXT	n	Additional notes																							
+notes	TEXT	n	Additional notes						
+----------------------------------------------------------------------------------------------------------------------------------																	
 source	VARCHAR(250) DEFAULT 'kiosk'	n	"Source of the log (e.g., kiosk, system)"																							
 last_source	VARCHAR(22)	n	Last known source																							
 shift_name	VARCHAR(100)	n	Name of the shift																							
