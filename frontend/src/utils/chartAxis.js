@@ -119,61 +119,101 @@ export function getSimpleYAxis(values) {
  * @returns {Object} Complete chart configuration with data and options
  */
 export function getUnifiedStackedBarChart(items, valueKey, labelKey, colorPalette, options = {}) {
-  // Sort items by value (lowest to highest) for proper stacking
-  const sortedItems = [...items].sort((a, b) => a[valueKey] - b[valueKey]);
-  
+  // If per-period stacking is requested, compute stacking order for each period
+  let stackingOrders = null;
+  let periods = options.periods || [{ data: items }];
+  if (options.perPeriodStacking && periods.length > 1) {
+    stackingOrders = getStackingOrderForPeriods(
+      periods,
+      items.map(item => item[labelKey]),
+      (period, field) => {
+        // Find the item in this period with the given label
+        const found = (period.data || []).find(i => i[labelKey] === field);
+        return found ? found[valueKey] : 0;
+      }
+    );
+  }
+
   // Extract values for tick generation
-  const values = sortedItems.map(item => item[valueKey]);
-  
+  let values = [];
+  if (stackingOrders) {
+    periods.forEach(period => {
+      (period.data || []).forEach(item => {
+        values.push(item[valueKey]);
+      });
+    });
+  } else {
+    values = items.map(item => item[valueKey]);
+  }
+
   // Generate ticks using our standard utility
   const { min, max, ticks, mapValue } = getSimpleYAxis(values);
-  
-  // Calculate cumulative positions for proper stacking
-  let cumulativeValues = [];
-  let runningSum = 0;
-  
-  // Build cumulative sums: [91, 191, 305]
-  for (const item of sortedItems) {
-    runningSum += item[valueKey];
-    cumulativeValues.push(runningSum);
-  }
-  
-  // Map cumulative sums to logarithmic positions
-  const cumulativeLogPositions = cumulativeValues.map(cumVal => mapValue(cumVal));
-  
-  // Calculate incremental heights for each segment
-  const incrementalHeights = [];
-  for (let i = 0; i < cumulativeLogPositions.length; i++) {
-    if (i === 0) {
-      incrementalHeights.push(cumulativeLogPositions[0]); // First segment starts from 0
-    } else {
-      incrementalHeights.push(cumulativeLogPositions[i] - cumulativeLogPositions[i-1]); // Difference
-    }
-  }
-  
-  // DEBUG: Log corrected stacking logic
-  console.log('=== CORRECTED STACKING DEBUG ===');
-  console.log('sortedItems:', sortedItems.map(item => ({ label: item[labelKey], value: item[valueKey] })));
-  console.log('Cumulative values:', cumulativeValues);
-  console.log('Cumulative log positions:', cumulativeLogPositions);
-  console.log('Incremental heights:', incrementalHeights);
-  console.log('Sum of incremental heights:', incrementalHeights.reduce((sum, val) => sum + val, 0));
-  console.log('Should equal max log position:', mapValue(max));
-  console.log('====================================');
 
-  // Create chart data with corrected stacking
-  const chartData = {
-    labels: options.labels || [''],
-    datasets: sortedItems.map((item, idx) => ({
-      label: item[labelKey],
-      data: [incrementalHeights[idx]], // Use incremental height, not individual mapping
-      backgroundColor: colorPalette[items.indexOf(item) % colorPalette.length], // Use original index for consistent colors
-      borderColor: options.borderColor || '#222c44',
-      borderWidth: options.borderWidth || 2,
-      order: idx
-    }))
-  };
-  
+  let chartData;
+  if (stackingOrders) {
+    // Per-period stacking: each bar (period) has its own stacking order
+    const maxFields = items.length;
+    chartData = {
+      labels: periods.map((period, idx) => period.label || `Period ${idx + 1}`),
+      datasets: Array.from({ length: maxFields }).map((_, stackIdx) => {
+        return {
+          label: null, // will be set per period in tooltip
+          data: periods.map((period, periodIdx) => {
+            const field = stackingOrders[periodIdx][stackIdx];
+            const found = (period.data || []).find(i => i[labelKey] === field);
+            const value = found ? found[valueKey] : 0;
+            return mapValue(value);
+          }),
+          backgroundColor: periods.map((period, periodIdx) => {
+            const field = stackingOrders[periodIdx][stackIdx];
+            const found = items.find(i => i[labelKey] === field);
+            return found ? colorPalette[items.indexOf(found) % colorPalette.length] : '#24c2ab';
+          }),
+          borderColor: options.borderColor || '#222c44',
+          borderWidth: options.borderWidth || 2,
+          _fields: periods.map((period, periodIdx) => stackingOrders[periodIdx][stackIdx])
+        };
+      })
+    };
+    // Set dataset labels for legend (use first period's stacking order)
+    chartData.datasets.forEach((ds, idx) => {
+      const field = stackingOrders[0][idx];
+      ds.label = field;
+    });
+  } else {
+    // Default: global stacking order (legacy)
+    const sortedItems = [...items].sort((a, b) => a[valueKey] - b[valueKey]);
+    // Calculate cumulative positions for proper stacking
+    let cumulativeValues = [];
+    let runningSum = 0;
+    for (const item of sortedItems) {
+      runningSum += item[valueKey];
+      cumulativeValues.push(runningSum);
+    }
+    // Map cumulative sums to logarithmic positions
+    const cumulativeLogPositions = cumulativeValues.map(cumVal => mapValue(cumVal));
+    // Calculate incremental heights for each segment
+    const incrementalHeights = [];
+    for (let i = 0; i < cumulativeLogPositions.length; i++) {
+      if (i === 0) {
+        incrementalHeights.push(cumulativeLogPositions[0]);
+      } else {
+        incrementalHeights.push(cumulativeLogPositions[i] - cumulativeLogPositions[i-1]);
+      }
+    }
+    chartData = {
+      labels: options.labels || [''],
+      datasets: sortedItems.map((item, idx) => ({
+        label: item[labelKey],
+        data: [incrementalHeights[idx]],
+        backgroundColor: colorPalette[items.indexOf(item) % colorPalette.length],
+        borderColor: options.borderColor || '#222c44',
+        borderWidth: options.borderWidth || 2,
+        order: idx
+      }))
+    };
+  }
+
   // Create chart options with our standard configuration
   const chartOptions = {
     responsive: true,
@@ -209,9 +249,16 @@ export function getUnifiedStackedBarChart(items, valueKey, labelKey, colorPalett
         padding: 12,
         callbacks: {
           label: ctx => {
-            // Find the original value from the sorted items
-            const originalValue = sortedItems[ctx.datasetIndex][valueKey];
-            return `${ctx.dataset.label}: ${originalValue.toLocaleString('en-US')}`;
+            if (ctx.dataset._fields) {
+              const field = ctx.dataset._fields[ctx.dataIndex];
+              const found = (periods[ctx.dataIndex].data || []).find(i => i[labelKey] === field);
+              const value = found ? found[valueKey] : 0;
+              return `${field}: ${value.toLocaleString('en-US')}`;
+            } else {
+              // Legacy/global stacking
+              const originalValue = items[ctx.datasetIndex][valueKey];
+              return `${ctx.dataset.label}: ${originalValue.toLocaleString('en-US')}`;
+            }
           }
         }
       },
@@ -247,8 +294,6 @@ export function getUnifiedStackedBarChart(items, valueKey, labelKey, colorPalett
             weight: 'bold' 
           },
           callback: function(value, index, values) {
-            console.log(`${options.chartName || 'Chart'} tick callback - Chart.js value:`, value, 'index:', index, 'our tick value:', ticks[index]);
-            // Map Chart.js tick positions to our exact values
             if (index < ticks.length) {
               return Math.round(ticks[index]).toLocaleString('en-US');
             }
@@ -262,10 +307,24 @@ export function getUnifiedStackedBarChart(items, valueKey, labelKey, colorPalett
   return {
     chartData,
     chartOptions,
-    sortedItems,
+    stackingOrders,
     values,
     ticks
   };
+}
+
+/**
+ * Computes per-period stacking order for fields/items.
+ * For each period, returns an array of field/item keys sorted by value (ascending).
+ * @param {Array} periods - Array of period objects (with summary or data)
+ * @param {Array} fields - Array of field/item keys
+ * @param {Function} getValue - Function (period, field) => value
+ * @returns {Array<Array>} stackingOrders[periodIndex] = [field1, field2, ...]
+ */
+export function getStackingOrderForPeriods(periods, fields, getValue) {
+  return periods.map(period => {
+    return [...fields].sort((a, b) => (getValue(period, a) || 0) - (getValue(period, b) || 0));
+  });
 }
 
 /**
@@ -280,16 +339,16 @@ export function getUnifiedStackedBarChart(items, valueKey, labelKey, colorPalett
  * @returns {Object} Complete chart configuration with data and options
  */
 export function getUnifiedPayslipChart(selectedFields, periods, formatLabel, fieldColors, options = {}) {
-  // Calculate total values for each field across all periods
-  const fieldTotals = {};
-  selectedFields.forEach(field => {
-    fieldTotals[field] = periods.reduce((sum, period) => 
-      sum + (period.summary ? period.summary[field] || 0 : 0), 0);
-  });
-  
-  // Sort fields by their total values (lowest to highest) for proper stacking
-  const sortedFields = [...selectedFields].sort((a, b) => fieldTotals[a] - fieldTotals[b]);
-  
+  // If per-period stacking is requested, compute stacking order for each period
+  let stackingOrders = null;
+  if (options.perPeriodStacking) {
+    stackingOrders = getStackingOrderForPeriods(
+      periods,
+      selectedFields,
+      (period, field) => period.summary ? period.summary[field] || 0 : 0
+    );
+  }
+
   // Extract all values for tick generation
   const values = [];
   periods.forEach(period => {
@@ -297,24 +356,72 @@ export function getUnifiedPayslipChart(selectedFields, periods, formatLabel, fie
       values.push(period.summary ? period.summary[field] || 0 : 0);
     });
   });
-  
+
   // Generate ticks using our standard utility
   const { min, max, ticks, mapValue } = getSimpleYAxis(values);
-  
+
   // Create chart data with logarithmically positioned values
-  const chartData = {
-    labels: periods.map(period => period.label),
-    datasets: sortedFields.map(field => ({
-      label: formatLabel(field),
-      data: periods.map(period => {
-        const originalValue = period.summary ? period.summary[field] || 0 : 0;
-        return mapValue(originalValue); // Map to logarithmic position
-      }),
-      backgroundColor: fieldColors[field] || '#24c2ab',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
-      borderWidth: 1
-    }))
-  };
+  let chartData;
+  if (stackingOrders) {
+    // Per-period stacking: each bar (period) has its own stacking order
+    // For Chart.js, we need to build datasets so that for each field, the data array aligns with the stacking order for each period
+    // We'll transpose the data: for each period, for each field in that period's stacking order, assign the mapped value
+    // To do this, we need to build datasets for all unique fields across all periods, but order the data in each period by that period's stacking order
+    // For each period, stackingOrders[periodIdx] gives the order for that period
+    // We'll build one dataset per field, but in each period, the value will be 0 unless that field is at the correct stacking position
+    // Instead, we will build one dataset per stacking position (max fields), and in each period, the dataset at that position is the field at that stacking order for that period
+    // This way, the stacking order is correct per period
+    const maxFields = selectedFields.length;
+    chartData = {
+      labels: periods.map(period => period.label),
+      datasets: Array.from({ length: maxFields }).map((_, stackIdx) => {
+        return {
+          label: null, // will be set per period in tooltip
+          data: periods.map((period, periodIdx) => {
+            const field = stackingOrders[periodIdx][stackIdx];
+            const value = period.summary ? period.summary[field] || 0 : 0;
+            return mapValue(value);
+          }),
+          backgroundColor: periods.map((period, periodIdx) => {
+            const field = stackingOrders[periodIdx][stackIdx];
+            return fieldColors[field] || '#24c2ab';
+          }),
+          borderColor: 'rgba(255, 255, 255, 0.1)',
+          borderWidth: 1,
+          // Custom property to help with tooltips
+          _fields: periods.map((period, periodIdx) => stackingOrders[periodIdx][stackIdx])
+        };
+      })
+    };
+    // Set dataset labels for legend (use first period's stacking order)
+    chartData.datasets.forEach((ds, idx) => {
+      const field = stackingOrders[0][idx];
+      ds.label = formatLabel(field);
+    });
+  } else {
+    // Default: global stacking order (legacy)
+    // Calculate total values for each field across all periods
+    const fieldTotals = {};
+    selectedFields.forEach(field => {
+      fieldTotals[field] = periods.reduce((sum, period) => 
+        sum + (period.summary ? period.summary[field] || 0 : 0), 0);
+    });
+    // Sort fields by their total values (lowest to highest) for proper stacking
+    const sortedFields = [...selectedFields].sort((a, b) => fieldTotals[a] - fieldTotals[b]);
+    chartData = {
+      labels: periods.map(period => period.label),
+      datasets: sortedFields.map(field => ({
+        label: formatLabel(field),
+        data: periods.map(period => {
+          const originalValue = period.summary ? period.summary[field] || 0 : 0;
+          return mapValue(originalValue); // Map to logarithmic position
+        }),
+        backgroundColor: fieldColors[field] || '#24c2ab',
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderWidth: 1
+      }))
+    };
+  }
   
   // Create chart options with our standard configuration
   const aggregationType = options.aggregationType || 'single';
@@ -337,8 +444,6 @@ export function getUnifiedPayslipChart(selectedFields, periods, formatLabel, fie
             size: 12
           },
           callback: function(value, index, values) {
-            console.log('Payslip tick callback - Chart.js value:', value, 'index:', index, 'our tick value:', ticks[index]);
-            // Map Chart.js tick positions to our exact values
             if (index < ticks.length) {
               return Math.round(ticks[index]).toLocaleString('en-US');
             }
@@ -395,12 +500,21 @@ export function getUnifiedPayslipChart(selectedFields, periods, formatLabel, fie
         padding: 10,
         callbacks: {
           label: function(context) {
-            const label = context.dataset.label || '';
-            // Get the original value before logarithmic mapping
-            const fieldIndex = sortedFields.indexOf(selectedFields.find(f => formatLabel(f) === label));
-            const field = sortedFields[fieldIndex];
-            const originalValue = periods[context.dataIndex].summary ? periods[context.dataIndex].summary[field] || 0 : 0;
-            return `${label}: ${originalValue.toLocaleString('en-US')}`;
+            // For per-period stacking, use _fields to get the field for this period/stack
+            if (context.dataset._fields) {
+              const field = context.dataset._fields[context.dataIndex];
+              const label = formatLabel(field);
+              const period = periods[context.dataIndex];
+              const value = period.summary ? period.summary[field] || 0 : 0;
+              return `${label}: ${value.toLocaleString('en-US')}`;
+            } else {
+              // Legacy/global stacking
+              const label = context.dataset.label || '';
+              const fieldIndex = selectedFields.findIndex(f => formatLabel(f) === label);
+              const field = selectedFields[fieldIndex];
+              const originalValue = periods[context.dataIndex].summary ? periods[context.dataIndex].summary[field] || 0 : 0;
+              return `${label}: ${originalValue.toLocaleString('en-US')}`;
+            }
           }
         }
       }
@@ -410,7 +524,7 @@ export function getUnifiedPayslipChart(selectedFields, periods, formatLabel, fie
   return {
     chartData,
     chartOptions,
-    sortedFields,
+    stackingOrders,
     values,
     ticks
   };

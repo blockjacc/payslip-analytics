@@ -1,0 +1,26 @@
+Affected Areas for Chart Stacking Order Logic
+============================================
+
+1. Payslip Analytics
+   - frontend/src/views/Analytics.vue
+     * Uses: getUnifiedPayslipChart
+
+2. Shifts Analytics
+   - frontend/src/views/ShiftsScheduleTypeAnalytics.vue
+     * Uses: getUnifiedStackedBarChart
+   - frontend/src/views/ShiftsAllocationAnalytics.vue
+     * Uses: getUnifiedStackedBarChart
+
+3. Chart Utilities
+   - frontend/src/utils/chartAxis.js
+     * Defines: getUnifiedPayslipChart, getUnifiedStackedBarChart, getSimpleYAxis, getLogYAxisConfig
+     * Referenced in documentation for future use
+
+4. Documentation
+   - README.md, frontend/README.md, learnings3.txt
+     * Reference these utilities for future development and onboarding
+
+5. Other Analytics Modules
+   - No direct usage found in: DeepDive, DrillDown, or other analytics-related Vue files (as of current codebase)
+
+Note: This inventory should be updated if new modules or files begin using these shared chart utilities. 

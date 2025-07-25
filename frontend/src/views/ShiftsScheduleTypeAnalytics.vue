@@ -59,7 +59,7 @@ export default {
     },
     chartData() {
       if (!this.scheduleTypes.length) return { labels: [], datasets: [] };
-      // Use unified chart configuration
+      // Use unified chart configuration with per-period stacking
       const { chartData } = getUnifiedStackedBarChart(
         this.scheduleTypes,
         'count',
@@ -72,14 +72,15 @@ export default {
           fontSize: 14,
           fontFamily: 'Open Sans',
           borderColor: 'rgba(255, 255, 255, 0.1)',
-          borderWidth: 1
+          borderWidth: 1,
+          perPeriodStacking: true
         }
       );
       return chartData;
     },
     chartOptions() {
       if (!this.scheduleTypes.length) return {};
-      // Use unified chart configuration
+      // Use unified chart configuration with per-period stacking
       const { chartOptions } = getUnifiedStackedBarChart(
         this.scheduleTypes,
         'count',
@@ -92,7 +93,8 @@ export default {
           fontSize: 14,
           fontFamily: 'Open Sans',
           borderColor: 'rgba(255, 255, 255, 0.1)',
-          borderWidth: 1
+          borderWidth: 1,
+          perPeriodStacking: true
         }
       );
       return chartOptions;

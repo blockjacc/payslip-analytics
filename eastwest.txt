@@ -1,0 +1,1943 @@
+{
+  "count": 323,
+  "employees": [
+    {
+      "company_name": "Aegis Secure Solutions Corp.",
+      "first_name": "richelle",
+      "last_name": "albuya",
+      "shift_name": "10PM to 7AM Dynamic"
+    },
+    {
+      "company_name": "Aegis Secure Solutions Corp.",
+      "first_name": "jay",
+      "last_name": "anuncio",
+      "shift_name": "10PM to 7AM Dynamic"
+    },
+    {
+      "company_name": "Aegis Secure Solutions Corp.",
+      "first_name": "norlan",
+      "last_name": "diestro",
+      "shift_name": "10PM to 7AM Dynamic"
+    },
+    {
+      "company_name": "Aegis Secure Solutions Corp.",
+      "first_name": "christopher john",
+      "last_name": "laurente",
+      "shift_name": "10PM to 7AM Dynamic"
+    },
+    {
+      "company_name": "Bigfoot Properties Inc.",
+      "first_name": "rodolfo",
+      "last_name": "bayocboc jr.",
+      "shift_name": "SG 10pm to 6am dynamic-2"
+    },
+    {
+      "company_name": "Bigfoot Properties Inc.",
+      "first_name": "Junil",
+      "last_name": "Dayondon",
+      "shift_name": "SG 10pm to 6am dynamic-2"
+    },
+    {
+      "company_name": "Bigfoot Properties Inc.",
+      "first_name": "gleen",
+      "last_name": "sombelon",
+      "shift_name": "SG 10pm to 6am dynamic-2"
+    },
+    {
+      "company_name": "Bigfoot Properties Inc.",
+      "first_name": "Richard",
+      "last_name": "Tabolong",
+      "shift_name": "SG 10pm to 6am dynamic-2"
+    },
+    {
+      "company_name": "BSA Solutions Outsourcing Inc.",
+      "first_name": "jemuel",
+      "last_name": "beltran",
+      "shift_name": "10pm to 7am wed-thur RD"
+    },
+    {
+      "company_name": "Creative Agency",
+      "first_name": "leo",
+      "last_name": "lim",
+      "shift_name": "10pm - 7am"
+    },
+    {
+      "company_name": "Donna Payslip Checker",
+      "first_name": "holiday sched 29",
+      "last_name": "labang",
+      "shift_name": "10pm-7am RD mon tues"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Christine",
+      "last_name": "Acopiado",
+      "shift_name": "10pm to 7am RD Sun-Mon"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Dexter",
+      "last_name": "Aguilar",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "jinkie",
+      "last_name": "alfonso",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Mario",
+      "last_name": "Ancheta",
+      "shift_name": "Security 10pm to 6am"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Donabel",
+      "last_name": "Bague",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Maria Angelica",
+      "last_name": "Bailen",
+      "shift_name": "10pm to 9am RD Sun-Mon-Sat"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Alyssa Faye",
+      "last_name": "Balagtas",
+      "shift_name": "10pm to 7am RD Sun/Mon"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Caezar Arnest",
+      "last_name": "Baluyot",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Nelyn",
+      "last_name": "Barical",
+      "shift_name": "10pm to 7am RD Tues/Wed"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Froilan",
+      "last_name": "Bautista",
+      "shift_name": "10pm to 9am RD Tue-Wed-Thu"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Joseph Ritz",
+      "last_name": "Bautista",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Leah Vanessa",
+      "last_name": "Bautista",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Joemar",
+      "last_name": "Bello",
+      "shift_name": "10pm to 7am RD Tues/Wed"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "pierre karim",
+      "last_name": "bernarte",
+      "shift_name": "10pm to 7am RD Fri-Sat"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Paul John",
+      "last_name": "Bonote",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Francis",
+      "last_name": "Borromeo",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jerico",
+      "last_name": "Buan",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Shaina Andrea",
+      "last_name": "Buan",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "jeff czar",
+      "last_name": "bulacito",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Sheila Rae",
+      "last_name": "Burton",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Steven Kennedy",
+      "last_name": "Cachuela",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Almar",
+      "last_name": "canlas",
+      "shift_name": "10pm to 7am RD Tue/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Ana Marie",
+      "last_name": "Carla",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jose Jacel",
+      "last_name": "Cartera",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Bernadeth",
+      "last_name": "Catacutan",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Leandro",
+      "last_name": "Chua",
+      "shift_name": "10pm to 9am RD Thu-Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Timothy John",
+      "last_name": "Cruz",
+      "shift_name": "10pm to 7am RD Sun-Mon"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Bon Bryan",
+      "last_name": "Cunanan",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jayvie",
+      "last_name": "Dadivas",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "carmina",
+      "last_name": "david",
+      "shift_name": "10pm to 7am RD Tue/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Michael John",
+      "last_name": "David",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Sandra Mae",
+      "last_name": "De Vera",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "keana maree",
+      "last_name": "del pilar",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Myco",
+      "last_name": "Dela Cruz",
+      "shift_name": "10pm to 7am RD Thurs/Fri"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Genesie Mizpah",
+      "last_name": "Dimla",
+      "shift_name": "10pm to 7am RD Sun/Mon"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Eric John",
+      "last_name": "Dizon",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Maynard",
+      "last_name": "Dizon",
+      "shift_name": "10pm to 7am RD Fri-Sat"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Carlos",
+      "last_name": "Dizon Jr",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Beyonce Therese",
+      "last_name": "Echevarria",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Winston",
+      "last_name": "Espanola",
+      "shift_name": "10pm to 7am RD Tue/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Valherine Kate",
+      "last_name": "Estrada",
+      "shift_name": "10pm to 7am RD Sun-Mon"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Marrielle",
+      "last_name": "Gabutero",
+      "shift_name": "10pm to 7am RD Tue/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "rechel may",
+      "last_name": "garcia",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "silvestre",
+      "last_name": "garsuta jr.",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Mary Rose",
+      "last_name": "Guillermo",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Lynette",
+      "last_name": "Henson",
+      "shift_name": "10pm to 7am RD Tue/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jaycee",
+      "last_name": "Hipolito",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Janica Audrey Angel",
+      "last_name": "Joven",
+      "shift_name": "10pm to 7am RD Fri/Sat"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Gio Dale",
+      "last_name": "Juico",
+      "shift_name": "10pm to 9am RD Sun-Mon-Tue"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Barbara",
+      "last_name": "Lacap",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Anmyrtolin",
+      "last_name": "Laurino",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Ed Paulo",
+      "last_name": "Liwanag",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Edmar",
+      "last_name": "Lunar",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Ayron",
+      "last_name": "Macaspac",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Virginia",
+      "last_name": "Magbitang",
+      "shift_name": "10pm to 7am RD Wed-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "camille",
+      "last_name": "maglalang",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "kim fredrick",
+      "last_name": "maglalang",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Roldan",
+      "last_name": "Magtanong",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jesha",
+      "last_name": "Malabanan",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Ana Katrina",
+      "last_name": "Malit",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Matthew",
+      "last_name": "Malit",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Arjay",
+      "last_name": "Mallari",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "jhon aidrian",
+      "last_name": "mallari",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Rendel",
+      "last_name": "Mallari",
+      "shift_name": "10pm to 7am RD Thurs/Fri"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Johnsen Cesar",
+      "last_name": "Malonzo",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Daniella Denise",
+      "last_name": "Manalili",
+      "shift_name": "10pm to 7am RD Thurs/Fri"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Lizeth",
+      "last_name": "Manalili",
+      "shift_name": "10pm to 7am RD Tue/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jocelyn",
+      "last_name": "Mananquil",
+      "shift_name": "10pm to 7am RD Fri-Sat"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Albert",
+      "last_name": "Maniago",
+      "shift_name": "10pm to 7am RD Fri-Sat"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Raymart",
+      "last_name": "Marlangawe",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jerric",
+      "last_name": "Martin",
+      "shift_name": "10pm to 7am RD Thurs/Fri"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Robin",
+      "last_name": "Matranas",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "gladez",
+      "last_name": "melgar",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "nino jesuel",
+      "last_name": "miranda",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Melvin",
+      "last_name": "Nicdao",
+      "shift_name": "10pm to 7am RD Sun/Mon"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Noemecel",
+      "last_name": "Nicolas",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jaymalyn",
+      "last_name": "Ninalga",
+      "shift_name": "10pm to 9am RD Sun-Tue-Wed"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Shayne",
+      "last_name": "Nuguid",
+      "shift_name": "10pm to 7am RD Sun/Mon"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jodeline Lucresia",
+      "last_name": "Nunez",
+      "shift_name": "10pm to 7am RD Wed/Thurs"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Maylene",
+      "last_name": "Ocampo",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Mark Allen",
+      "last_name": "Olalia",
+      "shift_name": "10pm to 9am RD Tue-Wed-Thu"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Zoe",
+      "last_name": "Orbigo",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "majale angelika lou",
+      "last_name": "panerio",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Willie",
+      "last_name": "Pangan",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jeremiah",
+      "last_name": "Pangilinan",
+      "shift_name": "10pm to 9am RD Thu-Fri-Sat"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Lorelyn",
+      "last_name": "Pangilinan",
+      "shift_name": "10pm to 7am RD Teus/Wed"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "jowen",
+      "last_name": "panlaqui",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Katrine Kate",
+      "last_name": "Paragas",
+      "shift_name": "10pm to 7am RD Wed/Thurs"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Karen",
+      "last_name": "Paz",
+      "shift_name": "10pm to 7am RD Thurs/Fri"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Bernie Stephen",
+      "last_name": "Pimentel",
+      "shift_name": "10pm to 7am RD Sun/Mon"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Christopher",
+      "last_name": "Pineda",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Milan",
+      "last_name": "Pineda",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Kurt",
+      "last_name": "Pingul",
+      "shift_name": "10pm to 9am RD Sun-Tue-Wed"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Adam",
+      "last_name": "Pinlac",
+      "shift_name": "10pm to 7am RD Teus/Wed"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jimbert",
+      "last_name": "Puno",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Cherry Lyn",
+      "last_name": "Quirante",
+      "shift_name": "10pm to 7am RD Thurs/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Stephanie Claire",
+      "last_name": "Reforma",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Ana Kriszel",
+      "last_name": "Reyes",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Edmond",
+      "last_name": "Roa",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jessa",
+      "last_name": "Sabian",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Edwin",
+      "last_name": "San Juan",
+      "shift_name": "Security 10pm to 6am"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Christian",
+      "last_name": "Sanchez",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Clare Agatha Eunice",
+      "last_name": "Santos",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Francesca Wrenice",
+      "last_name": "Santos",
+      "shift_name": "10pm to 7am RD Saturday"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Rosemarie",
+      "last_name": "Santos",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Rosemeld",
+      "last_name": "Santos",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Florelyn",
+      "last_name": "Suarez",
+      "shift_name": "10pm to 7am RD Fri/Sat"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Queen Diannette",
+      "last_name": "Sunega",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jace",
+      "last_name": "Sunglao",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Joy Alvie",
+      "last_name": "Tecson",
+      "shift_name": "10pm to 7am RD Thurs/Fri"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Carmella",
+      "last_name": "Tibay",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "andeener",
+      "last_name": "tiglao",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Marian Joy",
+      "last_name": "Tiglao",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Margie",
+      "last_name": "Timbol",
+      "shift_name": "10pm to 7am RD Sat-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jensen",
+      "last_name": "Tiongco",
+      "shift_name": "10pm to 7am RD Tue/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Casandra Mae",
+      "last_name": "Toledo",
+      "shift_name": "10pm to 7am RD Sun-Mon"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "John Philip",
+      "last_name": "Utulo",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Ryan Christopher",
+      "last_name": "Vasquez",
+      "shift_name": "10pm to 7am RD Thurs-Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jesus",
+      "last_name": "Velasco",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Jerald",
+      "last_name": "Viray",
+      "shift_name": "10pm to 7am RD Thurs/Fri"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Julie",
+      "last_name": "Yogawen",
+      "shift_name": "10pm to 7am RD Sat/Sun"
+    },
+    {
+      "company_name": "EASTWEST BPO, INC.",
+      "first_name": "Aaron Rhic",
+      "last_name": "Yutuc",
+      "shift_name": "10pm to 7am RD Tue/Sun"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "ruffa mae",
+      "last_name": "amamangpang",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "ferlyn",
+      "last_name": "arong",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "john lester",
+      "last_name": "bejarasco",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "ariel",
+      "last_name": "caballero",
+      "shift_name": "Night Shift - 10:00 PM to 7:00 AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "jovanie",
+      "last_name": "cabante",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "ivy trishia",
+      "last_name": "jayme",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "marie chris",
+      "last_name": "kintanilla",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "james lemuel",
+      "last_name": "lawas",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "micole corzenie",
+      "last_name": "lumansang",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "constanica fe",
+      "last_name": "pesidas",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "jefrizon",
+      "last_name": "quebuen",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "john brian",
+      "last_name": "riveral",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "lutchie",
+      "last_name": "sevilla",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Global Healthcare Resource Philippines Inc.",
+      "first_name": "mark diven",
+      "last_name": "tudtud",
+      "shift_name": "10PM to 7AM"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "gamaliel",
+      "last_name": "alfanta",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "winston",
+      "last_name": "alinea",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Gave",
+      "last_name": "Alingasa",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "kimberly megan",
+      "last_name": "amor",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "darlene",
+      "last_name": "aroma",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "isaac",
+      "last_name": "asistol",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "klevin",
+      "last_name": "austria",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Lourence",
+      "last_name": "Bajarias",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Carmela Mae",
+      "last_name": "Cadayona",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Adrian Kent",
+      "last_name": "Calacar",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Rea May Grace",
+      "last_name": "Calda",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "erma",
+      "last_name": "camarenes",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "jennifer",
+      "last_name": "canoy",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "michelle",
+      "last_name": "catedral",
+      "shift_name": "10:00 PM- 7:00 AM "
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "mellyzza carlyne",
+      "last_name": "catingub",
+      "shift_name": "10:00 PM- 7:00 AM "
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "jade einsel",
+      "last_name": "cresino",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "rey leonardo",
+      "last_name": "dabatian",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Irish",
+      "last_name": "Daclitan",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "ann jeanette",
+      "last_name": "desoyo",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "fredo",
+      "last_name": "devibar",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "brittany kate",
+      "last_name": "diez",
+      "shift_name": "Default"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "micolaine",
+      "last_name": "dolloso",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "john raynan",
+      "last_name": "enriquez",
+      "shift_name": "10:00 PM- 7:00 AM "
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "melissa",
+      "last_name": "erato",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Carevie",
+      "last_name": "Espina",
+      "shift_name": "10:00 PM- 7:00 AM "
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Kathleen Frances",
+      "last_name": "Evangelista",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "divine grace",
+      "last_name": "evidor",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Luke Ysmael",
+      "last_name": "Fedillaga",
+      "shift_name": "10:00 PM- 7:00 AM "
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "john andrew",
+      "last_name": "fin",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "pamela",
+      "last_name": "franco",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "joselle ann",
+      "last_name": "gabronino",
+      "shift_name": "10:00PM-7:00 AM Mon-Sun Off"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Marilou",
+      "last_name": "Galang",
+      "shift_name": "10:00 PM- 7:00 AM "
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "reggien",
+      "last_name": "gambayan",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Jenny",
+      "last_name": "Gaspar",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "jeanne",
+      "last_name": "kikoy",
+      "shift_name": "10:00 PM"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Lougene",
+      "last_name": "Kinilitan",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Isaac Telmo",
+      "last_name": "Lazo",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "janhasthon",
+      "last_name": "legaspi",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "sandra camille",
+      "last_name": "lineses",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "angeril",
+      "last_name": "luardo",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "michael vincent",
+      "last_name": "martin",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "arlene",
+      "last_name": "mejia",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "ryan faustino",
+      "last_name": "micabalo",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "jessa mae",
+      "last_name": "mission",
+      "shift_name": "Default"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "tiffany paige",
+      "last_name": "montesclaros",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "rhealine",
+      "last_name": "moore",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Ma.Inna Sophia",
+      "last_name": "Nobles",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Charmane Justice",
+      "last_name": "Nolasco",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "ma. shani dorte",
+      "last_name": "oca\u00f1ada",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Jubelyn May",
+      "last_name": "Pajarillaga",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "dan karlo",
+      "last_name": "papa",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Edmon",
+      "last_name": "Paradiang",
+      "shift_name": "10:00 PM - 7 AM Fri-Sat Off"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "marie jane",
+      "last_name": "paran",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "shelame",
+      "last_name": "pepito",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "jo aubrey",
+      "last_name": "pineda",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "marjorie",
+      "last_name": "presbitero",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "regino",
+      "last_name": "prevendido",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "charo may",
+      "last_name": "ramos",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Ray Christian",
+      "last_name": "Ramos",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "al gregory",
+      "last_name": "rejuso",
+      "shift_name": "HGreg Wed-Fri 10PM Sat 11PM Sun 11PM RD Mon Tue"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "maria veronica",
+      "last_name": "remolano",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "ariadna evonne",
+      "last_name": "rivas",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "marc lister",
+      "last_name": "rivera",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "roderick jr.",
+      "last_name": "rodaje",
+      "shift_name": "10:00 PM- 7:00 AM "
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Marvi Leigh",
+      "last_name": "Sadol",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Jerflor Ni\u00f1o",
+      "last_name": "Saladaga",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "veronica",
+      "last_name": "salalima",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Louella",
+      "last_name": "Salcedo",
+      "shift_name": "10:00 PM- 7:00 AM "
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Gerlyn",
+      "last_name": "Salimbangon",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "patrick ivan",
+      "last_name": "santillan",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "lois hannah",
+      "last_name": "suicon",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "alimar",
+      "last_name": "tapang",
+      "shift_name": "10:00 PM- 7:00 AM "
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Khrystal Colen",
+      "last_name": "Trangia",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "michael",
+      "last_name": "tumanda",
+      "shift_name": "10:00 PM- 7:00 AM "
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "Girlie Mae",
+      "last_name": "Villarta",
+      "shift_name": "10PM- 7AM SAT SUN RD"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "jessa sharmaine",
+      "last_name": "villaver",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Go Virtual Assistants, Inc.",
+      "first_name": "lailani",
+      "last_name": "yulas",
+      "shift_name": "10:00pm - 7:00am"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "Andrew",
+      "last_name": "Alvarez",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "Sheila Mae",
+      "last_name": "Bacayo",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "cherry may",
+      "last_name": "balbuena",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "Jayne Key",
+      "last_name": "Dela Cruz",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "ronald",
+      "last_name": "descalzota",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "john michael angelo",
+      "last_name": "dizon",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "warren",
+      "last_name": "figueroa",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "marie brienne",
+      "last_name": "lee",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "john jaevee",
+      "last_name": "mendoza",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "paolo antonio",
+      "last_name": "mirasol",
+      "shift_name": "CX 10PM to 7AM RD Sun Mon"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "angelica mae",
+      "last_name": "nicolas",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "marc romulus",
+      "last_name": "revoltar",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "virgil",
+      "last_name": "salgado",
+      "shift_name": "10PM - 7AM RD Fri-Sat"
+    },
+    {
+      "company_name": "Guesty Philippines Corporation",
+      "first_name": "paul",
+      "last_name": "yangao",
+      "shift_name": "10PM - 7AM RD Sat-Sun"
+    },
+    {
+      "company_name": "INTELECONNECT CONCEPTS, INC.",
+      "first_name": "WILSON",
+      "last_name": "JAYAGAN",
+      "shift_name": "Night Shift Schedule"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "mark glenn",
+      "last_name": "alqueza",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "stacy claudette",
+      "last_name": "antipuesto",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "Lawrence Nathaniel",
+      "last_name": "Antolo",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "dennis james",
+      "last_name": "cababan",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "ivan",
+      "last_name": "camacho",
+      "shift_name": "2200-0700 (TW)"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "rose guadalyn",
+      "last_name": "cane",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "mia grace",
+      "last_name": "del rosario",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "gemmy",
+      "last_name": "demiar",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "sidney wilbert",
+      "last_name": "encabo",
+      "shift_name": "2200-0700 (SS)"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "jaylord",
+      "last_name": "escarda",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "daniel",
+      "last_name": "fajardo",
+      "shift_name": "2200-0700 (TW)"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "leonar",
+      "last_name": "malunjao",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "louis joseph",
+      "last_name": "manalili",
+      "shift_name": "2200-0700 (TF)"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "mart alvin",
+      "last_name": "nacario",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "john paul",
+      "last_name": "perdiguez",
+      "shift_name": "2200-0700 (SS)"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "benedicto",
+      "last_name": "rizon",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "tiffanny",
+      "last_name": "salazar",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "john gregle",
+      "last_name": "senining",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "mariel may",
+      "last_name": "son",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "mary ann",
+      "last_name": "torion",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "ronald",
+      "last_name": "vergara",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "dave anthony",
+      "last_name": "villaver",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "IONOS PHILIPPINES, INC.",
+      "first_name": "jomarie",
+      "last_name": "vite&ntilde;o",
+      "shift_name": "2200-0700"
+    },
+    {
+      "company_name": "MasterRemit",
+      "first_name": "Gemli",
+      "last_name": "Tagab",
+      "shift_name": "10pm - 7am RD Sun Mon"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "francis daryl",
+      "last_name": "abcede",
+      "shift_name": "CW 10PM-7AM Without Lunch Logs"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "Milagros Corazon",
+      "last_name": "Bejer",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "rossely",
+      "last_name": "bohol",
+      "shift_name": "CW 10PM-7AM Without Lunch Logs"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "jennie Cris",
+      "last_name": "Borres",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs Sunday - Thursday Shift"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "lanne claudelyn",
+      "last_name": "boyonas",
+      "shift_name": "CW 10PM-7AM Without Lunch Logs"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "Lindsay May",
+      "last_name": "Calinawan",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs Sunday - Thursday Shift"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "bea patricia",
+      "last_name": "cutor",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "Kate Lianuelle",
+      "last_name": "Eyao",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs Sunday - Thursday Shift"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "James Michael",
+      "last_name": "Kiamco",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs Tuesday - Saturday Shift"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "Hazel",
+      "last_name": "Mendoza",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs Tuesday - Saturday Shift"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "Albert Alfie",
+      "last_name": "Reyes",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs Tuesday - Saturday Shift"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "sheree mae",
+      "last_name": "romano",
+      "shift_name": "CW 10PM-7AM Without Lunch Logs"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "Catherine",
+      "last_name": "Saavedra",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "April Angelou",
+      "last_name": "Sancover",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "mary chyll coe",
+      "last_name": "tormis",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs"
+    },
+    {
+      "company_name": "Noon Dalton Philippines Inc.",
+      "first_name": "debby rose",
+      "last_name": "villamor",
+      "shift_name": "CW 10PM - 7AM With Lunch Logs"
+    },
+    {
+      "company_name": "THRIVESOURCE GLOBAL INC",
+      "first_name": "junadel son",
+      "last_name": "amoro",
+      "shift_name": "10PM -7AM  M-F"
+    },
+    {
+      "company_name": "THRIVESOURCE GLOBAL INC",
+      "first_name": "eduard ryan",
+      "last_name": "fuentes",
+      "shift_name": "Mon-Thu and Sat RD Fri Sun "
+    },
+    {
+      "company_name": "THRIVESOURCE GLOBAL INC",
+      "first_name": "roy julius",
+      "last_name": "gepitulan",
+      "shift_name": "Sat to Wed 10PM -7AM"
+    },
+    {
+      "company_name": "THRIVESOURCE GLOBAL INC",
+      "first_name": "marrion royce",
+      "last_name": "villa",
+      "shift_name": "10PM -7AM M-F"
+    },
+    {
+      "company_name": "Valuelabs Philippines, Inc.",
+      "first_name": "Marie Cecille Angeline",
+      "last_name": "Senedo",
+      "shift_name": "EMAIL 10PM - 7AM SUN SAT RD"
+    },
+    {
+      "company_name": "VIRTUAL RECEPTION SYSTEMS LIMITED",
+      "first_name": "Jumay",
+      "last_name": "Aldaba",
+      "shift_name": "VT PM 22-07 SS"
+    },
+    {
+      "company_name": "VIRTUAL RECEPTION SYSTEMS LIMITED",
+      "first_name": "Jonnica",
+      "last_name": "Guillermo",
+      "shift_name": "VT PM 22-07 TW"
+    },
+    {
+      "company_name": "VIRTUAL RECEPTION SYSTEMS LIMITED",
+      "first_name": "jan angelo",
+      "last_name": "pagulayan. mr",
+      "shift_name": "VT PM 22-07 SS"
+    },
+    {
+      "company_name": "WINDWARD SOFTWARE PHILIPPINES INC.",
+      "first_name": "Dennis",
+      "last_name": "Lauron",
+      "shift_name": "Mon to Fri - 10PM TO 7AM"
+    },
+    {
+      "company_name": "WINDWARD SOFTWARE PHILIPPINES INC.",
+      "first_name": "Ina Gabrielle",
+      "last_name": "Madamba",
+      "shift_name": "Mon to Fri - 10PM TO 7AM"
+    },
+    {
+      "company_name": "WINDWARD SOFTWARE PHILIPPINES INC.",
+      "first_name": "Cherry Lou",
+      "last_name": "Moreno",
+      "shift_name": "Mon to Fri - 10PM TO 7AM"
+    },
+    {
+      "company_name": "WINDWARD SOFTWARE PHILIPPINES INC.",
+      "first_name": "Abigail Faye",
+      "last_name": "Nemenzo",
+      "shift_name": "Mon to Fri - 10PM TO 7AM"
+    },
+    {
+      "company_name": "WINDWARD SOFTWARE PHILIPPINES INC.",
+      "first_name": "Ceazar Mikhail Jr.",
+      "last_name": "Serranillo",
+      "shift_name": "Mon to Fri - 10PM TO 7AM"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "Bernard Aurelien",
+      "last_name": "Alogo",
+      "shift_name": "Dynamic 10pm-7am"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "John Gabrielle",
+      "last_name": "Baran",
+      "shift_name": "Dynamic 10pm-7am"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "lemuel",
+      "last_name": "caser jr.",
+      "shift_name": "10pm-7am Fri-Sat Off"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "rosielane",
+      "last_name": "cuyno",
+      "shift_name": "10pm-7am Mon-Sun Off"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "Rey Joshua",
+      "last_name": "Dayondon",
+      "shift_name": "Dynamic 10pm-7am"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "jayson",
+      "last_name": "frallon",
+      "shift_name": "10pm-7am Mon-Sun Off"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "john mark",
+      "last_name": "garcillano",
+      "shift_name": "10pm-7am Fri-Sat Off"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "Rajiv",
+      "last_name": "Mansukhani",
+      "shift_name": "Dynamic 10pm-7am"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "dalton",
+      "last_name": "mendoza",
+      "shift_name": "10pm-7am Sat-Sun Off"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "julian albert",
+      "last_name": "pacilan",
+      "shift_name": "10pm-7am Mon-Sun Off"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "Gladys",
+      "last_name": "Pepito",
+      "shift_name": "Dynamic 10pm-7am"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "michelle",
+      "last_name": "reynes",
+      "shift_name": "10pm-7am Fri-Sat Off"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "bella rutchie",
+      "last_name": "tolang",
+      "shift_name": "Dynamic 10pm-7am"
+    },
+    {
+      "company_name": "WorldRemit Service Centre Ltd",
+      "first_name": "Yna",
+      "last_name": "Tuting",
+      "shift_name": "Dynamic 10pm-7am"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "monica",
+      "last_name": "ajero",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "jella mae",
+      "last_name": "balmedina",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "roxanne",
+      "last_name": "basco",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "leon anatoly",
+      "last_name": "castro",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "carina",
+      "last_name": "de paz",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "michael angelo",
+      "last_name": "donato",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "Michael Alfred",
+      "last_name": "Gacayan",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "nor fatimah",
+      "last_name": "garcia",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "danilo",
+      "last_name": "guzon jr",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "mikee",
+      "last_name": "lita",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "Camille",
+      "last_name": "Manolis",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "lyka",
+      "last_name": "moret",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "queen venus",
+      "last_name": "savariz",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "joynoni eden",
+      "last_name": "tordilla",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "maricel",
+      "last_name": "toriaga",
+      "shift_name": "NS - 11pm to 8am_MON TUES WED THURS 10pm to 7am FRI - SAT SUN RD"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "jonah flor",
+      "last_name": "valladolid",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    },
+    {
+      "company_name": "ZZ Connect Inc",
+      "first_name": "Teresita",
+      "last_name": "Ventolero",
+      "shift_name": "10:00pm - 07:00am (SAT & SUN - RD)"
+    }
+  ]
+}

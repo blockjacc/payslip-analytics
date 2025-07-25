@@ -1,0 +1,201 @@
+
+DeepDive.vue:297 
+Array(1)
+0
+: 
+b_work_schedule_id
+: 
+null
+bg_color
+: 
+null
+company_id
+: 
+364
+cost_center_id
+: 
+0
+deleted
+: 
+"0"
+emp_id
+: 
+45435
+migrate_status
+: 
+null
+payroll_group_id
+: 
+0
+sequence_number
+: 
+null
+shift_name
+: 
+"2200-0700 (TW)"
+shift_status
+: 
+"Active"
+shifts_schedule_id
+: 
+31412444
+status
+: 
+"Active"
+text_color
+: 
+null
+until
+: 
+"Fri, 18 Apr 2025 00:00:00 GMT"
+valid_from
+: 
+"Fri, 18 Apr 2025 00:00:00 GMT"
+work_schedule_id
+: 
+110436
+work_type_name
+: 
+"Uniform Working Days"
+[[Prototype]]
+: 
+Object
+length
+: 
+1
+[[Prototype]]
+: 
+Array(0)
+at
+: 
+ƒ at()
+concat
+: 
+ƒ concat()
+constructor
+: 
+ƒ Array()
+copyWithin
+: 
+ƒ copyWithin()
+entries
+: 
+ƒ entries()
+every
+: 
+ƒ every()
+fill
+: 
+ƒ fill()
+filter
+: 
+ƒ filter()
+find
+: 
+ƒ find()
+findIndex
+: 
+ƒ findIndex()
+findLast
+: 
+ƒ findLast()
+findLastIndex
+: 
+ƒ findLastIndex()
+flat
+: 
+ƒ flat()
+flatMap
+: 
+ƒ flatMap()
+forEach
+: 
+ƒ forEach()
+includes
+: 
+ƒ includes()
+indexOf
+: 
+ƒ indexOf()
+join
+: 
+ƒ join()
+keys
+: 
+ƒ keys()
+lastIndexOf
+: 
+ƒ lastIndexOf()
+length
+: 
+0
+map
+: 
+ƒ map()
+pop
+: 
+ƒ pop()
+push
+: 
+ƒ push()
+reduce
+: 
+ƒ reduce()
+reduceRight
+: 
+ƒ reduceRight()
+reverse
+: 
+ƒ reverse()
+shift
+: 
+ƒ shift()
+slice
+: 
+ƒ slice()
+some
+: 
+ƒ some()
+sort
+: 
+ƒ sort()
+splice
+: 
+ƒ splice()
+toLocaleString
+: 
+ƒ toLocaleString()
+toReversed
+: 
+ƒ toReversed()
+toSorted
+: 
+ƒ toSorted()
+toSpliced
+: 
+ƒ toSpliced()
+toString
+: 
+ƒ toString()
+unshift
+: 
+ƒ unshift()
+values
+: 
+ƒ values()
+with
+: 
+ƒ with()
+Symbol(Symbol.iterator)
+: 
+ƒ values()
+Symbol(Symbol.unscopables)
+: 
+{at: true, copyWithin: true, entries: true, fill: true, find: true, …}
+[[Prototype]]
+: 
+Object
+﻿
+
+
+

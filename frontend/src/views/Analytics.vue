@@ -223,13 +223,13 @@ export default defineComponent({
         }];
       }
       if (periods.length) {
-        // Use unified chart configuration
+        // Use unified chart configuration with per-period stacking
         const { chartData } = getUnifiedPayslipChart(
           this.selectedFields,
           periods,
           this.formatLabel,
           this.fieldColors,
-          { aggregationType }
+          { aggregationType, perPeriodStacking: true }
         );
         return chartData;
       } else {
@@ -286,13 +286,13 @@ export default defineComponent({
         }];
       }
       if (periods.length) {
-        // Use unified chart configuration
+        // Use unified chart configuration with per-period stacking
         const { chartOptions } = getUnifiedPayslipChart(
           this.selectedFields,
           periods,
           this.formatLabel,
           this.fieldColors,
-          { aggregationType }
+          { aggregationType, perPeriodStacking: true }
         );
         return chartOptions;
       } else {

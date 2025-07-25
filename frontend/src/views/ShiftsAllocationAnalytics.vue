@@ -77,7 +77,7 @@ export default defineComponent({
     },
     chartData() {
       if (!this.schedules.length) return { labels: [], datasets: [] };
-      // Use unified chart configuration for consistent behavior
+      // Use unified chart configuration with per-period stacking
       const { chartData } = getUnifiedStackedBarChart(
         this.schedules,
         'employee_count',
@@ -91,14 +91,15 @@ export default defineComponent({
           fontSize: 14,
           fontFamily: 'IBM Plex Mono',
           borderColor: 'rgba(255, 255, 255, 0.1)',
-          borderWidth: 1
+          borderWidth: 1,
+          perPeriodStacking: true
         }
       );
       return chartData;
     },
     chartOptions() {
       if (!this.schedules.length) return {};
-      // Use unified chart configuration for consistent behavior
+      // Use unified chart configuration with per-period stacking
       const { chartOptions } = getUnifiedStackedBarChart(
         this.schedules,
         'employee_count',
@@ -112,7 +113,8 @@ export default defineComponent({
           fontSize: 14,
           fontFamily: 'IBM Plex Mono',
           borderColor: 'rgba(255, 255, 255, 0.1)',
-          borderWidth: 1
+          borderWidth: 1,
+          perPeriodStacking: true
         }
       );
       
