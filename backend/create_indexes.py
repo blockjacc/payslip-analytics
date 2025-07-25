@@ -114,6 +114,17 @@ def create_indexes():
             else:
                 print("⏭️  Index idx_ess_company_sched_status already exists")
             
+            # Index for payroll group queries
+            if not index_exists(cursor, 'idx_company_payroll_group', 'payroll_payslip'):
+                print("Creating index for payroll group queries...")
+                cursor.execute("""
+                    CREATE INDEX idx_company_payroll_group 
+                    ON payroll_payslip(company_id, payroll_group_id)
+                """)
+                print("✅ Created idx_company_payroll_group")
+            else:
+                print("⏭️  Index idx_company_payroll_group already exists")
+            
             mysql.connection.commit()
             cursor.close()
             
